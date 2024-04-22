@@ -28,6 +28,10 @@ export default function Register() {
         email: formState.email,
         password: formState.password
       });
+
+      if (error){
+        console.log(error);
+      }
       console.log('Registering with:', formState);
     };
 

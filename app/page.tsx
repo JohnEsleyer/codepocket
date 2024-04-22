@@ -2,15 +2,16 @@
 'use client'
 import Image from "next/image";
 import { useState } from "react";
+import supabase from "./utils/supabase";
 
 type FormState = {
-  username: string;
+  email: string;
   password: string;
 };
 
 
 export default function Home() {
-  const [formState, setFormState] = useState<FormState>({ username: '', password: '' });
+  const [formState, setFormState] = useState<FormState>({ email: '', password: '' });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -20,9 +21,17 @@ export default function Home() {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Here you can handle the login logic, e.g., sending the formState to a server
+    const {data, error} = await supabase.auth.signInWithPassword({
+      email: formState.email,
+      password: formState.password,
+    });
+    
+    if (!error){
+      console.log("success");
+    }
+
     console.log('Logging in with:', formState);
   };
 
@@ -31,8 +40,8 @@ export default function Home() {
       <h1>Login</h1>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
-          <input type="text" name="username" value={formState.username} onChange={handleInputChange} />
+          Email:
+          <input type="text" name="email" value={formState.email} onChange={handleInputChange} />
         </label>
         <br />
         <label>
