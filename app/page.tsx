@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 import supabase from "./utils/supabase";
+import { useRouter } from "next/navigation";
+
 
 type FormState = {
   email: string;
@@ -11,6 +13,9 @@ type FormState = {
 
 
 export default function Home() {
+
+  const router =  useRouter();
+
   const [formState, setFormState] = useState<FormState>({ email: '', password: '' });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +34,7 @@ export default function Home() {
     });
     
     if (!error){
+      router.push('/home');
       console.log("success");
     }
 
