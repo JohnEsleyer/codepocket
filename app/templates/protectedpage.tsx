@@ -10,24 +10,14 @@ interface Props {
 
 export default function ProtectedPage({ children }: Props) {
     const [session, setSession] = useState<Session | null>(null);
+    
     useEffect(() => {
-        
         async function supabaseExecution() {
-            // const { data: { user } } = await supabase.auth.getUser(supabaseToken!);
-            // if (user) {
-            //     setIsLoggedIn(true);
- 
-            // } else {
-            //     setIsLoggedIn(false);
-            // }
-
             supabase.auth.getSession().then(({ data: { session } }) => {
                 setSession(session)
               })
         }
         supabaseExecution();
-        
-
     }, []);
 
     if (session) {
@@ -39,7 +29,7 @@ export default function ProtectedPage({ children }: Props) {
     } else {
         return (
             <div>
-                Error
+                Unauthorized Access
             </div>
         );
     }

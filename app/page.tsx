@@ -52,7 +52,7 @@ export default function Home() {
         <br />
         <label>
           Password:
-          <input type="password" name="password" value={formState.password} onChange={handleInputChange} />
+          <input className="text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
         </label>
         <br />
         <button type="submit">Login</button>
