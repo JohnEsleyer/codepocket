@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
-
-import MarkdownPreview from '@uiw/react-markdown-preview';
+import CodeBlock from "./codeblock";
 
 
 interface Collection {
@@ -51,6 +50,8 @@ export default function Home() {
     }, []);
     
  
+    
+
     return (
         <ProtectedPage>
             <div className="bg-gray-200 text-black h-screen flex font-sans">
@@ -91,13 +92,13 @@ export default function Home() {
                         <p className="text-2xl font-bold">Collection name</p>
                         <div className=" flex flex-wrap">
                         {snippets.map((value, index) => (
-                            <div className="m-2 w-80 h-80 p-4">
+                            <div className="m-2 h-80 ">
                                 <p className="text-2xl">{value.title}</p>
-                                <MarkdownPreview 
-                                    style={{padding:2}}
-                                    source={value.code}
-                                />
-                               
+                                <p className="">{value.description}</p>
+                                <div className="h-60 overflow-x-hidden rounded-2xl ">
+                                <CodeBlock code={value.code}/>
+                                </div>
+                                
                             </div>
                         ))}
                         </div>

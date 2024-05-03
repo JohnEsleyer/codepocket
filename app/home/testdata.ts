@@ -91,122 +91,305 @@ export const testSnippets = [
     {
         id: 1,
         title: "Snippet 1",
-        code: "print('Hello world')print('Hello world')print('Hello world')print('Hello world')print('Hello world')print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 2,
         title: "Snippet 2",
-        code: `### Hello`,
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code:`\`\`\`js
-        function () {
-          console.log('hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello')
-        }
-        \`\`\``,
+        code:`import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     }, {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     }
     , {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     }
     , {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Collection 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Collection 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Collection 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Collection 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     },
     {
         id: 3,
         title: "Collection 3",
-        code: "print('Hello world')",
+        code: `import random
+import string
+
+def generate_password(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+# Generate a random password of length 12
+password = generate_password(12)
+print(password)
+`,
         language: "Python",
         description: "Description"
     }
