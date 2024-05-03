@@ -17,6 +17,7 @@ interface Collection {
 interface Snippet {
     id: number;
     title: string;
+    collection_id: number;
     code: string;
     language: string;
     description: string;
@@ -95,6 +96,7 @@ export default function Home() {
         setSnippets([...snippets, {
             id: snippets.length + 1,
             title: "Snippet " + snippets.length + 1,
+            collection_id: 1,
             code: ``,
             language: "Python",
             description: "Description"
@@ -171,6 +173,7 @@ export default function Home() {
                         {/* // Collections */}
                         {collections.map((value, index) => (
                             <button 
+                            key={index}
                             className="flex justify-start"
                             onClick={() => {
                                 setActiveCollection(value);
@@ -229,38 +232,49 @@ export default function Home() {
 
                     <div className="flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
                         {snippets.map((value, index) => (
-                            <div className="m-2 h-80 fade-in visible">
-                                <form className="flex flex-col">
-                                    <input 
-                                        className="text-2xl bg-gray-200"
-                                        name="title"
-                                        type="text"
-                                        disabled={false}
-                                        value={value.title}
-                                        onChange={(event) => {
-                                            setSnippets((prevItems) =>
-                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value} : item))
-                                              );
-                                        }}
-                                    />
-                                    <input
-                                        className="bg-gray-200"
-                                        name="description"
-                                        type="text"
-                                        value={value.description}
-                                        onChange={(event) => {
-                                            setSnippets((prevItems) =>
-                                                prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value} : item))
-                                              );
-                                        }}
-                                    />
-                                </form>
-                              
-                                <div className="h-60 overflow-x-hidden rounded-2xl ">
-                                    <CodeBlock code={value.code} />
-                                </div>
-
+                            <div>
+                                {
+                                    value.collection_id == activeCollection?.id &&
+                                     <div key={index} className="m-2 h-80 fade-in visible">
+                                     <form className="flex flex-col">
+                                         <input 
+                                             className="text-2xl bg-gray-200"
+                                             name="title"
+                                             type="text"
+                                             disabled={false}
+                                             value={value.title}
+                                             onChange={(event) => {
+                                                 setSnippets((prevItems) =>
+                                                     prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value} : item))
+                                                   );
+                                             }}
+                                         />
+                                         <input
+                                             className="bg-gray-200"
+                                             name="description"
+                                             type="text"
+                                             value={value.description}
+                                             onChange={(event) => {
+                                                 setSnippets((prevItems) =>
+                                                     prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value} : item))
+                                                   );
+                                             }}
+                                         />
+                                     </form>
+                                   
+                                     <div className="h-60 overflow-x-hidden rounded-2xl ">
+                                         <CodeBlock codeValue={value.code} onCodeChange={(codeValue) => {
+                                             console.log(codeValue);
+                                              setSnippets((prevItems) =>
+                                                 prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue} : item))
+                                               );
+                                         }}/>
+                                     </div>
+     
+                                 </div>
+                                }
                             </div>
+                           
                         ))}
                     </div>
                 </div>

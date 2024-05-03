@@ -17,71 +17,71 @@ export const testCollections = [
         description: "Description"
     },
     {
-        id: 3,
+        id: 4,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 5,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 6,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 7,
         title: "Collection 3",
         description: "Description"
     }, {
-        id: 3,
+        id: 8,
         title: "Collection 3",
         description: "Description"
     }
     , {
-        id: 3,
+        id: 9,
         title: "Collection 3",
         description: "Description"
     }
     , {
-        id: 3,
+        id: 10,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 11,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 12,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 13,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 14,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 15,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 16,
         title: "Collection 3",
         description: "Description"
     },
     {
-        id: 3,
+        id: 17,
         title: "Collection 3",
         description: "Description"
     }
@@ -91,6 +91,7 @@ export const testSnippets = [
     {
         id: 1,
         title: "Snippet 1",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -109,6 +110,7 @@ print(password)
     {
         id: 2,
         title: "Snippet 2",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -127,6 +129,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code:`import random
 import string
 
@@ -145,6 +148,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 2,
         code: `import random
 import string
 
@@ -163,6 +167,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 2,
         code: `import random
 import string
 
@@ -181,6 +186,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -199,6 +205,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 3,
         code: `import random
 import string
 
@@ -216,6 +223,7 @@ print(password)
     }, {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -234,6 +242,7 @@ print(password)
     , {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -252,6 +261,7 @@ print(password)
     , {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -270,6 +280,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -288,6 +299,7 @@ print(password)
     {
         id: 3,
         title: "Snippet 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -306,6 +318,7 @@ print(password)
     {
         id: 3,
         title: "Collection 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -324,6 +337,7 @@ print(password)
     {
         id: 3,
         title: "Collection 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -342,6 +356,7 @@ print(password)
     {
         id: 3,
         title: "Collection 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -360,6 +375,7 @@ print(password)
     {
         id: 3,
         title: "Collection 3",
+        collection_id: 1,
         code: `import random
 import string
 
@@ -378,6 +394,7 @@ print(password)
     {
         id: 3,
         title: "Collection 3",
+        collection_id: 1,
         code: `import random
 import string
 

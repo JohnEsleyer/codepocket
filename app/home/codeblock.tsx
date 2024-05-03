@@ -43,16 +43,20 @@ import "ace-builds/src-noconflict/ext-language_tools";
 // SyntaxHighlighter.registerLanguage('javascript', js);
 
 interface Props {
-    code: string; 
+    codeValue: string; 
+    onCodeChange: (value: string, event?: any) => void;
 }
 
-const CodeBlock: React.FC<Props> = ({code}) => {
+const CodeBlock: React.FC<Props> = ({codeValue, onCodeChange}) => {
   return (
     <AceEditor
       className=""
       height="240px"
+      onChange={(value, event) => {
+        onCodeChange(value, event);
+      }}
       readOnly={false}
-      value={code}
+      value={codeValue}
       mode="python"
       theme="github_dark"
       fontSize="18px"
