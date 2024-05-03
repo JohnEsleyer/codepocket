@@ -150,16 +150,16 @@ print(password)
         title: "Snippet 3",
         collection_id: 2,
         code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
+        import string
+        
+        def generate_password(length):
+            characters = string.ascii_letters + string.digits + string.punctuation
+            password = ''.join(random.choice(characters) for i in range(length))
+            return password
+        
+        # Generate a random password of length 12
+        password = generate_password(12)
+        print(password)
 `,
         language: "Python",
         description: "Description"
@@ -315,100 +315,6 @@ print(password)
         language: "Python",
         description: "Description"
     },
-    {
-        id: 3,
-        title: "Collection 3",
-        collection_id: 1,
-        code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
-`,
-        language: "Python",
-        description: "Description"
-    },
-    {
-        id: 3,
-        title: "Collection 3",
-        collection_id: 1,
-        code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
-`,
-        language: "Python",
-        description: "Description"
-    },
-    {
-        id: 3,
-        title: "Collection 3",
-        collection_id: 1,
-        code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
-`,
-        language: "Python",
-        description: "Description"
-    },
-    {
-        id: 3,
-        title: "Collection 3",
-        collection_id: 1,
-        code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
-`,
-        language: "Python",
-        description: "Description"
-    },
-    {
-        id: 3,
-        title: "Collection 3",
-        collection_id: 1,
-        code: `import random
-import string
-
-def generate_password(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
-    password = ''.join(random.choice(characters) for i in range(length))
-    return password
-
-# Generate a random password of length 12
-password = generate_password(12)
-print(password)
-`,
-        language: "Python",
-        description: "Description"
-    }
+  
 ];
 

@@ -6,6 +6,7 @@ import { testCollections, testSnippets } from "./testdata";
 import CodeBlock from "./codeblock";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 interface Collection {
     id: number;
@@ -68,31 +69,31 @@ export default function Home() {
     }, []);
 
     const scrollToBottom = () => {
-        if (scrollableDiv.current){
+        if (scrollableDiv.current) {
             scrollableDiv.current.scrollTop = scrollableDiv.current.scrollHeight;
         }
     }
 
     const handleAddCollection = async () => {
         setLoadingAddCollection(true);
-    
-        
+
+
         setCollections([...collections, {
             id: collections.length + 1,
             title: "Collection " + collections.length + 1,
             description: "Description"
         }]);
 
-  
+
         setTimeout(() => {
             setLoadingAddCollection(false);
         }, 1000);
     };
 
     const handleAddSnippet = async () => {
-        
+
         setLoadingAddSnippet(true);
-        
+
         setSnippets([...snippets, {
             id: snippets.length + 1,
             title: "Snippet " + snippets.length + 1,
@@ -102,12 +103,12 @@ export default function Home() {
             description: "Description"
         }]);
 
-  
+
         setTimeout(() => {
             setLoadingAddSnippet(false);
             scrollToBottom();
         }, 1000);
-        
+
     };
 
 
@@ -145,9 +146,9 @@ export default function Home() {
                                 </p>
                             </button>
                             {/* // Add a collection Button */}
-                            <button 
-                            className="flex-initial pl-2 hover:bg-gray-400" 
-                            onClick={handleAddCollection}
+                            <button
+                                className="flex-initial pl-2 hover:bg-gray-400"
+                                onClick={handleAddCollection}
                             >
                                 <span className="flex items-center">
                                     <span className="material-symbols-outlined">
@@ -155,7 +156,7 @@ export default function Home() {
                                     </span>
                                     Add a collection
                                     {loadingAddCollection && <span className="pl-2">
-                                        <Image 
+                                        <Image
                                             src={Loading}
                                             alt={''}
                                             width={30}
@@ -172,12 +173,12 @@ export default function Home() {
                         {/* <p className="flex-initial">Collections</p> */}
                         {/* // Collections */}
                         {collections.map((value, index) => (
-                            <button 
-                            key={index}
-                            className="flex justify-start"
-                            onClick={() => {
-                                setActiveCollection(value);
-                            }}
+                            <button
+                                key={index}
+                                className="flex justify-start"
+                                onClick={() => {
+                                    setActiveCollection(value);
+                                }}
                             >
                                 <div className="w-full flex text-xl pl-2 hover:bg-gray-800 hover:text-white hover:rounded">
                                     <p>{value.title}</p>
@@ -190,91 +191,102 @@ export default function Home() {
                     </div>
                     {/* // End of collections */}
                 </div>
-                {/* // Code Snippets Section */}
-                <div className="flex-1 flex flex-col">
+                {/* // Left Section */}
+                <div className="flex-1 flex flex-col bg-gray-200 ">
                     <div className="p-2 shadow">
                         <p className="text-2xl font-bold flex"><span>{activeCollection?.title}</span>{loadingAddSnippet && <span className="pl-2">
-                                        <Image 
-                                            src={Loading}
-                                            alt={''}
-                                            width={30}
-                                            height={30}
-                                        />
-                                    </span>} </p> 
+                            <Image
+                                src={Loading}
+                                alt={''}
+                                width={30}
+                                height={30}
+                            />
+                        </span>} </p>
                         {/* // New code snippet */}
                         <div className="flex space-x-4">
-                        <button 
-                            className="hover:bg-gray-400 rounded"
-                            onClick={handleAddSnippet}
+                            <button
+                                className="hover:bg-gray-400 rounded"
+                                onClick={handleAddSnippet}
                             >
-                            <div className="flex w-44 flex items-center">
+                                <div className="flex w-44 flex items-center">
 
-                                <span className="text-2xl material-symbols-outlined">
-                                    add
-                                </span>
-                                <span className="flex items-center ">New code snippet </span>
+                                    <span className="text-2xl material-symbols-outlined">
+                                        add
+                                    </span>
+                                    <span className="flex items-center ">New code snippet </span>
 
-                            </div>
-                        </button>
-                        {/* // Share collection */}
-                        <button className="hover:bg-gray-400 rounded ">
-                            <div className="flex w-20 flex items-center">
+                                </div>
+                            </button>
+                            {/* // Share collection */}
+                            <button className="hover:bg-gray-400 rounded ">
+                                <div className="flex w-20 flex items-center">
 
-                                <span className="text-2xl material-symbols-outlined">
-                                    share
-                                </span>
-                                <span className="flex items-center">Share</span>
+                                    <span className="text-2xl material-symbols-outlined">
+                                        share
+                                    </span>
+                                    <span className="flex items-center">Share</span>
 
-                            </div>
-                        </button>
+                                </div>
+                            </button>
                         </div>
                     </div>
 
+                    {/* // Snippets Section */}
                     <div className="flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
                         {snippets.map((value, index) => (
-                            <div>
+                            <div className="">
                                 {
                                     value.collection_id == activeCollection?.id &&
-                                     <div key={index} className="m-2 h-80 fade-in visible">
-                                     <form className="flex flex-col">
-                                         <input 
-                                             className="text-2xl bg-gray-200"
-                                             name="title"
-                                             type="text"
-                                             disabled={false}
-                                             value={value.title}
-                                             onChange={(event) => {
-                                                 setSnippets((prevItems) =>
-                                                     prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value} : item))
-                                                   );
-                                             }}
-                                         />
-                                         <input
-                                             className="bg-gray-200"
-                                             name="description"
-                                             type="text"
-                                             value={value.description}
-                                             onChange={(event) => {
-                                                 setSnippets((prevItems) =>
-                                                     prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value} : item))
-                                                   );
-                                             }}
-                                         />
-                                     </form>
-                                   
-                                     <div className="h-60 overflow-x-hidden rounded-2xl ">
-                                         <CodeBlock codeValue={value.code} onCodeChange={(codeValue) => {
-                                             console.log(codeValue);
-                                              setSnippets((prevItems) =>
-                                                 prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue} : item))
-                                               );
-                                         }}/>
-                                     </div>
-     
-                                 </div>
+                                    <div key={index} className="m-2 h-80">
+                                        <form className="flex flex-col">
+                                            <input
+                                                className="text-2xl bg-gray-200"
+                                                name="title"
+                                                type="text"
+                                                disabled={false}
+                                                value={value.title}
+                                                onChange={(event) => {
+                                                    setSnippets((prevItems) =>
+                                                        prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+                                                    );
+                                                }}
+                                            />
+                                            <input
+                                                className="bg-gray-200"
+                                                name="description"
+                                                type="text"
+                                                value={value.description}
+                                                onChange={(event) => {
+                                                    setSnippets((prevItems) =>
+                                                        prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
+                                                    );
+                                                }}
+                                            />
+                                        </form>
+                                        <div className="flex justify-end">
+                                        <CopyToClipboard text={value.code} onCopy={() => { }}>
+                                            <button className="hover:bg-gray-300 rounded flex items-center">
+                                                <span className="text-xl material-symbols-outlined">
+                                                    content_copy
+                                                </span>
+                                                <span>Copy</span>
+                                            </button>
+                                        </CopyToClipboard>
+                                        </div>
+                                        
+                                        <div className="h-60 overflow-x-hidden rounded-2xl ">
+                                            <CodeBlock codeValue={value.code} onCodeChange={(codeValue) => {
+                                                console.log(codeValue);
+                                                setSnippets((prevItems) =>
+                                                    prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))
+                                                );
+                                            }} />
+                                        </div>
+
+                                    </div>
                                 }
                             </div>
-                           
+
                         ))}
                     </div>
                 </div>
