@@ -15,7 +15,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ buttonText, children }) => 
 
   return (
     <div className="dropdown" style={{ position: 'relative', display: 'inline-block' }}>
-      <button className="dropdown-toggle " onClick={toggleDropdown}>
+      <button className="dropdown-toggle flex items-center" onClick={toggleDropdown}>
+      <span className="text-2xl material-symbols-outlined">expand_more</span>
         {buttonText}
       </button>
       {isOpen && (

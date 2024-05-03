@@ -104,7 +104,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -123,14 +123,14 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
         id: 3,
         title: "Snippet 3",
         collection_id: 1,
-        code:`import random
+        code: `import random
 import string
 
 def generate_password(length):
@@ -142,7 +142,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -161,7 +161,7 @@ print(password)
         password = generate_password(12)
         print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -180,7 +180,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -199,7 +199,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -218,7 +218,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     }, {
         id: 3,
@@ -236,7 +236,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     }
     , {
@@ -255,7 +255,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     }
     , {
@@ -274,7 +274,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -293,7 +293,7 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
     {
@@ -312,9 +312,9 @@ def generate_password(length):
 password = generate_password(12)
 print(password)
 `,
-        language: "Python",
+        language: "python",
         description: "Description"
     },
-  
+
 ];
 

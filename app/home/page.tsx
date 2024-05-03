@@ -5,6 +5,7 @@ import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
 import CodeBlock from "./codeblock";
 import Loading from "/public/loading.svg";
+import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DropdownMenu from "./dropdownmenu";
@@ -36,6 +37,8 @@ export default function Home() {
     const [snippets, setSnippets] = useState<Snippet[]>(testSnippets);
     const [orientation, setOrientation] = useState<string>('');
     const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
+    const [isFullScreen, setIsFullscreen] = useState(false);
+    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet | null>(null);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -118,6 +121,32 @@ export default function Home() {
     };
 
 
+    if (isFullScreen) {
+        return (
+            <ProtectedPage>
+                <div >
+                <div className="p-2">
+                <IconButton icon="close_fullscreen" text="Close full screen" isDark={true} onClick={() => {
+                                                setIsFullscreen(false);
+                                                
+                                            }} />
+                </div>
+                    <CodeBlock
+                        full={true}
+                        codeValue={fullScreenSnippet?.code == null ? '' : fullScreenSnippet.code}
+                        language={fullScreenSnippet?.language == null ? '' : fullScreenSnippet.language}
+                        onCodeChange={(codeValue) => {
+                        
+                            setSnippets((prevItems) =>
+                                prevItems.map((item) => (item.id === fullScreenSnippet?.id ? { ...item, code: codeValue } : item))
+                            );
+                        }} />
+                </div>
+            </ProtectedPage>
+        );
+    }
+
+
     return (
         <ProtectedPage>
             <div className="bg-gray-200 text-black h-screen flex font-sans">
@@ -143,7 +172,6 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col overflow-y-auto pl-2">
-                        {/* <p className="flex-initial">Collections</p> */}
                         {/* // Collections */}
                         {collections.map((value, index) => (
                             <button
@@ -169,19 +197,19 @@ export default function Home() {
                     <div className="p-2 border-b border-black bg-neutral-900  text-white ">
                         <p className="text-2xl font-bold flex"><span>{activeCollection?.title}</span>{loadingAddSnippet && <span className="pl-2">
                             <Image
-                                src={Loading}
+                                src={WhiteLoading}
                                 alt={''}
                                 width={30}
                                 height={30}
-                                
+
                             />
                         </span>} </p>
-                        
+
                         <div className="flex space-x-4">
                             {/* // New code snippet */}
-                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true}/>
+                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
                             {/* // Share collection */}
-                            <IconButton icon="share" text="Share" isDark={true}/>
+                            <IconButton icon="share" text="Share" isDark={true} />
                         </div>
                     </div>
 
@@ -220,7 +248,6 @@ export default function Home() {
                                             />
                                         </form>
                                         <div className="flex justify-end items-center space-x-2">
-
                                             <DropdownMenu buttonText={value.language} >
 
                                                 <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
@@ -233,7 +260,10 @@ export default function Home() {
                                                     ))}
                                                 </div>
                                             </DropdownMenu>
-
+                                            <IconButton icon="open_in_full" text="Full screen" onClick={() => {
+                                                setIsFullscreen(true);
+                                                setFullScreenSnippet(value);
+                                            }} />
                                             <CopyToClipboard text={value.code} onCopy={() => { }}>
                                                 <IconButton icon="content_copy" text="Copy" />
                                             </CopyToClipboard>
@@ -241,7 +271,7 @@ export default function Home() {
 
 
                                         <div className="h-60 overflow-x-hidden rounded-2xl ">
-                                            <CodeBlock codeValue={value.code} onCodeChange={(codeValue) => {
+                                            <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
                                                 console.log(codeValue);
                                                 setSnippets((prevItems) =>
                                                     prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))

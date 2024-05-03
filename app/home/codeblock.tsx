@@ -39,23 +39,45 @@ import "ace-builds/src-noconflict/mode-zig";
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
 import "ace-builds/src-noconflict/ext-language_tools";
+import { useEffect, useState } from "react";
 
 interface Props {
     codeValue: string;
+    language: string;
+    full?: boolean;
     onCodeChange: (value: string, event?: any) => void;
 }
 
-const CodeBlock: React.FC<Props> = ({ codeValue, onCodeChange }) => {
+const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) => {
+    const [maxScreenHeight, setMaxScreenHeight] = useState<number | null>(null);
+    const [maxScreenWidth, setMaxScreenWidth] = useState<number | null>(null);
+
+    useEffect(() => {
+      const updateMaxScreen = () => {
+        setMaxScreenHeight(window.innerHeight);
+        setMaxScreenWidth(window.innerWidth);
+      };
+  
+      updateMaxScreen();
+  
+      window.addEventListener('resize', updateMaxScreen);
+  
+      return () => {
+        window.removeEventListener('resize', updateMaxScreen);
+      };
+    }, []);
+    
     return (
         <AceEditor
             //   className="bg-slate-50"
-            height="240px"
+            height={full ? maxScreenHeight!-50 + "px" : "240px"}
+            width={full ? maxScreenWidth + "px" : "480px"}
             onChange={(value, event) => {
                 onCodeChange(value, event);
             }}
             readOnly={false}
             value={codeValue}
-            mode="python"
+            mode={language}
             theme="tomorrow_night"
             fontSize="18px"
             highlightActiveLine={false}
