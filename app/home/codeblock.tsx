@@ -36,39 +36,37 @@ import "ace-builds/src-noconflict/mode-sql";
 import "ace-builds/src-noconflict/mode-xml";
 import "ace-builds/src-noconflict/mode-zig";
 
+import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
-import "ace-builds/src-noconflict/theme-github_dark";
 import "ace-builds/src-noconflict/ext-language_tools";
 
-// SyntaxHighlighter.registerLanguage('javascript', js);
-
 interface Props {
-    codeValue: string; 
+    codeValue: string;
     onCodeChange: (value: string, event?: any) => void;
 }
 
-const CodeBlock: React.FC<Props> = ({codeValue, onCodeChange}) => {
-  return (
-    <AceEditor
-      className=""
-      height="240px"
-      onChange={(value, event) => {
-        onCodeChange(value, event);
-      }}
-      readOnly={false}
-      value={codeValue}
-      mode="python"
-      theme="github_dark"
-      fontSize="18px"
-      highlightActiveLine={false}
-      setOptions={{
-        enableLiveAutocompletion: false,
-        showLineNumbers: true,
-        tabSize: 2,
-        scrollPastEnd: false,
-      }}
-    />
-  );
+const CodeBlock: React.FC<Props> = ({ codeValue, onCodeChange }) => {
+    return (
+        <AceEditor
+            //   className="bg-slate-50"
+            height="240px"
+            onChange={(value, event) => {
+                onCodeChange(value, event);
+            }}
+            readOnly={false}
+            value={codeValue}
+            mode="python"
+            theme="tomorrow_night"
+            fontSize="18px"
+            highlightActiveLine={false}
+            setOptions={{
+                enableLiveAutocompletion: false,
+                showLineNumbers: true,
+                tabSize: 2,
+                scrollPastEnd: false,
+            }}
+        />
+    );
 };
 
 export default CodeBlock;

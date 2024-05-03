@@ -1,12 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
 import CodeBlock from "./codeblock";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import DropdownMenu from "./dropdownmenu";
+import { languages } from "./constants";
+import SidebarButton from "./sidebarbutton";
+import IconButton from "../components/iconbutton";
 
 interface Collection {
     id: number;
@@ -36,6 +40,8 @@ export default function Home() {
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
+
+
 
 
     useEffect(() => {
@@ -112,59 +118,26 @@ export default function Home() {
     };
 
 
-
-
     return (
         <ProtectedPage>
             <div className="bg-gray-200 text-black h-screen flex font-sans">
-                <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col`}>
+                <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
                     <div className="shadow">
                         <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
                         <div className="pt-4 pb-2 flex flex-col">
                             {/* // Search */}
-                            <button className="p-1 hover:bg-gray-400">
-                                <p className="flex items-center pl-2 ">
-                                    <span className="material-symbols-outlined">
-                                        search
-                                    </span>Search
-                                </p>
-                            </button>
+                            <SidebarButton icon="search" text="Search" />
                             {/* // Settings */}
-                            <button className="p-1 hover:bg-gray-400">
-                                <p className="flex items-center pl-2 ">
-                                    <span className="material-symbols-outlined">
-                                        settings
-                                    </span>Settings
-                                </p>
-                            </button>
+                            <SidebarButton icon="settings" text="Settings" />
                             {/* // Signout */}
-                            <button className="p-1 hover:bg-gray-400">
-                                <p className="flex items-center pl-2">
-                                    <span className="material-symbols-outlined">
-                                        logout
-                                    </span>Sign out
-                                </p>
-                            </button>
+                            <SidebarButton icon="logout" text="Sign out" />
                             {/* // Add a collection Button */}
-                            <button
-                                className="flex-initial pl-2 hover:bg-gray-400"
+                            <SidebarButton
+                                icon="add"
+                                text="Add a collection"
                                 onClick={handleAddCollection}
-                            >
-                                <span className="flex items-center">
-                                    <span className="material-symbols-outlined">
-                                        add
-                                    </span>
-                                    Add a collection
-                                    {loadingAddCollection && <span className="pl-2">
-                                        <Image
-                                            src={Loading}
-                                            alt={''}
-                                            width={30}
-                                            height={30}
-                                        />
-                                    </span>}
-                                </span>
-                            </button>
+                                loading={loadingAddCollection}
+                            />
                         </div>
 
                     </div>
@@ -180,7 +153,7 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className="w-full flex text-xl pl-2 hover:bg-gray-800 hover:text-white hover:rounded">
+                                <div className="w-full flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded">
                                     <p>{value.title}</p>
                                 </div>
                             </button>
@@ -192,53 +165,35 @@ export default function Home() {
                     {/* // End of collections */}
                 </div>
                 {/* // Left Section */}
-                <div className="flex-1 flex flex-col bg-gray-200 ">
-                    <div className="p-2 shadow">
+                <div className="flex-1 flex flex-col">
+                    <div className="p-2 border-b border-black bg-neutral-900  text-white ">
                         <p className="text-2xl font-bold flex"><span>{activeCollection?.title}</span>{loadingAddSnippet && <span className="pl-2">
                             <Image
                                 src={Loading}
                                 alt={''}
                                 width={30}
                                 height={30}
+                                
                             />
                         </span>} </p>
-                        {/* // New code snippet */}
+                        
                         <div className="flex space-x-4">
-                            <button
-                                className="hover:bg-gray-400 rounded"
-                                onClick={handleAddSnippet}
-                            >
-                                <div className="flex w-44 flex items-center">
-
-                                    <span className="text-2xl material-symbols-outlined">
-                                        add
-                                    </span>
-                                    <span className="flex items-center ">New code snippet </span>
-
-                                </div>
-                            </button>
+                            {/* // New code snippet */}
+                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true}/>
                             {/* // Share collection */}
-                            <button className="hover:bg-gray-400 rounded ">
-                                <div className="flex w-20 flex items-center">
-
-                                    <span className="text-2xl material-symbols-outlined">
-                                        share
-                                    </span>
-                                    <span className="flex items-center">Share</span>
-
-                                </div>
-                            </button>
+                            <IconButton icon="share" text="Share" isDark={true}/>
                         </div>
                     </div>
 
                     {/* // Snippets Section */}
-                    <div className="flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
+                    <div className=" flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <div className="">
                                 {
                                     value.collection_id == activeCollection?.id &&
                                     <div key={index} className="m-2 h-80">
                                         <form className="flex flex-col">
+                                            {/* // Snippet's Title */}
                                             <input
                                                 className="text-2xl bg-gray-200"
                                                 name="title"
@@ -251,6 +206,7 @@ export default function Home() {
                                                     );
                                                 }}
                                             />
+                                            {/* // Snippet's Description */}
                                             <input
                                                 className="bg-gray-200"
                                                 name="description"
@@ -263,17 +219,27 @@ export default function Home() {
                                                 }}
                                             />
                                         </form>
-                                        <div className="flex justify-end">
-                                        <CopyToClipboard text={value.code} onCopy={() => { }}>
-                                            <button className="hover:bg-gray-300 rounded flex items-center">
-                                                <span className="text-xl material-symbols-outlined">
-                                                    content_copy
-                                                </span>
-                                                <span>Copy</span>
-                                            </button>
-                                        </CopyToClipboard>
+                                        <div className="flex justify-end items-center space-x-2">
+
+                                            <DropdownMenu buttonText={value.language} >
+
+                                                <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                                    {languages.map((lang, index) => (
+                                                        <button onClick={() => {
+                                                            setSnippets((prevItems) =>
+                                                                prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
+                                                            );
+                                                        }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                                    ))}
+                                                </div>
+                                            </DropdownMenu>
+
+                                            <CopyToClipboard text={value.code} onCopy={() => { }}>
+                                                <IconButton icon="content_copy" text="Copy" />
+                                            </CopyToClipboard>
                                         </div>
-                                        
+
+
                                         <div className="h-60 overflow-x-hidden rounded-2xl ">
                                             <CodeBlock codeValue={value.code} onCodeChange={(codeValue) => {
                                                 console.log(codeValue);
