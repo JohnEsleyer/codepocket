@@ -109,6 +109,8 @@ export default function Home() {
     };
 
 
+
+
     return (
         <ProtectedPage>
             <div className="bg-gray-200 text-black h-screen flex font-sans">
@@ -228,8 +230,32 @@ export default function Home() {
                     <div className="flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <div className="m-2 h-80 fade-in visible">
-                                <p className="text-2xl">{value.title}</p>
-                                <p className="">{value.description}</p>
+                                <form className="flex flex-col">
+                                    <input 
+                                        className="text-2xl bg-gray-200"
+                                        name="title"
+                                        type="text"
+                                        disabled={false}
+                                        value={value.title}
+                                        onChange={(event) => {
+                                            setSnippets((prevItems) =>
+                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value} : item))
+                                              );
+                                        }}
+                                    />
+                                    <input
+                                        className="bg-gray-200"
+                                        name="description"
+                                        type="text"
+                                        value={value.description}
+                                        onChange={(event) => {
+                                            setSnippets((prevItems) =>
+                                                prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value} : item))
+                                              );
+                                        }}
+                                    />
+                                </form>
+                              
                                 <div className="h-60 overflow-x-hidden rounded-2xl ">
                                     <CodeBlock code={value.code} />
                                 </div>
