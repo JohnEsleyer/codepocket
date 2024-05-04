@@ -74,7 +74,7 @@ export default function Home() {
             }
 
             console.log(window.innerWidth);
-            if (window.innerWidth < 850) {
+            if (window.innerWidth < 890) {
                 console.log("single");
                 setSingleColumn(true)
             } else {
@@ -148,13 +148,15 @@ export default function Home() {
     };
 
     const handleSignOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        router.replace('/');
+        setShowOverlayMenuPage(true);
+        setCurrentOverlayMenuPage("signout");
+        // const { error } = await supabase.auth.signOut();
+        // router.replace('/');
 
     };
 
     const displayCurrentOverlayMenuPage = () => {
-        switch (currentOverlayMenuPage){
+        switch (currentOverlayMenuPage) {
             case "search":
                 return (
                     <OverlayMenuPage title="Search" onClose={() => {
@@ -165,9 +167,9 @@ export default function Home() {
                             className="text-2xl bg-gray-300 border border-black rounded w-full text-2xl"
                             name="search"
                             type="text"
-        
+
                             onChange={(event) => {
-        
+
                             }}
                         />
                     </OverlayMenuPage>);
@@ -178,8 +180,22 @@ export default function Home() {
                     }}>
                         <p>Settings</p>
                     </OverlayMenuPage>);
+            case "signout":
+                return (
+                    <OverlayMenuPage title="Sign Out" dialogMode={true} onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <p>Are you sure, you want to sign out?</p>
+                        <button 
+                            className="bg-black text-white p-2 border rounded"
+                            onClick={ async () => {
+                                const { error } = await supabase.auth.signOut();
+                                router.replace('/');
+                            }}
+                        >Continue</button>
+                    </OverlayMenuPage>);
         }
-        
+
     }
 
 
@@ -265,8 +281,8 @@ export default function Home() {
                                 }}
                             />
                             {/* // Settings */}
-                            <SidebarButton 
-                                icon="settings" 
+                            <SidebarButton
+                                icon="settings"
                                 text="Settings"
                                 onClick={() => {
                                     setShowOverlayMenuPage(true);
