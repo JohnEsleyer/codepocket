@@ -12,6 +12,8 @@ import DropdownMenu from "./dropdownmenu";
 import { languages } from "./constants";
 import SidebarButton from "./sidebarbutton";
 import IconButton from "../components/iconbutton";
+import supabase from "../utils/supabase";
+import { useRouter } from "next/navigation";
 
 interface Collection {
     id: number;
@@ -30,6 +32,7 @@ interface Snippet {
 }
 
 export default function Home() {
+    const router = useRouter();
 
     const scrollableDiv = useRef<HTMLDivElement>(null);
 
@@ -141,6 +144,11 @@ export default function Home() {
 
     };
 
+    const handleSignOut = async () => {
+        const {error} = await supabase.auth.signOut();
+        router.replace('/');
+
+    };
 
     if (isFullScreen) {
         return (
@@ -211,7 +219,11 @@ export default function Home() {
                             {/* // Settings */}
                             <SidebarButton icon="settings" text="Settings" />
                             {/* // Signout */}
-                            <SidebarButton icon="logout" text="Sign out" />
+                            <SidebarButton 
+                                icon="logout" 
+                                text="Sign out" 
+                                onClick={handleSignOut}
+                            />
                             {/* // Add a collection Button */}
                             <SidebarButton
                                 icon="add"
