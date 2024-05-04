@@ -106,7 +106,7 @@ export default function Home() {
         setSnippets([...snippets, {
             id: snippets.length + 1,
             title: "Snippet " + snippets.length + 1,
-            collection_id: 1,
+            collection_id: activeCollection?.id as number,
             code: ``,
             language: "Python",
             description: "Description"
@@ -125,18 +125,18 @@ export default function Home() {
         return (
             <ProtectedPage>
                 <div >
-                <div className="p-2">
-                <IconButton icon="close_fullscreen" text="Close full screen" isDark={true} onClick={() => {
-                                                setIsFullscreen(false);
-                                                
-                                            }} />
-                </div>
+                    <div className="p-2">
+                        <IconButton icon="close_fullscreen" text="Close full screen" isDark={true} onClick={() => {
+                            setIsFullscreen(false);
+
+                        }} />
+                    </div>
                     <CodeBlock
                         full={true}
                         codeValue={fullScreenSnippet?.code == null ? '' : fullScreenSnippet.code}
                         language={fullScreenSnippet?.language == null ? '' : fullScreenSnippet.language}
                         onCodeChange={(codeValue) => {
-                        
+
                             setSnippets((prevItems) =>
                                 prevItems.map((item) => (item.id === fullScreenSnippet?.id ? { ...item, code: codeValue } : item))
                             );
@@ -214,75 +214,83 @@ export default function Home() {
                     </div>
 
                     {/* // Snippets Section */}
-                    <div className=" flex-1 flex flex-wrap overflow-y-auto" ref={scrollableDiv}>
+                    <div className={`flex-1 grid ${orientation == "Portrait" ? 'grid-cols-1' : 'grid-cols-2'} overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
-                            <div className="">
-                                {
-                                    value.collection_id == activeCollection?.id &&
-                                    <div key={index} className="m-2 h-80">
-                                        <form className="flex flex-col">
-                                            {/* // Snippet's Title */}
-                                            <input
-                                                className="text-2xl bg-gray-200"
-                                                name="title"
-                                                type="text"
-                                                disabled={false}
-                                                value={value.title}
-                                                onChange={(event) => {
+                            <>
+                                { value.collection_id == activeCollection?.id &&
+                                    <div key={index} className="border border-black">
+
+                                        <div key={index} className="m-2 h-90">
+                                            <form className="flex flex-col">
+                                                {/* // Snippet's Title */}
+                                                <input
+                                                    className="text-2xl bg-gray-200"
+                                                    name="title"
+                                                    type="text"
+                                                    disabled={false}
+                                                    value={value.title}
+                                                    onChange={(event) => {
+                                                        setSnippets((prevItems) =>
+                                                            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+                                                        );
+                                                    }}
+                                                />
+                                                {/* // Snippet's Description */}
+
+
+                                                <textarea
+                                                    className="bg-gray-200 w-full"
+                                                    name="description"
+
+
+                                                    maxLength={110}
+                                                    value={value.description}
+                                                    onChange={(event) => {
+                                                        setSnippets((prevItems) =>
+                                                            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
+                                                        );
+                                                    }}
+                                                />
+
+
+                                            </form>
+                                            <div className="flex justify-end items-center space-x-2">
+                                                <DropdownMenu buttonText={value.language} >
+
+                                                    <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                                        {languages.map((lang, index) => (
+                                                            <button key={index} onClick={() => {
+                                                                setSnippets((prevItems) =>
+                                                                    prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
+                                                                );
+                                                            }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                                        ))}
+                                                    </div>
+                                                </DropdownMenu>
+                                                <IconButton icon="open_in_full" text="Full screen" onClick={() => {
+                                                    setIsFullscreen(true);
+                                                    setFullScreenSnippet(value);
+                                                }} />
+                                                <CopyToClipboard text={value.code} onCopy={() => { }}>
+                                                    <IconButton icon="content_copy" text="Copy" />
+                                                </CopyToClipboard>
+                                            </div>
+
+
+                                            <div className="h-60 overflow-x-hidden rounded-2xl ">
+                                                <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
+                                                    console.log(codeValue);
                                                     setSnippets((prevItems) =>
-                                                        prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+                                                        prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))
                                                     );
-                                                }}
-                                            />
-                                            {/* // Snippet's Description */}
-                                            <input
-                                                className="bg-gray-200"
-                                                name="description"
-                                                type="text"
-                                                value={value.description}
-                                                onChange={(event) => {
-                                                    setSnippets((prevItems) =>
-                                                        prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
-                                                    );
-                                                }}
-                                            />
-                                        </form>
-                                        <div className="flex justify-end items-center space-x-2">
-                                            <DropdownMenu buttonText={value.language} >
+                                                }} />
+                                            </div>
 
-                                                <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
-                                                    {languages.map((lang, index) => (
-                                                        <button onClick={() => {
-                                                            setSnippets((prevItems) =>
-                                                                prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
-                                                            );
-                                                        }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
-                                                    ))}
-                                                </div>
-                                            </DropdownMenu>
-                                            <IconButton icon="open_in_full" text="Full screen" onClick={() => {
-                                                setIsFullscreen(true);
-                                                setFullScreenSnippet(value);
-                                            }} />
-                                            <CopyToClipboard text={value.code} onCopy={() => { }}>
-                                                <IconButton icon="content_copy" text="Copy" />
-                                            </CopyToClipboard>
-                                        </div>
-
-
-                                        <div className="h-60 overflow-x-hidden rounded-2xl ">
-                                            <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-                                                console.log(codeValue);
-                                                setSnippets((prevItems) =>
-                                                    prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))
-                                                );
-                                            }} />
                                         </div>
 
                                     </div>
                                 }
-                            </div>
-
+                            </>
                         ))}
                     </div>
                 </div>
