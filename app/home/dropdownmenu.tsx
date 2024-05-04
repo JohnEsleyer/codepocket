@@ -28,7 +28,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ buttonText, children }) => 
             left: 1,
           
             boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            zIndex: 1,
+            zIndex: 5,
           }}
         >
           <button onClick={() => {

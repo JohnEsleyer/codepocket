@@ -14,6 +14,7 @@ import SidebarButton from "./sidebarbutton";
 import IconButton from "../components/iconbutton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
+import OverlayMenu from "./overlayMenu";
 
 interface Collection {
     id: number;
@@ -50,6 +51,8 @@ export default function Home() {
         description: ''
     });
     const [singleColumn, setSingleColumn] = useState(false);
+    const [showOverlayMenu, setShowOverlayMenu] = useState(false);
+    const [currentOverlayMenu, setCurrentOverlayMenu] = useState('search');
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -150,6 +153,36 @@ export default function Home() {
 
     };
 
+    const displayCurrentOverlayMenu = () => {
+        switch (currentOverlayMenu){
+            case "search":
+                return (
+                    <OverlayMenu title="Search" onClose={() => {
+                        setShowOverlayMenu(false);
+                    }}>
+                        <p>Search</p>
+                        <input
+                            className="text-2xl bg-gray-300 border border-black rounded w-full text-2xl"
+                            name="search"
+                            type="text"
+        
+                            onChange={(event) => {
+        
+                            }}
+                        />
+                    </OverlayMenu>);
+            case "settings":
+                return (
+                    <OverlayMenu title="Settings" onClose={() => {
+                        setShowOverlayMenu(false);
+                    }}>
+                        <p>Settings</p>
+                    </OverlayMenu>);
+        }
+        
+    }
+
+
     if (isFullScreen) {
         return (
             <ProtectedPage>
@@ -159,6 +192,7 @@ export default function Home() {
                             setIsFullscreen(false);
 
                         }} />
+                        {/* // Fullscreen language selection dropdown */}
                         <div className="hover:bg-gray-300 rounded w-26 text-black">
                             <DropdownMenu buttonText={fullScreenSnippet.language} >
 
@@ -176,6 +210,7 @@ export default function Home() {
                                 </div>
                             </DropdownMenu>
                         </div>
+                        {/* //  Fullscreen delete button */}
                         <IconButton icon="delete" text="Delete" onClick={() => {
                             setSnippets((prevItems) => {
                                 return prevItems.filter((item) => item.id !== fullScreenSnippet.id);
@@ -206,18 +241,38 @@ export default function Home() {
         );
     }
 
-
     return (
         <ProtectedPage>
-            <div className="bg-gray-200 text-black h-screen flex font-sans">
+            {/* <div className="absolute top-0 left-0 w-full h-full bg-red-500 opacity-50">e4</div> */}
+            <div className={`${!showOverlayMenu && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
+            </div>
+            <div className={`${!showOverlayMenu && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
+                {displayCurrentOverlayMenu()}
+            </div>
+
+            <div className="relative z-1 bg-gray-200 text-black h-screen flex font-sans">
                 <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
                     <div className="shadow">
                         <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
                         <div className="pt-4 pb-2 flex flex-col">
                             {/* // Search */}
-                            <SidebarButton icon="search" text="Search" />
+                            <SidebarButton
+                                icon="search"
+                                text="Search"
+                                onClick={() => {
+                                    setShowOverlayMenu(true);
+                                    setCurrentOverlayMenu("search");
+                                }}
+                            />
                             {/* // Settings */}
-                            <SidebarButton icon="settings" text="Settings" />
+                            <SidebarButton 
+                                icon="settings" 
+                                text="Settings"
+                                onClick={() => {
+                                    setShowOverlayMenu(true);
+                                    setCurrentOverlayMenu("settings");
+                                }}
+                            />
                             {/* // Signout */}
                             <SidebarButton
                                 icon="logout"
@@ -276,7 +331,7 @@ export default function Home() {
                     <div className="p-2 border-b border-black bg-neutral-900  text-white ">
                         <p className="text-2xl font-bold flex">
                             <input
-                                className="text-2xl bg-neutral-900 text-2xl font-bold "
+                                className="text-2xl bg-neutral-900 w-full text-2xl font-bold"
                                 name="title"
                                 type="text"
                                 value={activeCollection?.title}
@@ -396,6 +451,7 @@ export default function Home() {
                 </div>
                 {/* // End Code Snippets Section */}
             </div>
+
         </ProtectedPage>
     );
 }
