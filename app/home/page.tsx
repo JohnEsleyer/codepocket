@@ -14,7 +14,7 @@ import SidebarButton from "./sidebarbutton";
 import IconButton from "../components/iconbutton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import OverlayMenu from "./overlayMenu";
+import OverlayMenuPage from "./overlayMenuPage";
 
 interface Collection {
     id: number;
@@ -51,8 +51,8 @@ export default function Home() {
         description: ''
     });
     const [singleColumn, setSingleColumn] = useState(false);
-    const [showOverlayMenu, setShowOverlayMenu] = useState(false);
-    const [currentOverlayMenu, setCurrentOverlayMenu] = useState('search');
+    const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
+    const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -153,12 +153,12 @@ export default function Home() {
 
     };
 
-    const displayCurrentOverlayMenu = () => {
-        switch (currentOverlayMenu){
+    const displayCurrentOverlayMenuPage = () => {
+        switch (currentOverlayMenuPage){
             case "search":
                 return (
-                    <OverlayMenu title="Search" onClose={() => {
-                        setShowOverlayMenu(false);
+                    <OverlayMenuPage title="Search" onClose={() => {
+                        setShowOverlayMenuPage(false);
                     }}>
                         <p>Search</p>
                         <input
@@ -170,14 +170,14 @@ export default function Home() {
         
                             }}
                         />
-                    </OverlayMenu>);
+                    </OverlayMenuPage>);
             case "settings":
                 return (
-                    <OverlayMenu title="Settings" onClose={() => {
-                        setShowOverlayMenu(false);
+                    <OverlayMenuPage title="Settings" onClose={() => {
+                        setShowOverlayMenuPage(false);
                     }}>
                         <p>Settings</p>
-                    </OverlayMenu>);
+                    </OverlayMenuPage>);
         }
         
     }
@@ -244,10 +244,10 @@ export default function Home() {
     return (
         <ProtectedPage>
             {/* <div className="absolute top-0 left-0 w-full h-full bg-red-500 opacity-50">e4</div> */}
-            <div className={`${!showOverlayMenu && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
+            <div className={`${!showOverlayMenuPage && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
             </div>
-            <div className={`${!showOverlayMenu && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
-                {displayCurrentOverlayMenu()}
+            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
+                {displayCurrentOverlayMenuPage()}
             </div>
 
             <div className="relative z-1 bg-gray-200 text-black h-screen flex font-sans">
@@ -260,8 +260,8 @@ export default function Home() {
                                 icon="search"
                                 text="Search"
                                 onClick={() => {
-                                    setShowOverlayMenu(true);
-                                    setCurrentOverlayMenu("search");
+                                    setShowOverlayMenuPage(true);
+                                    setCurrentOverlayMenuPage("search");
                                 }}
                             />
                             {/* // Settings */}
@@ -269,8 +269,8 @@ export default function Home() {
                                 icon="settings" 
                                 text="Settings"
                                 onClick={() => {
-                                    setShowOverlayMenu(true);
-                                    setCurrentOverlayMenu("settings");
+                                    setShowOverlayMenuPage(true);
+                                    setCurrentOverlayMenuPage("settings");
                                 }}
                             />
                             {/* // Signout */}
