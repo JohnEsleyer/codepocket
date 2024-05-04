@@ -58,20 +58,20 @@ export default function Home() {
 
     useEffect(() => {
         const checkOrientation = () => {
-          
+
             const screenRatio = window.innerWidth / window.innerHeight;
 
-            if (screenRatio > 1){
+            if (screenRatio > 1) {
                 setOrientation('Landscape');
-            }else{
+            } else {
                 setOrientation('Portrait');
             }
 
             console.log(window.innerWidth);
-            if (window.innerWidth < 850){
+            if (window.innerWidth < 850) {
                 console.log("single");
                 setSingleColumn(true)
-            }else{
+            } else {
                 console.log("double");
                 setSingleColumn(false);
             }
@@ -146,11 +146,36 @@ export default function Home() {
         return (
             <ProtectedPage>
                 <div >
-                    <div className="p-2 bg-white">
+                    <div className="p-2 bg-white space-x-4 flex">
                         <IconButton icon="close_fullscreen" text="Close full screen" onClick={() => {
                             setIsFullscreen(false);
 
                         }} />
+                        <div className="hover:bg-gray-300 rounded w-26 text-black">
+                            <DropdownMenu buttonText={fullScreenSnippet.language} >
+
+                                <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                    {languages.map((lang, index) => (
+                                        <button key={index} onClick={() => {
+                                            setSnippets((prevItems) =>
+                                                prevItems.map((item) => (item.id === fullScreenSnippet.id ? { ...item, language: lang } : item))
+                                            );
+                                            setFullScreenSnippet((prevValue) => {
+                                                return {...fullScreenSnippet, language: lang}
+                                            });
+                                        }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                    ))}
+                                </div>
+                            </DropdownMenu>
+                        </div>
+                        <IconButton icon="delete" text="Delete" onClick={() => {
+                            setSnippets((prevItems) => {
+                                return prevItems.filter((item) => item.id !== fullScreenSnippet.id);
+                            });
+                        }} />
+                        <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => { }}>
+                            <IconButton icon="content_copy" text="Copy" />
+                        </CopyToClipboard>
                     </div>
                     <CodeBlock
                         full={true}
@@ -166,7 +191,7 @@ export default function Home() {
                                     code: codeValue,
                                 }
                             });
-                      
+
                         }} />
                 </div>
             </ProtectedPage>
@@ -244,7 +269,7 @@ export default function Home() {
                     <div className={`flex-1 bg-gray-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <>
-                                { value.collection_id == activeCollection?.id &&
+                                {value.collection_id == activeCollection?.id &&
                                     <div key={index} className="bg-gray-200 border border-black rounded h-96">
 
                                         <div key={index} className="m-2 ">
@@ -281,18 +306,18 @@ export default function Home() {
                                             </form>
                                             <div className="flex justify-end items-center space-x-2">
                                                 <div className="hover:bg-gray-300 rounded">
-                                                <DropdownMenu buttonText={value.language} >
+                                                    <DropdownMenu buttonText={value.language} >
 
-                                                    <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
-                                                        {languages.map((lang, index) => (
-                                                            <button key={index} onClick={() => {
-                                                                setSnippets((prevItems) =>
-                                                                    prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
-                                                                );
-                                                            }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
-                                                        ))}
-                                                    </div>
-                                                </DropdownMenu>
+                                                        <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                                            {languages.map((lang, index) => (
+                                                                <button key={index} onClick={() => {
+                                                                    setSnippets((prevItems) =>
+                                                                        prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
+                                                                    );
+                                                                }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                                            ))}
+                                                        </div>
+                                                    </DropdownMenu>
                                                 </div>
                                                 <IconButton icon="open_in_full" text="Full screen" onClick={() => {
                                                     setIsFullscreen(true);
