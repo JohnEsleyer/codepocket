@@ -71,7 +71,7 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) 
         <AceEditor
             //   className="bg-slate-50"
             height={full ? maxScreenHeight!-50 + "px" : "240px"}
-            width={full ? maxScreenWidth + "px" : "480px"}
+            width={full ? maxScreenWidth + "px" : "600px"}
             onChange={(value, event) => {
                 onCodeChange(value, event);
             }}
