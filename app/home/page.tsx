@@ -39,6 +39,7 @@ export default function Home() {
     const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet | null>(null);
+    const [singleColumn, setSingleColumn] = useState(false);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -49,10 +50,22 @@ export default function Home() {
 
     useEffect(() => {
         const checkOrientation = () => {
-            if (window.matchMedia("(orientation: portrait)").matches) {
-                setOrientation('Portrait');
-            } else if (window.matchMedia("(orientation: landscape)").matches) {
+          
+            const screenRatio = window.innerWidth / window.innerHeight;
+
+            if (screenRatio > 1){
                 setOrientation('Landscape');
+            }else{
+                setOrientation('Portrait');
+            }
+
+            console.log(window.innerWidth);
+            if (window.innerWidth < 850){
+                console.log("single");
+                setSingleColumn(true)
+            }else{
+                console.log("double");
+                setSingleColumn(false);
             }
         };
 
@@ -108,7 +121,7 @@ export default function Home() {
             title: "Snippet " + snippets.length + 1,
             collection_id: activeCollection?.id as number,
             code: ``,
-            language: "Python",
+            language: "python",
             description: "Description"
         }]);
 
@@ -214,13 +227,13 @@ export default function Home() {
                     </div>
 
                     {/* // Snippets Section */}
-                    <div className={`flex-1 grid ${orientation == "Portrait" ? 'grid-cols-1' : 'grid-cols-2'} overflow-y-auto justify-center`} ref={scrollableDiv}>
+                    <div className={`flex-1 bg-gray-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <>
                                 { value.collection_id == activeCollection?.id &&
-                                    <div key={index} className="border border-black">
+                                    <div key={index} className="bg-gray-200 border border-black rounded h-96">
 
-                                        <div key={index} className="m-2 h-90">
+                                        <div key={index} className="m-2 ">
                                             <form className="flex flex-col">
                                                 {/* // Snippet's Title */}
                                                 <input
@@ -236,8 +249,6 @@ export default function Home() {
                                                     }}
                                                 />
                                                 {/* // Snippet's Description */}
-
-
                                                 <textarea
                                                     className="bg-gray-200 w-full"
                                                     name="description"
@@ -255,6 +266,7 @@ export default function Home() {
 
                                             </form>
                                             <div className="flex justify-end items-center space-x-2">
+                                                <div className="hover:bg-gray-300 rounded">
                                                 <DropdownMenu buttonText={value.language} >
 
                                                     <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
@@ -267,6 +279,7 @@ export default function Home() {
                                                         ))}
                                                     </div>
                                                 </DropdownMenu>
+                                                </div>
                                                 <IconButton icon="open_in_full" text="Full screen" onClick={() => {
                                                     setIsFullscreen(true);
                                                     setFullScreenSnippet(value);
