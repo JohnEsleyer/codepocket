@@ -110,7 +110,7 @@ export default function Home() {
 
         setCollections([...collections, {
             id: collections.length + 1,
-            title: "Collection " + collections.length + 1,
+            title: "Collection " + (collections.length + 1),
             description: "Description"
         }]);
 
@@ -126,7 +126,7 @@ export default function Home() {
 
         setSnippets([...snippets, {
             id: snippets.length + 1,
-            title: "Snippet " + snippets.length + 1,
+            title: "Snippet " + (snippets.length + 1) ,
             collection_id: activeCollection?.id as number,
             code: ``,
             language: "python",
@@ -161,7 +161,7 @@ export default function Home() {
                                                 prevItems.map((item) => (item.id === fullScreenSnippet.id ? { ...item, language: lang } : item))
                                             );
                                             setFullScreenSnippet((prevValue) => {
-                                                return {...fullScreenSnippet, language: lang}
+                                                return { ...fullScreenSnippet, language: lang }
                                             });
                                         }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
                                     ))}
@@ -233,8 +233,20 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className="w-full flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded">
-                                    <p>{value.title}</p>
+                                <div className="w-full space-x-10 flex text-xl pl-2  hover:bg-neutral-900 hover:text-white hover:rounded">
+                                    <p className="">{value.title}</p>
+                                    <div className="flex-1 flex justify-end pr-2">
+                                    <button onClick={()=>{
+                                        setCollections((prevItems) => {
+                                            return prevItems.filter((item) => item.id !== value.id);
+
+                                        });
+                                    }}>
+                                    <span className="material-symbols-outlined">delete</span>
+
+                                    </button>
+
+                                    </div>
                                 </div>
                             </button>
 
