@@ -129,7 +129,7 @@ export default function Home() {
 
         setSnippets([...snippets, {
             id: snippets.length + 1,
-            title: "Snippet " + (snippets.length + 1) ,
+            title: "Snippet " + (snippets.length + 1),
             collection_id: activeCollection?.id as number,
             code: ``,
             language: "python",
@@ -145,7 +145,7 @@ export default function Home() {
     };
 
     const handleSignOut = async () => {
-        const {error} = await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut();
         router.replace('/');
 
     };
@@ -219,9 +219,9 @@ export default function Home() {
                             {/* // Settings */}
                             <SidebarButton icon="settings" text="Settings" />
                             {/* // Signout */}
-                            <SidebarButton 
-                                icon="logout" 
-                                text="Sign out" 
+                            <SidebarButton
+                                icon="logout"
+                                text="Sign out"
                                 onClick={handleSignOut}
                             />
                             {/* // Add a collection Button */}
@@ -246,17 +246,20 @@ export default function Home() {
                                 }}
                             >
                                 <div className="w-full space-x-10 flex text-xl pl-2  hover:bg-neutral-900 hover:text-white hover:rounded">
-                                    <p className="">{value.title}</p>
+                                    <div className="flex overflow-x-auto ">
+                                        <p className="truncate">{value.title}</p>
+                                    </div>
+
                                     <div className="flex-1 flex justify-end pr-2">
-                                    <button onClick={()=>{
-                                        setCollections((prevItems) => {
-                                            return prevItems.filter((item) => item.id !== value.id);
+                                        <button onClick={() => {
+                                            setCollections((prevItems) => {
+                                                return prevItems.filter((item) => item.id !== value.id);
 
-                                        });
-                                    }}>
-                                    <span className="material-symbols-outlined">delete</span>
+                                            });
+                                        }}>
+                                            <span className="material-symbols-outlined">delete</span>
 
-                                    </button>
+                                        </button>
 
                                     </div>
                                 </div>
@@ -271,15 +274,31 @@ export default function Home() {
                 {/* // Left Section */}
                 <div className="flex-1 flex flex-col">
                     <div className="p-2 border-b border-black bg-neutral-900  text-white ">
-                        <p className="text-2xl font-bold flex"><span>{activeCollection?.title}</span>{loadingAddSnippet && <span className="pl-2">
-                            <Image
-                                src={WhiteLoading}
-                                alt={''}
-                                width={30}
-                                height={30}
+                        <p className="text-2xl font-bold flex">
+                            <input
+                                className="text-2xl bg-neutral-900 text-2xl font-bold "
+                                name="title"
+                                type="text"
+                                value={activeCollection?.title}
+                                onChange={(event) => {
+                                    setCollections((prevItems) =>
+                                        prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
+                                    );
+                                    setActiveCollection((prevValue) => {
+                                        return { ...prevValue!, title: event.target.value }
+                                    }
+                                    );
+                                }}
+                            />{loadingAddSnippet && <span className="pl-2">
 
-                            />
-                        </span>} </p>
+                                <Image
+                                    src={WhiteLoading}
+                                    alt={''}
+                                    width={30}
+                                    height={30}
+
+                                />
+                            </span>} </p>
 
                         <div className="flex space-x-4">
                             {/* // New code snippet */}
