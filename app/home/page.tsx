@@ -298,6 +298,11 @@ export default function Home() {
                                                     setIsFullscreen(true);
                                                     setFullScreenSnippet(value);
                                                 }} />
+                                                <IconButton icon="delete" text="Delete" onClick={() => {
+                                                    setSnippets((prevItems) => {
+                                                        return prevItems.filter((item, index2) => index2 !== index)
+                                                    });
+                                                }} />
                                                 <CopyToClipboard text={value.code} onCopy={() => { }}>
                                                     <IconButton icon="content_copy" text="Copy" />
                                                 </CopyToClipboard>

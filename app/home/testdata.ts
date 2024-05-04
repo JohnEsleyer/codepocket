@@ -105,7 +105,7 @@ password = generate_password(12)
 print(password)
 `,
         language: "python",
-        description: "Generate a list of domain names from this initial domain idea mycodepocket.com or codepocket.com, both of which are already takenGenerate a list of domain names from this initial domain idea mycodepocket.com or codepocket.com, both of which are already taken"
+        description: "Description"
     },
     {
         id: 2,
