@@ -38,12 +38,20 @@ export default function Home() {
     const [orientation, setOrientation] = useState<string>('');
     const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
     const [isFullScreen, setIsFullscreen] = useState(false);
-    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet | null>(null);
+    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>({
+        id: 0,
+        title: 'untitled',
+        collection_id: 0,
+        code: '',
+        language: 'python',
+        description: ''
+    });
     const [singleColumn, setSingleColumn] = useState(false);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
+
 
 
 
@@ -138,21 +146,27 @@ export default function Home() {
         return (
             <ProtectedPage>
                 <div >
-                    <div className="p-2">
-                        <IconButton icon="close_fullscreen" text="Close full screen" isDark={true} onClick={() => {
+                    <div className="p-2 bg-white">
+                        <IconButton icon="close_fullscreen" text="Close full screen" onClick={() => {
                             setIsFullscreen(false);
 
                         }} />
                     </div>
                     <CodeBlock
                         full={true}
-                        codeValue={fullScreenSnippet?.code == null ? '' : fullScreenSnippet.code}
+                        codeValue={fullScreenSnippet.code}
                         language={fullScreenSnippet?.language == null ? '' : fullScreenSnippet.language}
                         onCodeChange={(codeValue) => {
-
                             setSnippets((prevItems) =>
                                 prevItems.map((item) => (item.id === fullScreenSnippet?.id ? { ...item, code: codeValue } : item))
                             );
+                            setFullScreenSnippet((value) => {
+                                return {
+                                    ...value,
+                                    code: codeValue,
+                                }
+                            });
+                      
                         }} />
                 </div>
             </ProtectedPage>
