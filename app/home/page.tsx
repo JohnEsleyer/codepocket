@@ -32,6 +32,7 @@ interface Snippet {
     code: string;
     language: string;
     description: string;
+    checked: boolean;
 }
 
 export default function Home() {
@@ -50,12 +51,12 @@ export default function Home() {
         collection_id: 0,
         code: '',
         language: 'python',
-        description: ''
+        description: '',
+        checked: false,
     });
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
-    const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([]);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -137,7 +138,8 @@ export default function Home() {
             collection_id: activeCollection?.id as number,
             code: ``,
             language: "python",
-            description: "Description"
+            description: "Description",
+            checked: false,
         }]);
 
 
@@ -197,6 +199,15 @@ export default function Home() {
         }
 
     }
+
+    const handleDeleteSnippets = () => {
+        setSnippets((prevItems) => {
+            return prevItems.filter((item) => {
+                console.log("Delete: " + item.checked + "Title: " +item.title);
+                return item.checked == false && item.collection_id == activeCollection?.id;
+            });
+        });
+    };
 
 
     if (isFullScreen) {
@@ -259,7 +270,6 @@ export default function Home() {
 
     return (
         <ProtectedPage>
-            {/* <div className="absolute top-0 left-0 w-full h-full bg-red-500 opacity-50">e4</div> */}
             <div className={`${!showOverlayMenuPage && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
             </div>
             <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
@@ -376,6 +386,7 @@ export default function Home() {
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
                             {/* // Share collection */}
                             <IconButton icon="share" text="Share" isDark={true} />
+                            <IconButton icon="delete" text="Delete" isDark={true} onClick={handleDeleteSnippets} />
                         </div>
                     </div>
 
@@ -402,16 +413,18 @@ export default function Home() {
                                                         }}
                                                     />
                                                     <input
-                                                        className="w-6"
+                                                        className="w-6 accent-black"
                                                         type="checkbox"
                                                         id="Checkbox"
                                                         name="myCheckbox"
+
                                                         onChange={(event) => {
-                                                            if (event.target.checked) {
-                                                                setSelectedSnippets((prevItems) => (
-                                                                    value.id in prevItems ? prevItems : [...prevItems,]
+
+                                                                setSnippets((prevItems) => (
+                                                                    prevItems.map((item) => (item.id == value.id ? {...item, checked: event.target.checked} : item))
                                                                 ));
-                                                            }
+                                                                
+                                                            
                                                         }} />
 
                                                 </div>
@@ -451,11 +464,7 @@ export default function Home() {
                                                     setIsFullscreen(true);
                                                     setFullScreenSnippet(value);
                                                 }} />
-                                                <IconButton icon="delete" text="Delete" onClick={() => {
-                                                    setSnippets((prevItems) => {
-                                                        return prevItems.filter((item, index2) => index2 !== index)
-                                                    });
-                                                }} />
+                                               
                                                 <CopyToClipboard text={value.code} onCopy={() => { }}>
                                                     <IconButton icon="content_copy" text="Copy" />
                                                 </CopyToClipboard>
