@@ -32,7 +32,6 @@ interface Snippet {
     code: string;
     language: string;
     description: string;
-    checked: boolean;
 }
 
 export default function Home() {
@@ -52,12 +51,11 @@ export default function Home() {
         code: '',
         language: 'python',
         description: '',
-        checked: false,
     });
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
-
+    const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
@@ -133,13 +131,12 @@ export default function Home() {
         setLoadingAddSnippet(true);
 
         setSnippets([...snippets, {
-            id: snippets.length + 1,
+            id: snippets.length + Math.random() * 10000,
             title: "Snippet " + (snippets.length + 1),
             collection_id: activeCollection?.id as number,
             code: ``,
             language: "python",
             description: "Description",
-            checked: false,
         }]);
 
 
@@ -153,7 +150,7 @@ export default function Home() {
     const handleSignOut = async () => {
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("signout");
-       
+
 
     };
 
@@ -196,17 +193,60 @@ export default function Home() {
                             }}
                         >Continue</button>
                     </OverlayMenuPage>);
+            case "delete":
+                return (
+                    <OverlayMenuPage title="Delete" onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <p>Delete</p>
+                        {collections.map((value, index) => (
+                            <button
+                                key={index}
+                                className="flex justify-start"
+                                onClick={() => {
+                                    setActiveCollection(value);
+                                }}
+                            >
+                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-gray-300 text-black"} hover:rounded`}>
+                                    <div className="flex overflow-x-auto ">
+                                        <p className="truncate">{value.title}</p>
+                                    </div>
+
+                                    <div className="flex-1 flex justify-end pr-2">
+                                        <button onClick={() => {
+                                            setCollections((prevItems) => {
+                                                return prevItems.filter((item) => item.id !== value.id);
+
+                                            });
+                                        }}>
+                                            <span className="material-symbols-outlined">delete</span>
+
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </button>
+
+                        ))}
+                    </OverlayMenuPage>);
+
         }
 
     }
 
     const handleDeleteSnippets = () => {
-        setSnippets((prevItems) => {
-            return prevItems.filter((item) => {
-                console.log("Delete: " + item.checked + "Title: " +item.title);
-                return item.checked == false && item.collection_id == activeCollection?.id;
-            });
-        });
+        setSnippets((prevItems) => (
+            prevItems.filter((item, index) => (
+                !selectedSnippetsId.includes(item.id)
+            ))
+        ));
+        setSelectedSnippetsId([]);
+
+    };
+
+    const handleMoveSnippets = () => {
+        setCurrentOverlayMenuPage('delete');
+        setShowOverlayMenuPage(true);
     };
 
 
@@ -323,10 +363,11 @@ export default function Home() {
                                 key={index}
                                 className="flex justify-start"
                                 onClick={() => {
+                                    setSelectedSnippetsId([]);
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className="w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded">
+                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-gray-300 text-black"} hover:rounded`}>
                                     <div className="flex overflow-x-auto ">
                                         <p className="truncate">{value.title}</p>
                                     </div>
@@ -387,6 +428,8 @@ export default function Home() {
                             {/* // Share collection */}
                             <IconButton icon="share" text="Share" isDark={true} />
                             <IconButton icon="delete" text="Delete" isDark={true} onClick={handleDeleteSnippets} />
+                            <IconButton icon="folder" text="Move" isDark={true} onClick={handleMoveSnippets} />
+                           
                         </div>
                     </div>
 
@@ -417,14 +460,20 @@ export default function Home() {
                                                         type="checkbox"
                                                         id="Checkbox"
                                                         name="myCheckbox"
-
+                                                        key={value.id}
                                                         onChange={(event) => {
-
-                                                                setSnippets((prevItems) => (
-                                                                    prevItems.map((item) => (item.id == value.id ? {...item, checked: event.target.checked} : item))
-                                                                ));
-                                                                
                                                             
+                                                            setSelectedSnippetsId((prevItems) => {
+                                                                if (prevItems.includes(value.id)){
+                                                                    return prevItems.filter((snippetId) => (
+                                                                        snippetId !== value.id 
+                                                                    ));
+                                                                }else{
+                                                                    return [...prevItems, value.id];
+                                                                }
+                                                            });
+                                                            console.log('Selected:' + selectedSnippetsId);
+
                                                         }} />
 
                                                 </div>
@@ -464,7 +513,7 @@ export default function Home() {
                                                     setIsFullscreen(true);
                                                     setFullScreenSnippet(value);
                                                 }} />
-                                               
+
                                                 <CopyToClipboard text={value.code} onCopy={() => { }}>
                                                     <IconButton icon="content_copy" text="Copy" />
                                                 </CopyToClipboard>
