@@ -427,9 +427,8 @@ export default function Home() {
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
                             {/* // Share collection */}
                             <IconButton icon="share" text="Share" isDark={true} />
-                            <IconButton icon="delete" text="Delete" isDark={true} onClick={handleDeleteSnippets} />
-                            <IconButton icon="folder" text="Move" isDark={true} onClick={handleMoveSnippets} />
-                           
+                            <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
+                            <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
                     </div>
 
