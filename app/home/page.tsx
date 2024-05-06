@@ -17,7 +17,6 @@ import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./overlayMenuPage";
 import { DndContext } from "@dnd-kit/core";
 
-
 interface Collection {
     id: number;
     title: string;
@@ -56,6 +55,10 @@ export default function Home() {
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
     const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
+    const [query, setQuery] = useState('');
+    const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
+
+
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
@@ -126,6 +129,17 @@ export default function Home() {
         }, 1000);
     };
 
+
+    const handleInputChange = (e: any) => {
+        const newQuery = e.target.value;
+        setQuery(newQuery);
+        const filtered = snippets.filter(item =>
+            item.title.toLowerCase().includes(newQuery.toLowerCase()) ||
+            item.description.toLowerCase().includes(newQuery.toLowerCase())
+        );
+        setFilteredSnippets(filtered);
+    }
+
     const handleAddSnippet = async () => {
 
         setLoadingAddSnippet(true);
@@ -163,14 +177,27 @@ export default function Home() {
                     }}>
                         <p>Search</p>
                         <input
-                            className="text-2xl bg-gray-300 border border-black rounded w-full text-2xl"
+                            className="text-2xl p-1 bg-slate-300 border border-black rounded w-full text-2xl"
                             name="search"
                             type="text"
-
-                            onChange={(event) => {
-
-                            }}
+                            placeholder="Type the snippet's title or description"
+                            onChange={handleInputChange}
                         />
+                        <ul>
+                            {filteredSnippets.map(item => (
+                                <li key={item.id} className="shadow hover:bg-slate-300 p-1 border m-1 ">
+                                    <div className="w-3/4">
+                                        <strong>{item.title}</strong>
+                                        <p className="truncate"> - {item.description}</p>
+                                    </div>
+                                    <p className="flex items-center ">
+                                        <span className="material-symbols-outlined">folder</span>
+                                        {collections[item.collection_id].title}
+                                        </p>
+
+                                </li>
+                            ))}
+                        </ul>
                     </OverlayMenuPage>);
             case "settings":
                 return (
@@ -205,10 +232,10 @@ export default function Home() {
                                     key={index}
                                     className="flex justify-start w-full"
                                     onClick={() => {
-                                        setSnippets((prevItems) => 
+                                        setSnippets((prevItems) =>
                                             prevItems.map((item) => {
-                                                if (selectedSnippetsId.includes(item.id)){
-                                                    return {...item, collection_id: value.id}
+                                                if (selectedSnippetsId.includes(item.id)) {
+                                                    return { ...item, collection_id: value.id }
                                                 }
                                                 return item;
                                             })
@@ -218,8 +245,8 @@ export default function Home() {
                                 >
                                     <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
                                         <div className="flex overflow-x-auto ">
-                                            <p className="truncate flex items-center">        
-                                            <span className="material-symbols-outlined">folder</span>
+                                            <p className="truncate flex items-center">
+                                                <span className="material-symbols-outlined">folder</span>
                                                 {value.title}
                                             </p>
                                         </div>
@@ -262,10 +289,10 @@ export default function Home() {
 
                         }} />
                         {/* // Fullscreen language selection dropdown */}
-                        <div className="hover:bg-gray-300 rounded w-26 text-black">
+                        <div className="hover:bg-slate-300 rounded w-26 text-black">
                             <DropdownMenu buttonText={fullScreenSnippet.language} >
 
-                                <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                <div className="h-44 grid grid-cols-1 w-24 bg-slate-200 overflow-y-auto">
                                     {languages.map((lang, index) => (
                                         <button key={index} onClick={() => {
                                             setSnippets((prevItems) =>
@@ -274,7 +301,7 @@ export default function Home() {
                                             setFullScreenSnippet((prevValue) => {
                                                 return { ...fullScreenSnippet, language: lang }
                                             });
-                                        }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                        }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                     ))}
                                 </div>
                             </DropdownMenu>
@@ -318,7 +345,7 @@ export default function Home() {
                 {displayCurrentOverlayMenuPage()}
             </div>
 
-            <div className="relative z-1 bg-gray-200 text-black h-screen flex font-sans">
+            <div className="relative z-1 bg-slate-200 text-black h-screen flex font-sans">
                 <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
                     <div className="shadow">
                         <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
@@ -329,6 +356,7 @@ export default function Home() {
                                 text="Search"
                                 onClick={() => {
                                     setShowOverlayMenuPage(true);
+                                    setFilteredSnippets([]);
                                     setCurrentOverlayMenuPage("search");
                                 }}
                             />
@@ -369,12 +397,12 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-gray-300 text-black"} hover:rounded`}>
+                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
                                     <div className="flex overflow-x-auto ">
                                         <p className="truncate flex items-center">
-                                        <span className="material-symbols-outlined">folder</span>
+                                            <span className="material-symbols-outlined">folder</span>
                                             {value.title}
-                                            </p>
+                                        </p>
                                     </div>
 
                                     <div className="flex-1 flex justify-end pr-2">
@@ -438,17 +466,17 @@ export default function Home() {
                     </div>
 
                     {/* // Snippets Section */}
-                    <div className={`flex-1 bg-gray-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
+                    <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <>
                                 {value.collection_id == activeCollection?.id &&
-                                    <div key={index} className="bg-gray-200 border border-black rounded h-96">
+                                    <div key={index} className="bg-slate-200 border border-black rounded h-96">
                                         <div key={index} className="m-2">
                                             <form className="flex flex-col">
                                                 <div className="flex ">
                                                     {/* // Snippet's Title */}
                                                     <input
-                                                        className="flex-1 text-2xl bg-gray-200"
+                                                        className="flex-1 text-2xl bg-slate-200"
                                                         name="title"
                                                         type="text"
                                                         disabled={false}
@@ -483,7 +511,7 @@ export default function Home() {
                                                 </div>
                                                 {/* // Snippet's Description */}
                                                 <textarea
-                                                    className="bg-gray-200 w-full"
+                                                    className="bg-slate-200 w-full"
                                                     name="description"
 
 
@@ -499,16 +527,16 @@ export default function Home() {
 
                                             </form>
                                             <div className="flex justify-end items-center space-x-2">
-                                                <div className="hover:bg-gray-300 rounded">
+                                                <div className="hover:bg-slate-300 rounded">
                                                     <DropdownMenu buttonText={value.language} >
 
-                                                        <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                                        <div className="h-44 grid grid-cols-1 w-24 bg-slate-200 overflow-y-auto">
                                                             {languages.map((lang, index) => (
                                                                 <button key={index} onClick={() => {
                                                                     setSnippets((prevItems) =>
                                                                         prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
                                                                     );
-                                                                }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                                                }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                                             ))}
                                                         </div>
                                                     </DropdownMenu>
