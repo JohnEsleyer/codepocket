@@ -25,7 +25,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   }
 
   return (
-    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-gray-300"} rounded`} onClick={onClick}>
+    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded`} onClick={onClick}>
       <div className={`flex flex items-center ${isDark && !disabled ? 'hover:text-black text-white' : disabled && 'text-gray-500'}`}>
         <span className={`text-2xl material-symbols-outlined text-${iconColor}-500`}>{icon}</span>
         <span className="flex items-center">{text}</span>

@@ -41,7 +41,7 @@ export default function Home() {
     const [collections, setCollections] = useState<Collection[]>(testCollections)
     const [snippets, setSnippets] = useState<Snippet[]>(testSnippets);
     const [orientation, setOrientation] = useState<string>('');
-    const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
+    const [activeCollection, setActiveCollection] = useState<Collection>();
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>({
         id: 0,
@@ -147,7 +147,7 @@ export default function Home() {
         setSnippets([...snippets, {
             id: snippets.length + Math.random() * 10000,
             title: "Snippet " + (snippets.length + 1),
-            collection_id: activeCollection?.id as number,
+            collection_id: activeCollection!.id,
             code: ``,
             language: "python",
             description: "Description",
@@ -168,6 +168,7 @@ export default function Home() {
 
     };
 
+ 
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
@@ -175,27 +176,36 @@ export default function Home() {
                     <OverlayMenuPage title="Search" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <p>Search</p>
+                        <p>What are you looking for?</p>
                         <input
-                            className="text-2xl p-1 bg-slate-300 border border-black rounded w-full text-2xl"
+                            className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
                             name="search"
                             type="text"
                             placeholder="Type the snippet's title or description"
                             onChange={handleInputChange}
                         />
-                        <ul>
+                        <ul className="h-80 overflow-y-auto">
                             {filteredSnippets.map(item => (
-                                <li key={item.id} className="shadow hover:bg-slate-300 p-1 border m-1 ">
-                                    <div className="w-3/4">
-                                        <strong>{item.title}</strong>
-                                        <p className="truncate"> - {item.description}</p>
-                                    </div>
-                                    <p className="flex items-center ">
-                                        <span className="material-symbols-outlined">folder</span>
-                                        {collections[item.collection_id].title}
-                                        </p>
 
+                                <li key={item.id} className="shadow hover:bg-slate-200 bg-slate-100 p-1 border m-1 ">
+                                    <button
+                                        className="w-full flex flex-col "
+                                        onClick={() => {
+                                            setShowOverlayMenuPage(false);
+                                            setActiveCollection(collections.find(obj => obj.id === item.collection_id));
+                                        }}
+                                    >
+                                        <div className="w-full flex flex-col">
+                                            <p className="flex justify-start"><strong>{item.title}</strong></p>
+                                            <p className="flex justify-start truncate">{item.description}</p>
+                                        </div>
+                                        <p className="flex items-center ">
+                                            <span className="material-symbols-outlined">folder</span>
+                                            {collections.find(obj => obj.id === item.collection_id)?.title}
+                                        </p>
+                                    </button>
                                 </li>
+
                             ))}
                         </ul>
                     </OverlayMenuPage>);
@@ -289,10 +299,10 @@ export default function Home() {
 
                         }} />
                         {/* // Fullscreen language selection dropdown */}
-                        <div className="hover:bg-slate-300 rounded w-26 text-black">
+                        <div className="hover:bg-slate-100 rounded w-26 text-black">
                             <DropdownMenu buttonText={fullScreenSnippet.language} >
 
-                                <div className="h-44 grid grid-cols-1 w-24 bg-slate-200 overflow-y-auto">
+                                <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                     {languages.map((lang, index) => (
                                         <button key={index} onClick={() => {
                                             setSnippets((prevItems) =>
@@ -341,11 +351,11 @@ export default function Home() {
         <ProtectedPage>
             <div className={`${!showOverlayMenuPage && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
             </div>
-            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
+            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-center opacity-100`}>
                 {displayCurrentOverlayMenuPage()}
             </div>
 
-            <div className="relative z-1 bg-slate-200 text-black h-screen flex font-sans">
+            <div className="relative z-1 bg-slate-100 text-black h-screen flex font-sans">
                 <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
                     <div className="shadow">
                         <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
@@ -470,13 +480,15 @@ export default function Home() {
                         {snippets.map((value, index) => (
                             <>
                                 {value.collection_id == activeCollection?.id &&
-                                    <div key={index} className="bg-slate-200 border border-black rounded h-96">
+                                    <div
+                                        key={index}
+                                        className="bg-slate-100 border border-black rounded h-96">
                                         <div key={index} className="m-2">
                                             <form className="flex flex-col">
                                                 <div className="flex ">
                                                     {/* // Snippet's Title */}
                                                     <input
-                                                        className="flex-1 text-2xl bg-slate-200"
+                                                        className="flex-1 text-2xl bg-slate-100"
                                                         name="title"
                                                         type="text"
                                                         disabled={false}
@@ -511,7 +523,7 @@ export default function Home() {
                                                 </div>
                                                 {/* // Snippet's Description */}
                                                 <textarea
-                                                    className="bg-slate-200 w-full"
+                                                    className="bg-slate-100 w-full"
                                                     name="description"
 
 
@@ -530,7 +542,7 @@ export default function Home() {
                                                 <div className="hover:bg-slate-300 rounded">
                                                     <DropdownMenu buttonText={value.language} >
 
-                                                        <div className="h-44 grid grid-cols-1 w-24 bg-slate-200 overflow-y-auto">
+                                                        <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                                             {languages.map((lang, index) => (
                                                                 <button key={index} onClick={() => {
                                                                     setSnippets((prevItems) =>
