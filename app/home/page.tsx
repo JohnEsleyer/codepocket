@@ -193,43 +193,45 @@ export default function Home() {
                             }}
                         >Continue</button>
                     </OverlayMenuPage>);
-            case "delete":
+            case "move":
                 return (
-                    <OverlayMenuPage title="Delete" onClose={() => {
+                    <OverlayMenuPage title="Move to collection" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <p>Delete</p>
-                        {collections.map((value, index) => (
-                            <button
-                                key={index}
-                                className="flex justify-start"
-                                onClick={() => {
-                                    setActiveCollection(value);
-                                }}
-                            >
-                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-gray-300 text-black"} hover:rounded`}>
-                                    <div className="flex overflow-x-auto ">
-                                        <p className="truncate">{value.title}</p>
+                        <p>Select a collection</p>
+                        <div>
+                            {collections.map((value, index) => (
+                                <button
+                                    key={index}
+                                    className="flex justify-start w-full"
+                                    onClick={() => {
+                                        setSnippets((prevItems) => 
+                                            prevItems.map((item) => {
+                                                if (selectedSnippetsId.includes(item.id)){
+                                                    return {...item, collection_id: value.id}
+                                                }
+                                                return item;
+                                            })
+                                        );
+                                        setShowOverlayMenuPage(false);
+                                    }}
+                                >
+                                    <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
+                                        <div className="flex overflow-x-auto ">
+                                            <p className="truncate flex items-center">        
+                                            <span className="material-symbols-outlined">folder</span>
+                                                {value.title}
+                                            </p>
+                                        </div>
+
+
                                     </div>
+                                </button>
 
-                                    <div className="flex-1 flex justify-end pr-2">
-                                        <button onClick={() => {
-                                            setCollections((prevItems) => {
-                                                return prevItems.filter((item) => item.id !== value.id);
+                            ))}
+                        </div>
 
-                                            });
-                                        }}>
-                                            <span className="material-symbols-outlined">delete</span>
-
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </button>
-
-                        ))}
                     </OverlayMenuPage>);
-
         }
 
     }
@@ -245,7 +247,7 @@ export default function Home() {
     };
 
     const handleMoveSnippets = () => {
-        setCurrentOverlayMenuPage('delete');
+        setCurrentOverlayMenuPage('move');
         setShowOverlayMenuPage(true);
     };
 
@@ -369,7 +371,10 @@ export default function Home() {
                             >
                                 <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-gray-300 text-black"} hover:rounded`}>
                                     <div className="flex overflow-x-auto ">
-                                        <p className="truncate">{value.title}</p>
+                                        <p className="truncate flex items-center">
+                                        <span className="material-symbols-outlined">folder</span>
+                                            {value.title}
+                                            </p>
                                     </div>
 
                                     <div className="flex-1 flex justify-end pr-2">
@@ -379,7 +384,7 @@ export default function Home() {
 
                                             });
                                         }}>
-                                            <span className="material-symbols-outlined">delete</span>
+                                            <span className="material-symbols-outlined flex items-center">delete</span>
 
                                         </button>
 
@@ -461,13 +466,13 @@ export default function Home() {
                                                         name="myCheckbox"
                                                         key={value.id}
                                                         onChange={(event) => {
-                                                            
+
                                                             setSelectedSnippetsId((prevItems) => {
-                                                                if (prevItems.includes(value.id)){
+                                                                if (prevItems.includes(value.id)) {
                                                                     return prevItems.filter((snippetId) => (
-                                                                        snippetId !== value.id 
+                                                                        snippetId !== value.id
                                                                     ));
-                                                                }else{
+                                                                } else {
                                                                     return [...prevItems, value.id];
                                                                 }
                                                             });
