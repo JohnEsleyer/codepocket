@@ -3,18 +3,20 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
-import CodeBlock from "./codeblock";
+import CodeBlock from "./Codeblock";
 import Loading from "/public/loading.svg";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import DropdownMenu from "./dropdownmenu";
+import DropdownMenu from "./DropdownMenu";
 import { languages } from "./constants";
-import SidebarButton from "./sidebarbutton";
-import IconButton from "../components/iconbutton";
+import SidebarButton from "./SidebarButton";
+import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./overlayMenuPage";
+import { DndContext } from "@dnd-kit/core";
+
 
 interface Collection {
     id: number;
@@ -53,6 +55,7 @@ export default function Home() {
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
+    const [selectedSnippets, setSelectedSnippets] = useState<Snippet[]>([]);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -64,21 +67,19 @@ export default function Home() {
 
     useEffect(() => {
         const checkOrientation = () => {
-
             const screenRatio = window.innerWidth / window.innerHeight;
 
-            if (screenRatio > 1) {
+            console.log(screenRatio);
+            if (screenRatio > 1.150) {
                 setOrientation('Landscape');
             } else {
                 setOrientation('Portrait');
             }
 
             console.log(window.innerWidth);
-            if (window.innerWidth < 890) {
-                console.log("single");
+            if (window.innerWidth < 950) {
                 setSingleColumn(true)
             } else {
-                console.log("double");
                 setSingleColumn(false);
             }
         };
@@ -150,8 +151,7 @@ export default function Home() {
     const handleSignOut = async () => {
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("signout");
-        // const { error } = await supabase.auth.signOut();
-        // router.replace('/');
+       
 
     };
 
@@ -186,9 +186,9 @@ export default function Home() {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to sign out?</p>
-                        <button 
+                        <button
                             className="bg-black text-white p-2 border rounded"
-                            onClick={ async () => {
+                            onClick={async () => {
                                 const { error } = await supabase.auth.signOut();
                                 router.replace('/');
                             }}
@@ -316,7 +316,7 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className="w-full space-x-10 flex text-xl pl-2  hover:bg-neutral-900 hover:text-white hover:rounded">
+                                <div className="w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded">
                                     <div className="flex overflow-x-auto ">
                                         <p className="truncate">{value.title}</p>
                                     </div>
@@ -385,22 +385,36 @@ export default function Home() {
                             <>
                                 {value.collection_id == activeCollection?.id &&
                                     <div key={index} className="bg-gray-200 border border-black rounded h-96">
-
-                                        <div key={index} className="m-2 ">
+                                        <div key={index} className="m-2">
                                             <form className="flex flex-col">
-                                                {/* // Snippet's Title */}
-                                                <input
-                                                    className="text-2xl bg-gray-200"
-                                                    name="title"
-                                                    type="text"
-                                                    disabled={false}
-                                                    value={value.title}
-                                                    onChange={(event) => {
-                                                        setSnippets((prevItems) =>
-                                                            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
-                                                        );
-                                                    }}
-                                                />
+                                                <div className="flex ">
+                                                    {/* // Snippet's Title */}
+                                                    <input
+                                                        className="flex-1 text-2xl bg-gray-200"
+                                                        name="title"
+                                                        type="text"
+                                                        disabled={false}
+                                                        value={value.title}
+                                                        onChange={(event) => {
+                                                            setSnippets((prevItems) =>
+                                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+                                                            );
+                                                        }}
+                                                    />
+                                                    <input
+                                                        className="w-6"
+                                                        type="checkbox"
+                                                        id="Checkbox"
+                                                        name="myCheckbox"
+                                                        onChange={(event) => {
+                                                            if (event.target.checked) {
+                                                                setSelectedSnippets((prevItems) => (
+                                                                    value.id in prevItems ? prevItems : [...prevItems,]
+                                                                ));
+                                                            }
+                                                        }} />
+
+                                                </div>
                                                 {/* // Snippet's Description */}
                                                 <textarea
                                                     className="bg-gray-200 w-full"
@@ -460,10 +474,12 @@ export default function Home() {
                                         </div>
 
                                     </div>
+
                                 }
                             </>
                         ))}
                     </div>
+
                 </div>
                 {/* // End Code Snippets Section */}
             </div>

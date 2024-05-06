@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import IconButton from "../components/iconbutton";
+import IconButton from "../components/IconButton";
 
 interface Props {
     onClose: () => void;
