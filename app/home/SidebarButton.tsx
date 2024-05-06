@@ -11,7 +11,7 @@ interface SidebarButtonProps {
 
 const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, text, onClick, loading }) => {
   return (
-    <button className="p-1 hover:bg-gray-300" onClick={onClick}>
+    <button className="p-1 hover:bg-slate-300" onClick={onClick}>
       <p className="flex items-center pl-2">
         <span className="material-symbols-outlined">{icon}</span>
         {text}

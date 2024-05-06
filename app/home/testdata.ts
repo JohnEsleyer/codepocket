@@ -32,7 +32,8 @@ password = generate_password(12)
 print(password)
 `,
         language: "python",
-        description: "Description"
+        description: "Description",
+        checked: false,
     },
     {
         id: 2,
@@ -51,7 +52,8 @@ password = generate_password(12)
 print(password)
 `,
         language: "python",
-        description: "Description"
+        description: "Description",
+        checked: false,
     },
     
 

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import IconButton from "../components/iconbutton";
+import IconButton from "../components/IconButton";
 
 interface Props {
     onClose: () => void;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const OverlayMenuPage: React.FC<Props> = ({onClose, title, children, dialogMode}) => {
-    return ( <div className={`border rounded bg-gray-200 text-black ${dialogMode ? 'w-80' : "w-4/5"} p-2`}>
+    return ( <div className={`border rounded bg-slate-100 text-black ${dialogMode ? 'w-80' : "w-4/5"} p-2`}>
     <div className="flex w-full">
         <p className="flex-1 text-3xl font-bold">{title}</p>
         <IconButton icon="close" text="Close" onClick={onClose} />

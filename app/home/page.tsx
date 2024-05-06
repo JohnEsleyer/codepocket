@@ -3,18 +3,19 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
-import CodeBlock from "./codeblock";
+import CodeBlock from "./Codeblock";
 import Loading from "/public/loading.svg";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import DropdownMenu from "./dropdownmenu";
+import DropdownMenu from "./DropdownMenu";
 import { languages } from "./constants";
-import SidebarButton from "./sidebarbutton";
-import IconButton from "../components/iconbutton";
+import SidebarButton from "./SidebarButton";
+import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./overlayMenuPage";
+import { DndContext } from "@dnd-kit/core";
 
 interface Collection {
     id: number;
@@ -40,7 +41,7 @@ export default function Home() {
     const [collections, setCollections] = useState<Collection[]>(testCollections)
     const [snippets, setSnippets] = useState<Snippet[]>(testSnippets);
     const [orientation, setOrientation] = useState<string>('');
-    const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
+    const [activeCollection, setActiveCollection] = useState<Collection>();
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>({
         id: 0,
@@ -48,11 +49,15 @@ export default function Home() {
         collection_id: 0,
         code: '',
         language: 'python',
-        description: ''
+        description: '',
     });
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
+    const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
+    const [query, setQuery] = useState('');
+    const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
+
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -64,21 +69,19 @@ export default function Home() {
 
     useEffect(() => {
         const checkOrientation = () => {
-
             const screenRatio = window.innerWidth / window.innerHeight;
 
-            if (screenRatio > 1) {
+            console.log(screenRatio);
+            if (screenRatio > 1.150) {
                 setOrientation('Landscape');
             } else {
                 setOrientation('Portrait');
             }
 
             console.log(window.innerWidth);
-            if (window.innerWidth < 890) {
-                console.log("single");
+            if (window.innerWidth < 950) {
                 setSingleColumn(true)
             } else {
-                console.log("double");
                 setSingleColumn(false);
             }
         };
@@ -126,17 +129,28 @@ export default function Home() {
         }, 1000);
     };
 
+
+    const handleInputChange = (e: any) => {
+        const newQuery = e.target.value;
+        setQuery(newQuery);
+        const filtered = snippets.filter(item =>
+            item.title.toLowerCase().includes(newQuery.toLowerCase()) ||
+            item.description.toLowerCase().includes(newQuery.toLowerCase())
+        );
+        setFilteredSnippets(filtered);
+    }
+
     const handleAddSnippet = async () => {
 
         setLoadingAddSnippet(true);
 
         setSnippets([...snippets, {
-            id: snippets.length + 1,
+            id: snippets.length + Math.random() * 10000,
             title: "Snippet " + (snippets.length + 1),
-            collection_id: activeCollection?.id as number,
+            collection_id: activeCollection!.id,
             code: ``,
             language: "python",
-            description: "Description"
+            description: "Description",
         }]);
 
 
@@ -150,11 +164,11 @@ export default function Home() {
     const handleSignOut = async () => {
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("signout");
-        // const { error } = await supabase.auth.signOut();
-        // router.replace('/');
+
 
     };
 
+ 
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
@@ -162,16 +176,38 @@ export default function Home() {
                     <OverlayMenuPage title="Search" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <p>Search</p>
+                        <p>What are you looking for?</p>
                         <input
-                            className="text-2xl bg-gray-300 border border-black rounded w-full text-2xl"
+                            className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
                             name="search"
                             type="text"
-
-                            onChange={(event) => {
-
-                            }}
+                            placeholder="Type the snippet's title or description"
+                            onChange={handleInputChange}
                         />
+                        <ul className="h-80 overflow-y-auto">
+                            {filteredSnippets.map(item => (
+
+                                <li key={item.id} className="shadow hover:bg-slate-200 bg-slate-100 p-1 border m-1 ">
+                                    <button
+                                        className="w-full flex flex-col "
+                                        onClick={() => {
+                                            setShowOverlayMenuPage(false);
+                                            setActiveCollection(collections.find(obj => obj.id === item.collection_id));
+                                        }}
+                                    >
+                                        <div className="w-full flex flex-col">
+                                            <p className="flex justify-start"><strong>{item.title}</strong></p>
+                                            <p className="flex justify-start truncate">{item.description}</p>
+                                        </div>
+                                        <p className="flex items-center ">
+                                            <span className="material-symbols-outlined">folder</span>
+                                            {collections.find(obj => obj.id === item.collection_id)?.title}
+                                        </p>
+                                    </button>
+                                </li>
+
+                            ))}
+                        </ul>
                     </OverlayMenuPage>);
             case "settings":
                 return (
@@ -186,17 +222,71 @@ export default function Home() {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to sign out?</p>
-                        <button 
+                        <button
                             className="bg-black text-white p-2 border rounded"
-                            onClick={ async () => {
+                            onClick={async () => {
                                 const { error } = await supabase.auth.signOut();
                                 router.replace('/');
                             }}
                         >Continue</button>
                     </OverlayMenuPage>);
+            case "move":
+                return (
+                    <OverlayMenuPage title="Move to collection" onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <p>Select a collection</p>
+                        <div>
+                            {collections.map((value, index) => (
+                                <button
+                                    key={index}
+                                    className="flex justify-start w-full"
+                                    onClick={() => {
+                                        setSnippets((prevItems) =>
+                                            prevItems.map((item) => {
+                                                if (selectedSnippetsId.includes(item.id)) {
+                                                    return { ...item, collection_id: value.id }
+                                                }
+                                                return item;
+                                            })
+                                        );
+                                        setShowOverlayMenuPage(false);
+                                    }}
+                                >
+                                    <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
+                                        <div className="flex overflow-x-auto ">
+                                            <p className="truncate flex items-center">
+                                                <span className="material-symbols-outlined">folder</span>
+                                                {value.title}
+                                            </p>
+                                        </div>
+
+
+                                    </div>
+                                </button>
+
+                            ))}
+                        </div>
+
+                    </OverlayMenuPage>);
         }
 
     }
+
+    const handleDeleteSnippets = () => {
+        setSnippets((prevItems) => (
+            prevItems.filter((item, index) => (
+                !selectedSnippetsId.includes(item.id)
+            ))
+        ));
+        setSelectedSnippetsId([]);
+
+    };
+
+    const handleMoveSnippets = () => {
+        setCurrentOverlayMenuPage('move');
+        setShowOverlayMenuPage(true);
+    };
 
 
     if (isFullScreen) {
@@ -209,10 +299,10 @@ export default function Home() {
 
                         }} />
                         {/* // Fullscreen language selection dropdown */}
-                        <div className="hover:bg-gray-300 rounded w-26 text-black">
+                        <div className="hover:bg-slate-100 rounded w-26 text-black">
                             <DropdownMenu buttonText={fullScreenSnippet.language} >
 
-                                <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                     {languages.map((lang, index) => (
                                         <button key={index} onClick={() => {
                                             setSnippets((prevItems) =>
@@ -221,7 +311,7 @@ export default function Home() {
                                             setFullScreenSnippet((prevValue) => {
                                                 return { ...fullScreenSnippet, language: lang }
                                             });
-                                        }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                        }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                     ))}
                                 </div>
                             </DropdownMenu>
@@ -259,14 +349,13 @@ export default function Home() {
 
     return (
         <ProtectedPage>
-            {/* <div className="absolute top-0 left-0 w-full h-full bg-red-500 opacity-50">e4</div> */}
             <div className={`${!showOverlayMenuPage && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
             </div>
-            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-start opacity-100`}>
+            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-center opacity-100`}>
                 {displayCurrentOverlayMenuPage()}
             </div>
 
-            <div className="relative z-1 bg-gray-200 text-black h-screen flex font-sans">
+            <div className="relative z-1 bg-slate-100 text-black h-screen flex font-sans">
                 <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
                     <div className="shadow">
                         <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
@@ -277,6 +366,7 @@ export default function Home() {
                                 text="Search"
                                 onClick={() => {
                                     setShowOverlayMenuPage(true);
+                                    setFilteredSnippets([]);
                                     setCurrentOverlayMenuPage("search");
                                 }}
                             />
@@ -313,12 +403,16 @@ export default function Home() {
                                 key={index}
                                 className="flex justify-start"
                                 onClick={() => {
+                                    setSelectedSnippetsId([]);
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className="w-full space-x-10 flex text-xl pl-2  hover:bg-neutral-900 hover:text-white hover:rounded">
+                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
                                     <div className="flex overflow-x-auto ">
-                                        <p className="truncate">{value.title}</p>
+                                        <p className="truncate flex items-center">
+                                            <span className="material-symbols-outlined">folder</span>
+                                            {value.title}
+                                        </p>
                                     </div>
 
                                     <div className="flex-1 flex justify-end pr-2">
@@ -328,7 +422,7 @@ export default function Home() {
 
                                             });
                                         }}>
-                                            <span className="material-symbols-outlined">delete</span>
+                                            <span className="material-symbols-outlined flex items-center">delete</span>
 
                                         </button>
 
@@ -376,34 +470,60 @@ export default function Home() {
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
                             {/* // Share collection */}
                             <IconButton icon="share" text="Share" isDark={true} />
+                            <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
+                            <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
                     </div>
 
                     {/* // Snippets Section */}
-                    <div className={`flex-1 bg-gray-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
+                    <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <>
                                 {value.collection_id == activeCollection?.id &&
-                                    <div key={index} className="bg-gray-200 border border-black rounded h-96">
-
-                                        <div key={index} className="m-2 ">
+                                    <div
+                                        key={index}
+                                        className="bg-slate-100 border border-black rounded h-96">
+                                        <div key={index} className="m-2">
                                             <form className="flex flex-col">
-                                                {/* // Snippet's Title */}
-                                                <input
-                                                    className="text-2xl bg-gray-200"
-                                                    name="title"
-                                                    type="text"
-                                                    disabled={false}
-                                                    value={value.title}
-                                                    onChange={(event) => {
-                                                        setSnippets((prevItems) =>
-                                                            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
-                                                        );
-                                                    }}
-                                                />
+                                                <div className="flex ">
+                                                    {/* // Snippet's Title */}
+                                                    <input
+                                                        className="flex-1 text-2xl bg-slate-100"
+                                                        name="title"
+                                                        type="text"
+                                                        disabled={false}
+                                                        value={value.title}
+                                                        onChange={(event) => {
+                                                            setSnippets((prevItems) =>
+                                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+                                                            );
+                                                        }}
+                                                    />
+                                                    <input
+                                                        className="w-6 accent-black"
+                                                        type="checkbox"
+                                                        id="Checkbox"
+                                                        name="myCheckbox"
+                                                        key={value.id}
+                                                        onChange={(event) => {
+
+                                                            setSelectedSnippetsId((prevItems) => {
+                                                                if (prevItems.includes(value.id)) {
+                                                                    return prevItems.filter((snippetId) => (
+                                                                        snippetId !== value.id
+                                                                    ));
+                                                                } else {
+                                                                    return [...prevItems, value.id];
+                                                                }
+                                                            });
+                                                            console.log('Selected:' + selectedSnippetsId);
+
+                                                        }} />
+
+                                                </div>
                                                 {/* // Snippet's Description */}
                                                 <textarea
-                                                    className="bg-gray-200 w-full"
+                                                    className="bg-slate-100 w-full"
                                                     name="description"
 
 
@@ -419,16 +539,16 @@ export default function Home() {
 
                                             </form>
                                             <div className="flex justify-end items-center space-x-2">
-                                                <div className="hover:bg-gray-300 rounded">
+                                                <div className="hover:bg-slate-300 rounded">
                                                     <DropdownMenu buttonText={value.language} >
 
-                                                        <div className="h-44 grid grid-cols-1 w-24 bg-gray-200 overflow-y-auto">
+                                                        <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                                             {languages.map((lang, index) => (
                                                                 <button key={index} onClick={() => {
                                                                     setSnippets((prevItems) =>
                                                                         prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
                                                                     );
-                                                                }}><p className=" hover:bg-gray-300 p-1">{lang}</p></button>
+                                                                }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                                             ))}
                                                         </div>
                                                     </DropdownMenu>
@@ -437,11 +557,7 @@ export default function Home() {
                                                     setIsFullscreen(true);
                                                     setFullScreenSnippet(value);
                                                 }} />
-                                                <IconButton icon="delete" text="Delete" onClick={() => {
-                                                    setSnippets((prevItems) => {
-                                                        return prevItems.filter((item, index2) => index2 !== index)
-                                                    });
-                                                }} />
+
                                                 <CopyToClipboard text={value.code} onCopy={() => { }}>
                                                     <IconButton icon="content_copy" text="Copy" />
                                                 </CopyToClipboard>
@@ -460,10 +576,12 @@ export default function Home() {
                                         </div>
 
                                     </div>
+
                                 }
                             </>
                         ))}
                     </div>
+
                 </div>
                 {/* // End Code Snippets Section */}
             </div>
