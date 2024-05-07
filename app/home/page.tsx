@@ -16,20 +16,7 @@ import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./overlayMenuPage";
 import { DndContext } from "@dnd-kit/core";
-
-interface Collection {
-    id: number;
-    title: string;
-}
-
-interface Snippet {
-    id: number;
-    title: string;
-    collection_id: number;
-    code: string;
-    language: string;
-    description: string;
-}
+import { Collection, Snippet } from "./types";
 
 export default function Home() {
     const router = useRouter();
@@ -138,6 +125,112 @@ export default function Home() {
         }, 1000);
     };
 
+    const handleDeleteCollection = async (value: Collection) => {
+
+        const { error } = await supabase
+            .from('collection')
+            .delete()
+            .eq('id', value.id);
+
+        if (error) {
+            console.log(error);
+        } else {
+            setCollections((prevItems) => {
+                return prevItems.filter((item) => item.id !== value.id);
+
+            });
+        }
+    }
+
+    const handleDeleteSnippets = async () => {
+
+        selectedSnippetsId.map(async (itemId) => {
+            console.log('itemId:' + itemId);
+            const { error } = await supabase
+                .from('snippet')
+                .delete()
+                .eq('id', itemId);
+
+            if (error) {
+                console.log(error);
+            } else {
+                setSnippets((prevItems) => (
+                    prevItems.filter((item, index) => (
+                        !selectedSnippetsId.includes(item.id)
+                    ))
+                ));
+            }
+        });
+
+        setSelectedSnippetsId([]);
+
+    };
+
+    // This handler does not execute from fullscreen mode, only preview.
+    const handleUpdateSnippetLanguage = async (value: Snippet, language: string) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, language: language } : item))
+        );
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ language: language })
+            .eq('id', value.id)
+
+
+        if (error) {
+            console.log(error);
+        }
+
+    };
+
+    // This handler does not execute from fullscreen mode, only preview.
+    const handleUpdateSnippetCode = async (value: Snippet, code: string) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, code: code } : item))
+        );
+        const { error } = await supabase
+            .from('snippet')
+            .update({ code: code })
+            .eq('id', value.id);
+
+
+        if (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateSnippetDescription = async (event: any, value: Snippet) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
+        );
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ description: event.target.value })
+            .eq('id', value.id);
+
+
+        if (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateSnippetTitle = async (event: any, value: Snippet) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+        );
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ title: event.target.value })
+            .eq('id', value.id)
+
+        if (error) {
+            console.log(error);
+        }
+
+    };
 
     const handleInputChange = (e: any) => {
         const newQuery = e.target.value;
@@ -267,9 +360,19 @@ export default function Home() {
                                     key={index}
                                     className="flex justify-start w-full"
                                     onClick={() => {
+
                                         setSnippets((prevItems) =>
                                             prevItems.map((item) => {
+                                                const updateDb = async () => {
+                                                    const { data, error } = await supabase
+                                                        .from('snippet')
+                                                        .update({ collection_id: value.id })
+                                                        .eq('id', item.id);
+                                                }
+
+
                                                 if (selectedSnippetsId.includes(item.id)) {
+                                                    updateDb();
                                                     return { ...item, collection_id: value.id }
                                                 }
                                                 return item;
@@ -298,46 +401,6 @@ export default function Home() {
 
     }
 
-    const handleDeleteCollection = async (value: Collection) => {
-
-        const { error } = await supabase
-            .from('collection')
-            .delete()
-            .eq('id', value.id);
-
-        if (error) {
-            console.log(error);
-        } else {
-            setCollections((prevItems) => {
-                return prevItems.filter((item) => item.id !== value.id);
-
-            });
-        }
-    }
-
-    const handleDeleteSnippets = async () => {
-
-        selectedSnippetsId.map(async (itemId) => {
-            console.log('itemId:' + itemId);
-            const { error } = await supabase
-                .from('snippet')
-                .delete()
-                .eq('id', itemId);
-
-            if (error) {
-                console.log(error);
-            } else {
-                setSnippets((prevItems) => (
-                    prevItems.filter((item, index) => (
-                        !selectedSnippetsId.includes(item.id)
-                    ))
-                ));
-            }
-        });
-
-        setSelectedSnippetsId([]);
-
-    };
 
     const handleMoveSnippets = () => {
         setCurrentOverlayMenuPage('move');
@@ -360,13 +423,22 @@ export default function Home() {
 
                                 <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                     {languages.map((lang, index) => (
-                                        <button key={index} onClick={() => {
+                                        <button key={index} onClick={async () => {
                                             setSnippets((prevItems) =>
                                                 prevItems.map((item) => (item.id === fullScreenSnippet.id ? { ...item, language: lang } : item))
                                             );
                                             setFullScreenSnippet((prevValue) => {
                                                 return { ...fullScreenSnippet, language: lang }
                                             });
+                                            const { error } = await supabase
+                                                .from('snippet')
+                                                .update({ language: lang })
+                                                .eq('id', fullScreenSnippet.id);
+
+
+                                            if (error) {
+                                                console.log(error);
+                                            }
                                         }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                     ))}
                                 </div>
@@ -386,7 +458,7 @@ export default function Home() {
                         full={true}
                         codeValue={fullScreenSnippet.code}
                         language={fullScreenSnippet?.language == null ? '' : fullScreenSnippet.language}
-                        onCodeChange={(codeValue) => {
+                        onCodeChange={async (codeValue) => {
                             setSnippets((prevItems) =>
                                 prevItems.map((item) => (item.id === fullScreenSnippet?.id ? { ...item, code: codeValue } : item))
                             );
@@ -396,6 +468,16 @@ export default function Home() {
                                     code: codeValue,
                                 }
                             });
+
+                            const { error } = await supabase
+                                .from('snippet')
+                                .update({ code: codeValue })
+                                .eq('id', fullScreenSnippet.id);
+
+
+                            if (error) {
+                                console.log(error);
+                            }
 
                         }} />
                 </div>
@@ -545,9 +627,7 @@ export default function Home() {
                                                         disabled={false}
                                                         value={value.title}
                                                         onChange={(event) => {
-                                                            setSnippets((prevItems) =>
-                                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
-                                                            );
+                                                            handleUpdateSnippetTitle(event, value);
                                                         }}
                                                     />
                                                     <input
@@ -575,14 +655,10 @@ export default function Home() {
                                                 <textarea
                                                     className="bg-slate-100 w-full"
                                                     name="description"
-
-
                                                     maxLength={110}
                                                     value={value.description}
                                                     onChange={(event) => {
-                                                        setSnippets((prevItems) =>
-                                                            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
-                                                        );
+                                                        handleUpdateSnippetDescription(event, value);
                                                     }}
                                                 />
 
@@ -595,9 +671,7 @@ export default function Home() {
                                                         <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                                             {languages.map((lang, index) => (
                                                                 <button key={index} onClick={() => {
-                                                                    setSnippets((prevItems) =>
-                                                                        prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
-                                                                    );
+                                                                    handleUpdateSnippetLanguage(value, lang);
                                                                 }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                                             ))}
                                                         </div>
@@ -616,10 +690,8 @@ export default function Home() {
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-                                                    console.log(codeValue);
-                                                    setSnippets((prevItems) =>
-                                                        prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))
-                                                    );
+
+                                                    handleUpdateSnippetCode(value, codeValue);
                                                 }} />
                                             </div>
 
