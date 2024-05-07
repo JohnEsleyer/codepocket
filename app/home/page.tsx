@@ -14,11 +14,21 @@ import SidebarButton from "./SidebarButton";
 import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import OverlayMenuPage from "./overlayMenuPage";
+import OverlayMenuPage from "./OverlayMenuPage";
 import { DndContext } from "@dnd-kit/core";
 import { Collection, Snippet } from "./types";
 
 export default function Home() {
+
+    const defaultFullscreenSnippet = {
+        id: 0,
+        title: 'untitled',
+        collection_id: 0,
+        code: '',
+        language: 'python',
+        description: '',
+    };
+
     const router = useRouter();
 
     const scrollableDiv = useRef<HTMLDivElement>(null);
@@ -28,57 +38,49 @@ export default function Home() {
     const [orientation, setOrientation] = useState<string>('');
     const [activeCollection, setActiveCollection] = useState<Collection>();
     const [isFullScreen, setIsFullscreen] = useState(false);
-    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>({
-        id: 0,
-        title: 'untitled',
-        collection_id: 0,
-        code: '',
-        language: 'python',
-        description: '',
-    });
+    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
     const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
-    const [query, setQuery] = useState('');
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
-
+    const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
+    const [query, setQuery] = useState('');
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
 
-
     const fetchDbData = async () => {
-        async function fetchAllCollections(){
+        async function fetchAllCollections() {
             // Fetch all collections by current user
             let { data: collection, error } = await supabase
-            .from('collection')
-            .select('*')
-            
-            if (error){
+                .from('collection')
+                .select('*')
+
+            if (error) {
                 console.log(error);
-            }else{
+            } else {
                 setCollections(collection as Collection[]);
             }
         }
 
-        async function fetchAllSnippets(){
+        async function fetchAllSnippets() {
             // Fetch all snippets by current user
             let { data: snippets, error } = await supabase
-            .from('snippet')
-            .select('*')
-            
-            if (error){
+                .from('snippet')
+                .select('*')
+
+            if (error) {
                 console.log(error);
-            }else{
+            } else {
                 setSnippets(snippets as Snippet[]);
             }
         }
 
         fetchAllCollections();
         fetchAllSnippets();
-        
+
     };
 
 
@@ -112,7 +114,7 @@ export default function Home() {
 
         // Set the first collection as the default active collection
         setActiveCollection(collections[0]);
-        
+
 
         window.addEventListener('resize', resizeListener);
 
@@ -159,19 +161,10 @@ export default function Home() {
 
     const handleDeleteCollection = async (value: Collection) => {
 
-        const { error } = await supabase
-            .from('collection')
-            .delete()
-            .eq('id', value.id);
-
-        if (error) {
-            console.log(error);
-        } else {
-            setCollections((prevItems) => {
-                return prevItems.filter((item) => item.id !== value.id);
-
-            });
-        }
+        setShowOverlayMenuPage(true);
+        setCurrentOverlayMenuPage("deleteCollectionConfirmation");
+        setToDeleteCollection(value);
+     
     }
 
     const handleDeleteSnippets = async () => {
@@ -285,14 +278,20 @@ export default function Home() {
 
     };
 
-    const handleInputChange = (e: any) => {
-        const newQuery = e.target.value;
-        setQuery(newQuery);
-        const filtered = snippets.filter(item =>
-            item.title.toLowerCase().includes(newQuery.toLowerCase()) ||
-            item.description.toLowerCase().includes(newQuery.toLowerCase())
-        );
-        setFilteredSnippets(filtered);
+    useEffect(()=> {
+        const timeoutId = setTimeout(() => {
+            const filtered = snippets.filter(item =>
+                item.title.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
+            );
+    
+            setFilteredSnippets(filtered);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+    }, [query]);
+    
+    const handleInputChange = (event: any) => {
+        setQuery(event.target.value);
     }
 
     const handleAddSnippet = async () => {
@@ -338,8 +337,6 @@ export default function Home() {
 
     };
 
-
-
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
@@ -348,13 +345,14 @@ export default function Home() {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>What are you looking for?</p>
-                        <input
-                            className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
-                            name="search"
-                            type="text"
-                            placeholder="Type the snippet's title or description"
-                            onChange={handleInputChange}
-                        />
+                            <input
+                                className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
+                                name="search"
+                                type="text"
+                                placeholder="Type the snippet's title or description"
+                                onChange={handleInputChange}
+                            />
+
                         <ul className="h-80 overflow-y-auto">
                             {filteredSnippets.map(item => (
 
@@ -400,6 +398,41 @@ export default function Home() {
                                 router.replace('/');
                             }}
                         >Continue</button>
+                    </OverlayMenuPage>);
+            case "deleteCollectionConfirmation":
+                return (
+                    <OverlayMenuPage title="Delete collection" dialogMode={true} disableCloseButton={true} onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <p>Are you sure, you want to delete this collection?</p>
+                        <button
+                            className="bg-black text-white p-2 border rounded"
+                            onClick={async () => {
+                                const { error } = await supabase
+                                    .from('collection')
+                                    .delete()
+                                    .eq('id', toDeleteCollection?.id);
+
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    setCollections((prevItems) => {
+                                        return prevItems.filter((item) => item.id !== toDeleteCollection?.id);
+
+                                    });
+                                }
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Continue</button>
+                        <button
+                            className=" p-2 border rounded"
+                            onClick={async () => {
+
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Cancel</button>
                     </OverlayMenuPage>);
             case "move":
                 return (
@@ -601,9 +634,9 @@ export default function Home() {
                                     <div className="flex overflow-x-auto w-80">
                                         <div className="truncate flex">
                                             <div className="flex items-center">
-                                            <span className="material-symbols-outlined">folder</span>
+                                                <span className="material-symbols-outlined">folder</span>
                                             </div>
-                                            
+
                                             <p className="truncate">{value.title}</p>
                                         </div>
                                     </div>

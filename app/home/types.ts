@@ -11,4 +11,3 @@ export interface Snippet {
     language: string;
     description: string;
 }
-
