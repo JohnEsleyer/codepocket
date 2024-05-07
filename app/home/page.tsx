@@ -165,25 +165,17 @@ export default function Home() {
         if (error) {
             console.log(error);
         } else {
-            // console.log(data[0].id);
+            console.log("success adding snippet to db");
+            // console.log('add:' + data[0].id);
             setSnippets([...snippets, {
                 id: data[0].id,
                 title: data[0].title,
-                collection_id: data[0].title,
-                code: data[0].language,
+                collection_id: data[0].collection_id,
+                code: data[0].code,
                 description: data[0].description,
                 language: data[0].language,
             }]);
         }
-
-        setSnippets([...snippets, {
-            id: snippets.length + Math.random() * 10000,
-            title: "Snippet " + (snippets.length + 1),
-            collection_id: activeCollection!.id,
-            code: ``,
-            language: "python",
-            description: "Description",
-        }]);
 
 
         setTimeout(() => {
@@ -306,12 +298,43 @@ export default function Home() {
 
     }
 
-    const handleDeleteSnippets = () => {
-        setSnippets((prevItems) => (
-            prevItems.filter((item, index) => (
-                !selectedSnippetsId.includes(item.id)
-            ))
-        ));
+    const handleDeleteCollection = async (value: Collection) => {
+
+        const { error } = await supabase
+            .from('collection')
+            .delete()
+            .eq('id', value.id);
+
+        if (error) {
+            console.log(error);
+        } else {
+            setCollections((prevItems) => {
+                return prevItems.filter((item) => item.id !== value.id);
+
+            });
+        }
+    }
+
+    const handleDeleteSnippets = async () => {
+
+        selectedSnippetsId.map(async (itemId) => {
+            console.log('itemId:' + itemId);
+            const { error } = await supabase
+                .from('snippet')
+                .delete()
+                .eq('id', itemId);
+
+            if (error) {
+                console.log(error);
+            } else {
+                setSnippets((prevItems) => (
+                    prevItems.filter((item, index) => (
+                        !selectedSnippetsId.includes(item.id)
+                    ))
+                ));
+            }
+        });
+
         setSelectedSnippetsId([]);
 
     };
@@ -449,12 +472,7 @@ export default function Home() {
                                     </div>
 
                                     <div className="flex-1 flex justify-end pr-2">
-                                        <button onClick={() => {
-                                            setCollections((prevItems) => {
-                                                return prevItems.filter((item) => item.id !== value.id);
-
-                                            });
-                                        }}>
+                                        <button onClick={() => handleDeleteCollection(value)}>
                                             <span className="material-symbols-outlined flex items-center">delete</span>
 
                                         </button>
@@ -500,9 +518,9 @@ export default function Home() {
 
                         <div className="flex space-x-4">
                             {/* // New code snippet */}
-                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
+                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
                             {/* // Share collection */}
-                            <IconButton icon="share" text="Share" isDark={true} />
+                            <IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} />
                             <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
@@ -539,17 +557,16 @@ export default function Home() {
                                                         name="myCheckbox"
                                                         key={value.id}
                                                         onChange={(event) => {
-
-                                                            setSelectedSnippetsId((prevItems) => {
-                                                                if (prevItems.includes(value.id)) {
-                                                                    return prevItems.filter((snippetId) => (
+                                                            setSelectedSnippetsId((prevItemsId) => {
+                                                                if (prevItemsId.includes(value.id)) {
+                                                                    return prevItemsId.filter((snippetId) => (
                                                                         snippetId !== value.id
                                                                     ));
                                                                 } else {
-                                                                    return [...prevItems, value.id];
+                                                                    return [...prevItemsId, value.id];
                                                                 }
                                                             });
-                                                            console.log('Selected:' + selectedSnippetsId);
+                                                            // console.log('Selected:' + selectedSnippetsId);
 
                                                         }} />
 
