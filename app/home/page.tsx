@@ -20,8 +20,6 @@ import { DndContext } from "@dnd-kit/core";
 interface Collection {
     id: number;
     title: string;
-    description: string;
-
 }
 
 interface Snippet {
@@ -38,8 +36,8 @@ export default function Home() {
 
     const scrollableDiv = useRef<HTMLDivElement>(null);
 
-    const [collections, setCollections] = useState<Collection[]>(testCollections)
-    const [snippets, setSnippets] = useState<Snippet[]>(testSnippets);
+    const [collections, setCollections] = useState<Collection[]>([])
+    const [snippets, setSnippets] = useState<Snippet[]>([]);
     const [orientation, setOrientation] = useState<string>('');
     const [activeCollection, setActiveCollection] = useState<Collection>();
     const [isFullScreen, setIsFullscreen] = useState(false);
@@ -107,6 +105,7 @@ export default function Home() {
 
     }, []);
 
+
     const scrollToBottom = () => {
         if (scrollableDiv.current) {
             scrollableDiv.current.scrollTop = scrollableDiv.current.scrollHeight;
@@ -116,12 +115,22 @@ export default function Home() {
     const handleAddCollection = async () => {
         setLoadingAddCollection(true);
 
+        const { data, error } = await supabase
+            .from('collection')
+            .insert({
+                title: "New Collection",
+            }).select();
 
-        setCollections([...collections, {
-            id: collections.length + 1,
-            title: "Collection " + (collections.length + 1),
-            description: "Description"
-        }]);
+        if (error) {
+            console.log(error);
+        } else {
+            // console.log(data[0].id);
+            setCollections([...collections, {
+                id: data[0].id,
+                title: data[0].title,
+            }]);
+
+        }
 
 
         setTimeout(() => {
@@ -141,8 +150,31 @@ export default function Home() {
     }
 
     const handleAddSnippet = async () => {
-
         setLoadingAddSnippet(true);
+
+        const { data, error } = await supabase
+            .from('snippet')
+            .insert({
+                title: "New Snippet",
+                description: "Provide a brief description here.",
+                collection_id: activeCollection?.id,
+                code: '',
+                language: 'python',
+            }).select();
+
+        if (error) {
+            console.log(error);
+        } else {
+            // console.log(data[0].id);
+            setSnippets([...snippets, {
+                id: data[0].id,
+                title: data[0].title,
+                collection_id: data[0].title,
+                code: data[0].language,
+                description: data[0].description,
+                language: data[0].language,
+            }]);
+        }
 
         setSnippets([...snippets, {
             id: snippets.length + Math.random() * 10000,
@@ -168,7 +200,8 @@ export default function Home() {
 
     };
 
- 
+
+
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
