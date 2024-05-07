@@ -49,7 +49,37 @@ export default function Home() {
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
 
 
+    const fetchDbData = async () => {
+        async function fetchAllCollections(){
+            // Fetch all collections by current user
+            let { data: collection, error } = await supabase
+            .from('collection')
+            .select('*')
+            
+            if (error){
+                console.log(error);
+            }else{
+                setCollections(collection as Collection[]);
+            }
+        }
 
+        async function fetchAllSnippets(){
+            // Fetch all snippets by current user
+            let { data: snippets, error } = await supabase
+            .from('snippet')
+            .select('*')
+            
+            if (error){
+                console.log(error);
+            }else{
+                setSnippets(snippets as Snippet[]);
+            }
+        }
+
+        fetchAllCollections();
+        fetchAllSnippets();
+        
+    };
 
 
     useEffect(() => {
@@ -77,10 +107,12 @@ export default function Home() {
             checkOrientation();
         };
 
-
+        // Fetch all user data
+        fetchDbData();
 
         // Set the first collection as the default active collection
         setActiveCollection(collections[0]);
+        
 
         window.addEventListener('resize', resizeListener);
 
@@ -183,6 +215,27 @@ export default function Home() {
         }
 
     };
+
+    const handleUpdateCollectionTitle = async (event: any) => {
+
+
+        setCollections((prevItems) =>
+            prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
+        );
+        setActiveCollection((prevValue) => {
+            return { ...prevValue!, title: event.target.value }
+        }
+        );
+        const { error } = await supabase
+            .from('collection')
+            .update({ title: event.target.value })
+            .eq('id', activeCollection?.id)
+
+        if (error) {
+            console.log(error);
+        }
+
+    }
 
     // This handler does not execute from fullscreen mode, only preview.
     const handleUpdateSnippetCode = async (value: Snippet, code: string) => {
@@ -383,8 +436,8 @@ export default function Home() {
                                 >
                                     <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
                                         <div className="flex overflow-x-auto ">
-                                            <p className="truncate flex items-center">
-                                                <span className="material-symbols-outlined">folder</span>
+                                            <p className="flex items-center">
+                                                <span className=" material-symbols-outlined">folder</span>
                                                 {value.title}
                                             </p>
                                         </div>
@@ -531,7 +584,6 @@ export default function Home() {
                                 loading={loadingAddCollection}
                             />
                         </div>
-
                     </div>
 
                     <div className="flex flex-col overflow-y-auto pl-2">
@@ -545,15 +597,18 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
-                                    <div className="flex overflow-x-auto ">
-                                        <p className="truncate flex items-center">
+                                <div className={`w-full flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
+                                    <div className="flex overflow-x-auto w-80">
+                                        <div className="truncate flex">
+                                            <div className="flex items-center">
                                             <span className="material-symbols-outlined">folder</span>
-                                            {value.title}
-                                        </p>
+                                            </div>
+                                            
+                                            <p className="truncate">{value.title}</p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex-1 flex justify-end pr-2">
+                                    <div className="flex-1 flex justify-end pr-2 ">
                                         <button onClick={() => handleDeleteCollection(value)}>
                                             <span className="material-symbols-outlined flex items-center">delete</span>
 
@@ -577,15 +632,10 @@ export default function Home() {
                                 className="text-2xl bg-neutral-900 w-full text-2xl font-bold"
                                 name="title"
                                 type="text"
+                                disabled={activeCollection ? false : true}
                                 value={activeCollection?.title}
                                 onChange={(event) => {
-                                    setCollections((prevItems) =>
-                                        prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
-                                    );
-                                    setActiveCollection((prevValue) => {
-                                        return { ...prevValue!, title: event.target.value }
-                                    }
-                                    );
+                                    handleUpdateCollectionTitle(event);
                                 }}
                             />{loadingAddSnippet && <span className="pl-2">
 
