@@ -4,7 +4,6 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
 import CodeBlock from "../components/Codeblock";
-import Loading from "/public/loading.svg";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';

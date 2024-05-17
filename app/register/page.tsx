@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
+import Loading from "/public/loading.svg";
 
 type FormState = {
     email: string;
@@ -17,6 +18,7 @@ export default function Register() {
 
     const [formState, setFormState] = useState<FormState>({email: '', password: '', confirm_password: ''});
     const [errorText, setErrorText] = useState<string>();
+    const [isLoading, setIsLoading] = useState(false);
 
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,11 +31,11 @@ export default function Register() {
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-
+      setIsLoading(true);
       if (formState.password !== formState.confirm_password){
 
         setErrorText("Passwords do not match. Please try again.");
-
+        setIsLoading(false);
         return
       }
 
@@ -48,7 +50,7 @@ export default function Register() {
     }else{
       setErrorText(error.message);
     }
-      console.log('Registering with:', formState);
+      setIsLoading(false);
     };
 
   return (
@@ -74,6 +76,12 @@ export default function Register() {
         <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
       </form>
       {errorText && <p className="text-red-500 flex justify-center">{errorText}</p>}
+      {isLoading &&
+            <div className="flex justify-center">
+              <Image src={Loading} alt="Loading" className="w-10 h-10" />
+            </div>
+
+          }
     </div>
     </div>
   </div>
