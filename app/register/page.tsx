@@ -55,7 +55,11 @@ export default function Register() {
 
   return (
     <div className="flex justify-center flex-col text-black h-screen">
-    <p className="text-4xl font-bold p-2 flex justify-center">CodePocket</p>
+    <button onClick={() => {
+      router.replace('/');
+    }}>
+      <p className="text-4xl font-bold p-2 flex justify-center">CodePocket</p>
+    </button>
     <div className="flex justify-center p-4">
     <div className="rounded bg-slate-200 p-4">
       <h1 className="flex justify-center text-xl font-bold">Register</h1>

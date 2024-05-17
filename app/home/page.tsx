@@ -14,8 +14,7 @@ import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./OverlayMenuPage";
-import { DndContext } from "@dnd-kit/core";
-import { Collection, Snippet } from "./types";
+import { Collection, Link, Snippet } from "./types";
 import SettingsOverlayPage from "./SettingsOverlayPage";
 
 export default function Home() {
@@ -30,7 +29,6 @@ export default function Home() {
     };
 
     const router = useRouter();
-
     const scrollableDiv = useRef<HTMLDivElement>(null);
 
     const [collections, setCollections] = useState<Collection[]>([])
@@ -150,6 +148,7 @@ export default function Home() {
             setCollections([...collections, {
                 id: data[0].id,
                 title: data[0].title,
+                shared: false,
             }]);
 
         }
@@ -165,7 +164,7 @@ export default function Home() {
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("deleteCollectionConfirmation");
         setToDeleteCollection(value);
-     
+
     }
 
     const handleDeleteSnippets = async () => {
@@ -279,13 +278,13 @@ export default function Home() {
 
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         const timeoutId = setTimeout(() => {
             const filtered = snippets.filter(item =>
                 item.title.toLowerCase().includes(query.toLowerCase()) ||
                 item.description.toLowerCase().includes(query.toLowerCase())
             );
-    
+
             setFilteredSnippets(filtered);
         }, 1000);
         return () => clearTimeout(timeoutId);
@@ -346,17 +345,16 @@ export default function Home() {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>What are you looking for?</p>
-                        <p>Press "Enter" to request a search result</p>
-                            <input
-                                className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
-                                name="search"
-                                type="text"
-                                placeholder="Type the snippet's title or description"
-                                onChange={handleInputChange}
-                            />
+                        <input
+                            className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
+                            name="search"
+                            type="text"
+                            placeholder="Type the snippet's title or description"
+                            onChange={handleInputChange}
+                        />
 
                         <ul className="h-80 overflow-y-auto">
-                            {filteredSnippets.map(item => (
+                            {filteredSnippets.length !== 0 ? filteredSnippets.map(item => (
 
                                 <li key={item.id} className="shadow hover:bg-slate-200 bg-slate-100 p-1 border m-1 ">
                                     <button
@@ -377,7 +375,7 @@ export default function Home() {
                                     </button>
                                 </li>
 
-                            ))}
+                            )) : <p className="flex justify-center items-center p-16">Press "Enter" to request a search result</p>}
                         </ul>
                     </OverlayMenuPage>);
             case "settings":
@@ -385,7 +383,7 @@ export default function Home() {
                     <OverlayMenuPage title="Settings" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <SettingsOverlayPage/>
+                        <SettingsOverlayPage />
                     </OverlayMenuPage>);
             case "signout":
                 return (
@@ -509,6 +507,50 @@ export default function Home() {
         setIsCopied(false);
     }
 
+    const handleShare = async () => {
+        const updateCollectionAccessibility = async () => {
+            const { data, error } = await supabase
+            .from('collection')
+            .update({ shared: true })
+            .eq('id', activeCollection?.id)
+            .select();
+        };
+
+        const insertLink = async () => {
+            const { data, error } = await supabase
+            .from('link')
+            .insert([
+                {
+                    accessibility: 'public',
+                    collection_id: activeCollection?.id,
+
+                },
+            ])
+            .select()
+        
+        console.log((data as Link[])[0].id);
+        };
+
+        if (!activeCollection?.shared){
+           updateCollectionAccessibility();
+           insertLink();
+
+           // Update the active collection shared attribute
+           const tempCollection = {...activeCollection, shared: true} as Collection;
+           setActiveCollection(tempCollection);
+           setCollections((prevValue) => (
+            prevValue.map((value) => {
+                if (value.id == activeCollection?.id){
+                    return {...value, shared: true};
+                }else{
+                    return value;
+                }
+            })
+           ));
+        }
+        
+
+    }
 
     if (isFullScreen) {
         return (
@@ -556,7 +598,7 @@ export default function Home() {
                             copyTrigger();
                         }}>
                             {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
-                            
+
                         </CopyToClipboard>
                     </div>
                     <CodeBlock
@@ -704,7 +746,7 @@ export default function Home() {
                             {/* // New code snippet */}
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
                             {/* // Share collection */}
-                            <IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} />
+                            {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true}/> :<IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
                             <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
@@ -786,7 +828,7 @@ export default function Home() {
 
                                                 <CopyToClipboard text={value.code} onCopy={() => {
                                                     copyTrigger();
-                                                 }}>
+                                                }}>
                                                     {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
 
                                                 </CopyToClipboard>
@@ -795,7 +837,7 @@ export default function Home() {
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-                                                        
+
                                                     handleUpdateSnippetCode(value, codeValue);
                                                 }} />
                                             </div>

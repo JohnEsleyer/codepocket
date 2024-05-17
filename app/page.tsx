@@ -57,21 +57,23 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="flex justify-center flex-col">
             <label>
               <p>Email</p>
-              <input className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
+              <input required className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
             </label>
             <label>
               <p>Password</p>
-              <input className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
+              <input required className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
             </label>
             <br />
             <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
+            <button onClick={() => {
+              router.push('/register');
+            }}><span className="underline">Create new account</span></button>
           </form>
           {errorText && <p className="text-red-500 flex justify-center">{errorText}</p>}
           {isLoading &&
             <div className="flex justify-center">
               <Image src={Loading} alt="Loading" className="w-10 h-10" />
             </div>
-
           }
         </div>
       </div>

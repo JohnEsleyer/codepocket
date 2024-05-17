@@ -1,6 +1,7 @@
 export interface Collection {
     id: number;
     title: string;
+    shared: boolean;
 }
 
 export interface Snippet {
@@ -10,4 +11,10 @@ export interface Snippet {
     code: string;
     language: string;
     description: string;
+}
+
+export interface Link{
+    id: string;
+    accessibility: string;
+    collection_id: number;
 }
