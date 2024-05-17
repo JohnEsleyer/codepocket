@@ -53,11 +53,11 @@ export default function Home() {
         <form onSubmit={handleSubmit} className="flex justify-center flex-col">
           <label>
             <p>Email</p>
-            <input className="p-1 pr-10" type="text" name="email" value={formState.email} onChange={handleInputChange} />
+            <input className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
           </label>
           <label>
             <p>Password</p>
-            <input className="p-1 pr-10 text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
+            <input className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
           </label>
           <br />
           <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
