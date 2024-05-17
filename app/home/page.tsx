@@ -3,68 +3,84 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
-import CodeBlock from "./Codeblock";
-import Loading from "/public/loading.svg";
+import CodeBlock from "../components/Codeblock";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import DropdownMenu from "./DropdownMenu";
+import DropdownMenu from "../components/DropdownMenu";
 import { languages } from "./constants";
 import SidebarButton from "./SidebarButton";
 import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import OverlayMenuPage from "./overlayMenuPage";
-import { DndContext } from "@dnd-kit/core";
-
-interface Collection {
-    id: number;
-    title: string;
-    description: string;
-
-}
-
-interface Snippet {
-    id: number;
-    title: string;
-    collection_id: number;
-    code: string;
-    language: string;
-    description: string;
-}
+import OverlayMenuPage from "./OverlayMenuPage";
+import { Collection, Link, Snippet } from "./types";
+import SettingsOverlayPage from "./SettingsOverlayPage";
 
 export default function Home() {
-    const router = useRouter();
 
-    const scrollableDiv = useRef<HTMLDivElement>(null);
-
-    const [collections, setCollections] = useState<Collection[]>(testCollections)
-    const [snippets, setSnippets] = useState<Snippet[]>(testSnippets);
-    const [orientation, setOrientation] = useState<string>('');
-    const [activeCollection, setActiveCollection] = useState<Collection>();
-    const [isFullScreen, setIsFullscreen] = useState(false);
-    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>({
+    const defaultFullscreenSnippet = {
         id: 0,
         title: 'untitled',
         collection_id: 0,
         code: '',
         language: 'python',
         description: '',
-    });
+    };
+
+    const router = useRouter();
+    const scrollableDiv = useRef<HTMLDivElement>(null);
+
+    const [collections, setCollections] = useState<Collection[]>([])
+    const [snippets, setSnippets] = useState<Snippet[]>([]);
+    const [orientation, setOrientation] = useState<string>('');
+    const [activeCollection, setActiveCollection] = useState<Collection>();
+    const [isFullScreen, setIsFullscreen] = useState(false);
+    const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
     const [singleColumn, setSingleColumn] = useState(false);
     const [showOverlayMenuPage, setShowOverlayMenuPage] = useState(false);
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
     const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
-    const [query, setQuery] = useState('');
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
-
+    const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
+    const [query, setQuery] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
 
+    const fetchDbData = async () => {
+        async function fetchAllCollections() {
+            // Fetch all collections by current user
+            let { data: collection, error } = await supabase
+                .from('collection')
+                .select('*')
 
+            if (error) {
+                console.log(error);
+            } else {
+                setCollections(collection as Collection[]);
+            }
+        }
 
+        async function fetchAllSnippets() {
+            // Fetch all snippets by current user
+            let { data: snippets, error } = await supabase
+                .from('snippet')
+                .select('*')
+
+            if (error) {
+                console.log(error);
+            } else {
+                setSnippets(snippets as Snippet[]);
+            }
+        }
+
+        fetchAllCollections();
+        fetchAllSnippets();
+
+    };
 
 
     useEffect(() => {
@@ -92,10 +108,12 @@ export default function Home() {
             checkOrientation();
         };
 
-
+        // Fetch all user data
+        fetchDbData();
 
         // Set the first collection as the default active collection
         setActiveCollection(collections[0]);
+
 
         window.addEventListener('resize', resizeListener);
 
@@ -107,6 +125,7 @@ export default function Home() {
 
     }, []);
 
+
     const scrollToBottom = () => {
         if (scrollableDiv.current) {
             scrollableDiv.current.scrollTop = scrollableDiv.current.scrollHeight;
@@ -116,12 +135,23 @@ export default function Home() {
     const handleAddCollection = async () => {
         setLoadingAddCollection(true);
 
+        const { data, error } = await supabase
+            .from('collection')
+            .insert({
+                title: "New Collection",
+            }).select();
 
-        setCollections([...collections, {
-            id: collections.length + 1,
-            title: "Collection " + (collections.length + 1),
-            description: "Description"
-        }]);
+        if (error) {
+            console.log(error);
+        } else {
+            // console.log(data[0].id);
+            setCollections([...collections, {
+                id: data[0].id,
+                title: data[0].title,
+                shared: false,
+            }]);
+
+        }
 
 
         setTimeout(() => {
@@ -129,29 +159,168 @@ export default function Home() {
         }, 1000);
     };
 
+    const handleDeleteCollection = async (value: Collection) => {
 
-    const handleInputChange = (e: any) => {
-        const newQuery = e.target.value;
-        setQuery(newQuery);
-        const filtered = snippets.filter(item =>
-            item.title.toLowerCase().includes(newQuery.toLowerCase()) ||
-            item.description.toLowerCase().includes(newQuery.toLowerCase())
+        setShowOverlayMenuPage(true);
+        setCurrentOverlayMenuPage("deleteCollectionConfirmation");
+        setToDeleteCollection(value);
+
+    }
+
+    const handleDeleteSnippets = async () => {
+
+        selectedSnippetsId.map(async (itemId) => {
+            console.log('itemId:' + itemId);
+            const { error } = await supabase
+                .from('snippet')
+                .delete()
+                .eq('id', itemId);
+
+            if (error) {
+                console.log(error);
+            } else {
+                setSnippets((prevItems) => (
+                    prevItems.filter((item, index) => (
+                        !selectedSnippetsId.includes(item.id)
+                    ))
+                ));
+            }
+        });
+
+        setSelectedSnippetsId([]);
+
+    };
+
+    // This handler does not execute from fullscreen mode, only preview.
+    const handleUpdateSnippetLanguage = async (value: Snippet, language: string) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, language: language } : item))
         );
-        setFilteredSnippets(filtered);
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ language: language })
+            .eq('id', value.id)
+
+
+        if (error) {
+            console.log(error);
+        }
+
+    };
+
+    const handleUpdateCollectionTitle = async (event: any) => {
+
+
+        setCollections((prevItems) =>
+            prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
+        );
+        setActiveCollection((prevValue) => {
+            return { ...prevValue!, title: event.target.value }
+        }
+        );
+        const { error } = await supabase
+            .from('collection')
+            .update({ title: event.target.value })
+            .eq('id', activeCollection?.id)
+
+        if (error) {
+            console.log(error);
+        }
+
+    }
+
+    // This handler does not execute from fullscreen mode, only preview.
+    const handleUpdateSnippetCode = async (value: Snippet, code: string) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, code: code } : item))
+        );
+        const { error } = await supabase
+            .from('snippet')
+            .update({ code: code })
+            .eq('id', value.id);
+
+
+        if (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateSnippetDescription = async (event: any, value: Snippet) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
+        );
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ description: event.target.value })
+            .eq('id', value.id);
+
+
+        if (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateSnippetTitle = async (event: any, value: Snippet) => {
+        setSnippets((prevItems) =>
+            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
+        );
+
+        const { error } = await supabase
+            .from('snippet')
+            .update({ title: event.target.value })
+            .eq('id', value.id)
+
+        if (error) {
+            console.log(error);
+        }
+
+    };
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            const filtered = snippets.filter(item =>
+                item.title.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
+            );
+
+            setFilteredSnippets(filtered);
+        }, 1000);
+        return () => clearTimeout(timeoutId);
+    }, [query]);
+
+    const handleInputChange = (event: any) => {
+        setQuery(event.target.value);
     }
 
     const handleAddSnippet = async () => {
-
         setLoadingAddSnippet(true);
 
-        setSnippets([...snippets, {
-            id: snippets.length + Math.random() * 10000,
-            title: "Snippet " + (snippets.length + 1),
-            collection_id: activeCollection!.id,
-            code: ``,
-            language: "python",
-            description: "Description",
-        }]);
+        const { data, error } = await supabase
+            .from('snippet')
+            .insert({
+                title: "New Snippet",
+                description: "Provide a brief description here.",
+                collection_id: activeCollection?.id,
+                code: '',
+                language: 'python',
+            }).select();
+
+        if (error) {
+            console.log(error);
+        } else {
+            console.log("success adding snippet to db");
+            // console.log('add:' + data[0].id);
+            setSnippets([...snippets, {
+                id: data[0].id,
+                title: data[0].title,
+                collection_id: data[0].collection_id,
+                code: data[0].code,
+                description: data[0].description,
+                language: data[0].language,
+            }]);
+        }
 
 
         setTimeout(() => {
@@ -168,7 +337,6 @@ export default function Home() {
 
     };
 
- 
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
@@ -184,8 +352,9 @@ export default function Home() {
                             placeholder="Type the snippet's title or description"
                             onChange={handleInputChange}
                         />
+
                         <ul className="h-80 overflow-y-auto">
-                            {filteredSnippets.map(item => (
+                            {filteredSnippets.length !== 0 ? filteredSnippets.map(item => (
 
                                 <li key={item.id} className="shadow hover:bg-slate-200 bg-slate-100 p-1 border m-1 ">
                                     <button
@@ -206,7 +375,7 @@ export default function Home() {
                                     </button>
                                 </li>
 
-                            ))}
+                            )) : <p className="flex justify-center items-center p-16">Press "Enter" to request a search result</p>}
                         </ul>
                     </OverlayMenuPage>);
             case "settings":
@@ -214,11 +383,11 @@ export default function Home() {
                     <OverlayMenuPage title="Settings" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <p>Settings</p>
+                        <SettingsOverlayPage />
                     </OverlayMenuPage>);
             case "signout":
                 return (
-                    <OverlayMenuPage title="Sign Out" dialogMode={true} onClose={() => {
+                    <OverlayMenuPage title="Sign Out" dialogMode={true} disableCloseButton={true} onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to sign out?</p>
@@ -229,6 +398,49 @@ export default function Home() {
                                 router.replace('/');
                             }}
                         >Continue</button>
+                        <button
+                            className=" p-2 border rounded"
+                            onClick={async () => {
+
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Cancel</button>
+                    </OverlayMenuPage>);
+            case "deleteCollectionConfirmation":
+                return (
+                    <OverlayMenuPage title="Delete collection" dialogMode={true} disableCloseButton={true} onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <p>Are you sure, you want to delete this collection?</p>
+                        <button
+                            className="bg-black text-white p-2 border rounded"
+                            onClick={async () => {
+                                const { error } = await supabase
+                                    .from('collection')
+                                    .delete()
+                                    .eq('id', toDeleteCollection?.id);
+
+                                if (error) {
+                                    console.log(error);
+                                } else {
+                                    setCollections((prevItems) => {
+                                        return prevItems.filter((item) => item.id !== toDeleteCollection?.id);
+
+                                    });
+                                }
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Continue</button>
+                        <button
+                            className=" p-2 border rounded"
+                            onClick={async () => {
+
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Cancel</button>
                     </OverlayMenuPage>);
             case "move":
                 return (
@@ -242,9 +454,19 @@ export default function Home() {
                                     key={index}
                                     className="flex justify-start w-full"
                                     onClick={() => {
+
                                         setSnippets((prevItems) =>
                                             prevItems.map((item) => {
+                                                const updateDb = async () => {
+                                                    const { data, error } = await supabase
+                                                        .from('snippet')
+                                                        .update({ collection_id: value.id })
+                                                        .eq('id', item.id);
+                                                }
+
+
                                                 if (selectedSnippetsId.includes(item.id)) {
+                                                    updateDb();
                                                     return { ...item, collection_id: value.id }
                                                 }
                                                 return item;
@@ -255,8 +477,8 @@ export default function Home() {
                                 >
                                     <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
                                         <div className="flex overflow-x-auto ">
-                                            <p className="truncate flex items-center">
-                                                <span className="material-symbols-outlined">folder</span>
+                                            <p className="flex items-center">
+                                                <span className=" material-symbols-outlined">folder</span>
                                                 {value.title}
                                             </p>
                                         </div>
@@ -273,21 +495,62 @@ export default function Home() {
 
     }
 
-    const handleDeleteSnippets = () => {
-        setSnippets((prevItems) => (
-            prevItems.filter((item, index) => (
-                !selectedSnippetsId.includes(item.id)
-            ))
-        ));
-        setSelectedSnippetsId([]);
-
-    };
 
     const handleMoveSnippets = () => {
         setCurrentOverlayMenuPage('move');
         setShowOverlayMenuPage(true);
     };
 
+    const copyTrigger = async () => {
+        setIsCopied(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        setIsCopied(false);
+    }
+
+    const handleShare = async () => {
+        const updateCollectionAccessibility = async () => {
+            const { data, error } = await supabase
+            .from('collection')
+            .update({ shared: true })
+            .eq('id', activeCollection?.id)
+            .select();
+        };
+
+        const insertLink = async () => {
+            const { data, error } = await supabase
+            .from('link')
+            .insert([
+                {
+                    accessibility: 'public',
+                    collection_id: activeCollection?.id,
+
+                },
+            ])
+            .select()
+        
+        console.log((data as Link[])[0].id);
+        };
+
+        if (!activeCollection?.shared){
+           updateCollectionAccessibility();
+           insertLink();
+
+           // Update the active collection shared attribute
+           const tempCollection = {...activeCollection, shared: true} as Collection;
+           setActiveCollection(tempCollection);
+           setCollections((prevValue) => (
+            prevValue.map((value) => {
+                if (value.id == activeCollection?.id){
+                    return {...value, shared: true};
+                }else{
+                    return value;
+                }
+            })
+           ));
+        }
+        
+
+    }
 
     if (isFullScreen) {
         return (
@@ -304,13 +567,22 @@ export default function Home() {
 
                                 <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                     {languages.map((lang, index) => (
-                                        <button key={index} onClick={() => {
+                                        <button key={index} onClick={async () => {
                                             setSnippets((prevItems) =>
                                                 prevItems.map((item) => (item.id === fullScreenSnippet.id ? { ...item, language: lang } : item))
                                             );
                                             setFullScreenSnippet((prevValue) => {
                                                 return { ...fullScreenSnippet, language: lang }
                                             });
+                                            const { error } = await supabase
+                                                .from('snippet')
+                                                .update({ language: lang })
+                                                .eq('id', fullScreenSnippet.id);
+
+
+                                            if (error) {
+                                                console.log(error);
+                                            }
                                         }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                     ))}
                                 </div>
@@ -322,15 +594,18 @@ export default function Home() {
                                 return prevItems.filter((item) => item.id !== fullScreenSnippet.id);
                             });
                         }} />
-                        <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => { }}>
-                            <IconButton icon="content_copy" text="Copy" />
+                        <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
+                            copyTrigger();
+                        }}>
+                            {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+
                         </CopyToClipboard>
                     </div>
                     <CodeBlock
                         full={true}
                         codeValue={fullScreenSnippet.code}
                         language={fullScreenSnippet?.language == null ? '' : fullScreenSnippet.language}
-                        onCodeChange={(codeValue) => {
+                        onCodeChange={async (codeValue) => {
                             setSnippets((prevItems) =>
                                 prevItems.map((item) => (item.id === fullScreenSnippet?.id ? { ...item, code: codeValue } : item))
                             );
@@ -340,6 +615,16 @@ export default function Home() {
                                     code: codeValue,
                                 }
                             });
+
+                            const { error } = await supabase
+                                .from('snippet')
+                                .update({ code: codeValue })
+                                .eq('id', fullScreenSnippet.id);
+
+
+                            if (error) {
+                                console.log(error);
+                            }
 
                         }} />
                 </div>
@@ -393,7 +678,6 @@ export default function Home() {
                                 loading={loadingAddCollection}
                             />
                         </div>
-
                     </div>
 
                     <div className="flex flex-col overflow-y-auto pl-2">
@@ -407,21 +691,19 @@ export default function Home() {
                                     setActiveCollection(value);
                                 }}
                             >
-                                <div className={`w-full space-x-10 flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
-                                    <div className="flex overflow-x-auto ">
-                                        <p className="truncate flex items-center">
-                                            <span className="material-symbols-outlined">folder</span>
-                                            {value.title}
-                                        </p>
+                                <div className={`w-full flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
+                                    <div className="flex overflow-x-auto w-80">
+                                        <div className="truncate flex">
+                                            <div className="flex items-center">
+                                                <span className="material-symbols-outlined">folder</span>
+                                            </div>
+
+                                            <p className="truncate">{value.title}</p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex-1 flex justify-end pr-2">
-                                        <button onClick={() => {
-                                            setCollections((prevItems) => {
-                                                return prevItems.filter((item) => item.id !== value.id);
-
-                                            });
-                                        }}>
+                                    <div className="flex-1 flex justify-end pr-2 ">
+                                        <button onClick={() => handleDeleteCollection(value)}>
                                             <span className="material-symbols-outlined flex items-center">delete</span>
 
                                         </button>
@@ -444,15 +726,10 @@ export default function Home() {
                                 className="text-2xl bg-neutral-900 w-full text-2xl font-bold"
                                 name="title"
                                 type="text"
+                                disabled={activeCollection ? false : true}
                                 value={activeCollection?.title}
                                 onChange={(event) => {
-                                    setCollections((prevItems) =>
-                                        prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
-                                    );
-                                    setActiveCollection((prevValue) => {
-                                        return { ...prevValue!, title: event.target.value }
-                                    }
-                                    );
+                                    handleUpdateCollectionTitle(event);
                                 }}
                             />{loadingAddSnippet && <span className="pl-2">
 
@@ -467,9 +744,9 @@ export default function Home() {
 
                         <div className="flex space-x-4">
                             {/* // New code snippet */}
-                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} isDark={true} />
+                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
                             {/* // Share collection */}
-                            <IconButton icon="share" text="Share" isDark={true} />
+                            {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true}/> :<IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
                             <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
@@ -494,9 +771,7 @@ export default function Home() {
                                                         disabled={false}
                                                         value={value.title}
                                                         onChange={(event) => {
-                                                            setSnippets((prevItems) =>
-                                                                prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
-                                                            );
+                                                            handleUpdateSnippetTitle(event, value);
                                                         }}
                                                     />
                                                     <input
@@ -506,17 +781,16 @@ export default function Home() {
                                                         name="myCheckbox"
                                                         key={value.id}
                                                         onChange={(event) => {
-
-                                                            setSelectedSnippetsId((prevItems) => {
-                                                                if (prevItems.includes(value.id)) {
-                                                                    return prevItems.filter((snippetId) => (
+                                                            setSelectedSnippetsId((prevItemsId) => {
+                                                                if (prevItemsId.includes(value.id)) {
+                                                                    return prevItemsId.filter((snippetId) => (
                                                                         snippetId !== value.id
                                                                     ));
                                                                 } else {
-                                                                    return [...prevItems, value.id];
+                                                                    return [...prevItemsId, value.id];
                                                                 }
                                                             });
-                                                            console.log('Selected:' + selectedSnippetsId);
+                                                            // console.log('Selected:' + selectedSnippetsId);
 
                                                         }} />
 
@@ -525,14 +799,10 @@ export default function Home() {
                                                 <textarea
                                                     className="bg-slate-100 w-full"
                                                     name="description"
-
-
                                                     maxLength={110}
                                                     value={value.description}
                                                     onChange={(event) => {
-                                                        setSnippets((prevItems) =>
-                                                            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
-                                                        );
+                                                        handleUpdateSnippetDescription(event, value);
                                                     }}
                                                 />
 
@@ -545,9 +815,7 @@ export default function Home() {
                                                         <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                                             {languages.map((lang, index) => (
                                                                 <button key={index} onClick={() => {
-                                                                    setSnippets((prevItems) =>
-                                                                        prevItems.map((item) => (item.id === value.id ? { ...item, language: lang } : item))
-                                                                    );
+                                                                    handleUpdateSnippetLanguage(value, lang);
                                                                 }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
                                                             ))}
                                                         </div>
@@ -558,18 +826,19 @@ export default function Home() {
                                                     setFullScreenSnippet(value);
                                                 }} />
 
-                                                <CopyToClipboard text={value.code} onCopy={() => { }}>
-                                                    <IconButton icon="content_copy" text="Copy" />
+                                                <CopyToClipboard text={value.code} onCopy={() => {
+                                                    copyTrigger();
+                                                }}>
+                                                    {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+
                                                 </CopyToClipboard>
                                             </div>
 
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-                                                    console.log(codeValue);
-                                                    setSnippets((prevItems) =>
-                                                        prevItems.map((item) => (item.id === value.id ? { ...item, code: codeValue } : item))
-                                                    );
+
+                                                    handleUpdateSnippetCode(value, codeValue);
                                                 }} />
                                             </div>
 

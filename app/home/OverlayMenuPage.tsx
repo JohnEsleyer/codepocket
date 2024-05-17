@@ -6,13 +6,14 @@ interface Props {
     title: string;
     children: ReactNode;
     dialogMode?: boolean;
+    disableCloseButton?: boolean;
 }
 
-const OverlayMenuPage: React.FC<Props> = ({onClose, title, children, dialogMode}) => {
+const OverlayMenuPage: React.FC<Props> = ({onClose, title, children, dialogMode, disableCloseButton}) => {
     return ( <div className={`border rounded bg-slate-100 text-black ${dialogMode ? 'w-80' : "w-4/5"} p-2`}>
     <div className="flex w-full">
         <p className="flex-1 text-3xl font-bold">{title}</p>
-        <IconButton icon="close" text="Close" onClick={onClose} />
+        {!disableCloseButton && <IconButton icon="close" text="Close" onClick={onClose} />}
     </div>
     {children}
 </div>);
