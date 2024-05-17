@@ -3,12 +3,12 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import { testCollections, testSnippets } from "./testdata";
-import CodeBlock from "./Codeblock";
+import CodeBlock from "../components/Codeblock";
 import Loading from "/public/loading.svg";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import DropdownMenu from "./DropdownMenu";
+import DropdownMenu from "../components/DropdownMenu";
 import { languages } from "./constants";
 import SidebarButton from "./SidebarButton";
 import IconButton from "../components/IconButton";
@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import OverlayMenuPage from "./OverlayMenuPage";
 import { DndContext } from "@dnd-kit/core";
 import { Collection, Snippet } from "./types";
+import SettingsOverlayPage from "./SettingsOverlayPage";
 
 export default function Home() {
 
@@ -46,6 +47,7 @@ export default function Home() {
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
     const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
+    const [isCopied, setIsCopied] = useState(false);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -289,7 +291,7 @@ export default function Home() {
         }, 1000);
         return () => clearTimeout(timeoutId);
     }, [query]);
-    
+
     const handleInputChange = (event: any) => {
         setQuery(event.target.value);
     }
@@ -345,6 +347,7 @@ export default function Home() {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>What are you looking for?</p>
+                        <p>Press "Enter" to request a search result</p>
                             <input
                                 className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
                                 name="search"
@@ -383,11 +386,11 @@ export default function Home() {
                     <OverlayMenuPage title="Settings" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
-                        <p>Settings</p>
+                        <SettingsOverlayPage/>
                     </OverlayMenuPage>);
             case "signout":
                 return (
-                    <OverlayMenuPage title="Sign Out" dialogMode={true} onClose={() => {
+                    <OverlayMenuPage title="Sign Out" dialogMode={true} disableCloseButton={true} onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to sign out?</p>
@@ -398,6 +401,14 @@ export default function Home() {
                                 router.replace('/');
                             }}
                         >Continue</button>
+                        <button
+                            className=" p-2 border rounded"
+                            onClick={async () => {
+
+                                setShowOverlayMenuPage(false);
+                            }}
+
+                        >Cancel</button>
                     </OverlayMenuPage>);
             case "deleteCollectionConfirmation":
                 return (
@@ -493,6 +504,12 @@ export default function Home() {
         setShowOverlayMenuPage(true);
     };
 
+    const copyTrigger = async () => {
+        setIsCopied(true);
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        setIsCopied(false);
+    }
+
 
     if (isFullScreen) {
         return (
@@ -536,8 +553,11 @@ export default function Home() {
                                 return prevItems.filter((item) => item.id !== fullScreenSnippet.id);
                             });
                         }} />
-                        <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => { }}>
-                            <IconButton icon="content_copy" text="Copy" />
+                        <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
+                            copyTrigger();
+                        }}>
+                            {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+                            
                         </CopyToClipboard>
                     </div>
                     <CodeBlock
@@ -765,15 +785,18 @@ export default function Home() {
                                                     setFullScreenSnippet(value);
                                                 }} />
 
-                                                <CopyToClipboard text={value.code} onCopy={() => { }}>
-                                                    <IconButton icon="content_copy" text="Copy" />
+                                                <CopyToClipboard text={value.code} onCopy={() => {
+                                                    copyTrigger();
+                                                 }}>
+                                                    {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+
                                                 </CopyToClipboard>
                                             </div>
 
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-
+                                                        
                                                     handleUpdateSnippetCode(value, codeValue);
                                                 }} />
                                             </div>

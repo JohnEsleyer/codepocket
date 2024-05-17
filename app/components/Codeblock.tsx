@@ -35,7 +35,6 @@ import "ace-builds/src-noconflict/mode-rust";
 import "ace-builds/src-noconflict/mode-sql";
 import "ace-builds/src-noconflict/mode-xml";
 import "ace-builds/src-noconflict/mode-zig";
-
 import 'ace-builds/src-noconflict/theme-tomorrow_night';
 
 import "ace-builds/src-noconflict/ext-language_tools";
