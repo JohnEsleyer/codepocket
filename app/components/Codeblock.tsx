@@ -44,10 +44,11 @@ interface Props {
     codeValue: string;
     language: string;
     full?: boolean;
+    readOnly?: boolean;
     onCodeChange: (value: string, event?: any) => void;
 }
 
-const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) => {
+const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange, readOnly}) => {
     const [maxScreenHeight, setMaxScreenHeight] = useState<number | null>(null);
     const [maxScreenWidth, setMaxScreenWidth] = useState<number | null>(null);
 
@@ -74,7 +75,7 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) 
             onChange={(value, event) => {
                 onCodeChange(value, event);
             }}
-            readOnly={false}
+            readOnly={readOnly}
             value={codeValue}
             mode={language}
             theme="tomorrow_night"
