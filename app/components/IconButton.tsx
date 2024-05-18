@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode, useState } from 'react';
 
 interface IconButtonProps {
   icon: string;
@@ -8,6 +8,7 @@ interface IconButtonProps {
   onClick?: () => void;
   iconColor?: string;
   disabled?: boolean;
+  elementAfterClick?: ReactNode;
 }
 
 const IconButton: React.FC<IconButtonProps> = ({ 
@@ -18,14 +19,32 @@ const IconButton: React.FC<IconButtonProps> = ({
   noBackground, 
   iconColor,
   disabled,
+  elementAfterClick,
 }) => {
+
+  const [changeElement, setChangeElement] = useState(false);
   
   if (disabled){
     noBackground = true;
   }
 
+  if (changeElement){
+    return (<div>
+      {elementAfterClick}
+    </div>)
+  }
+
   return (
-    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded`} onClick={onClick}>
+    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded`} onClick={() => {
+      setChangeElement(true);
+      onClick!();
+      
+      setTimeout(() => {
+        setChangeElement(false);
+      }, 2000);
+
+
+    }}>
       <div className={`flex flex items-center ${isDark && !disabled ? 'hover:text-black text-white' : disabled ? 'text-gray-500': 'text-black'}`}>
         <span className={`text-2xl material-symbols-outlined text-${iconColor}-500`}>{icon}</span>
         <span className="flex items-center">{text}</span>

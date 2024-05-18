@@ -44,7 +44,6 @@ export default function Home() {
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
     const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
-    const [isCopied, setIsCopied] = useState(false);
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -502,9 +501,7 @@ export default function Home() {
     };
 
     const copyTrigger = async () => {
-        setIsCopied(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setIsCopied(false);
     }
 
     const handleShare = async () => {
@@ -597,7 +594,11 @@ export default function Home() {
                         <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
                             copyTrigger();
                         }}>
-                            {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+                            <IconButton icon="content_copy" text="Copy" elementAfterClick={(
+                                <p className="pt-1">
+                                    Copied!
+                                </p>
+                            )}/>
 
                         </CopyToClipboard>
                     </div>
@@ -829,7 +830,11 @@ export default function Home() {
                                                 <CopyToClipboard text={value.code} onCopy={() => {
                                                     copyTrigger();
                                                 }}>
-                                                    {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+                                                   <IconButton icon="content_copy" text="Copy" elementAfterClick={
+                                                    (<p>
+                                                        Copied!
+                                                    </p>)
+                                                   }/>
 
                                                 </CopyToClipboard>
                                             </div>
