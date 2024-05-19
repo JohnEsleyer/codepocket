@@ -8,18 +8,17 @@ import Loading from "/public/loading.svg";
 
 type FormState = {
     email: string;
+    username: string;
     password: string;
     confirm_password: string;
-  };
-
+};
 
 export default function Register() {
     const router = useRouter();
 
-    const [formState, setFormState] = useState<FormState>({email: '', password: '', confirm_password: ''});
+    const [formState, setFormState] = useState<FormState>({email: '', username: '', password: '', confirm_password: ''});
     const [errorText, setErrorText] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
-
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = event.target;
@@ -41,8 +40,14 @@ export default function Register() {
 
       const {data, error} = await supabase.auth.signUp({
         email: formState.email,
-        password: formState.password
+        password: formState.password,
+        options: {
+          data: {
+            username: formState.username,
+          }
+        }
       });
+
 
       if (!error) {
       router.push('/home');
@@ -67,6 +72,10 @@ export default function Register() {
         <label>
           <p>Email</p>
           <input required className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
+        </label>
+        <label>
+          <p>Username</p>
+          <input required className="p-1 w-full" type="text" name="username" value={formState.username} onChange={handleInputChange} />
         </label>
         <label>
           <p>Password</p>
