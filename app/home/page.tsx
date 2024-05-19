@@ -653,6 +653,8 @@ export default function Home() {
                             )} />
 
                         </CopyToClipboard>
+                        {fullScreenSnippet.code.length >= 3000 && <p className="flex items-center text-red-500">Max characters reached!</p>}
+
                     </div>
                     <CodeBlock
                         full={true}
@@ -861,7 +863,9 @@ export default function Home() {
 
 
                                             </form>
+                                            
                                             <div className="flex justify-end items-center space-x-2">
+                                            {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
                                                 <div className="hover:bg-slate-300 rounded">
                                                     <DropdownMenu buttonText={value.language} >
 
@@ -891,6 +895,7 @@ export default function Home() {
                                                 </CopyToClipboard>
                                             </div>
 
+                                        
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
