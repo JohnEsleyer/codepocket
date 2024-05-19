@@ -8,7 +8,8 @@ import { Collection, Link, Snippet } from "@/app/home/types";
 import supabase from "@/app/utils/supabase";
 import { useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
-
+import Loading from "/public/loading.svg";
+import Image from "next/image";
 
 export default function Page({ params }: { params: { slug: string } }) {
 
@@ -27,7 +28,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [singleColumn, setSingleColumn] = useState(false);
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
-
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
 
@@ -42,7 +43,7 @@ export default function Page({ params }: { params: { slug: string } }) {
             // }
 
             console.log(window.innerWidth);
-            if (window.innerWidth < 950) {
+            if (window.innerWidth < 730) {
                 setSingleColumn(true)
             } else {
                 setSingleColumn(false);
@@ -56,22 +57,20 @@ export default function Page({ params }: { params: { slug: string } }) {
         };
 
 
+        const fetchSnippets = async (collection_id: number) => {
 
-        // Check if link exists in db
-        const fetchLink = async () => {
-            let { data: link, error } = await supabase
-                .from('link')
+            let { data: snippet, error } = await supabase
+                .from('snippet')
                 .select('*')
-                .eq('id', params.slug);
+                .eq('collection_id', collection_id);
 
             if (error) {
                 console.log(error);
             } else {
-                setLinkState((link as Link[])[0]);
-                fetchCollection((link as Link[])[0].collection_id);
+                setSnippets(snippet as Snippet[]);
+                setIsLoading(false);
             }
-
-        };
+        }
 
         // Fetch collection asssociate with the link
         const fetchCollection = async (collection_id: number) => {
@@ -90,19 +89,22 @@ export default function Page({ params }: { params: { slug: string } }) {
             }
         };
 
-        const fetchSnippets = async (collection_id: number) => {
-
-            let { data: snippet, error } = await supabase
-                .from('snippet')
+        // Check if link exists in db
+        const fetchLink = async () => {
+            let { data: link, error } = await supabase
+                .from('link')
                 .select('*')
-                .eq('collection_id', collection_id);
+                .eq('id', params.slug);
 
             if (error) {
                 console.log(error);
             } else {
-                setSnippets(snippet as Snippet[]);
+                setLinkState((link as Link[])[0]);
+                fetchCollection((link as Link[])[0].collection_id);
             }
-        }
+
+        };
+
 
         fetchLink();
 
@@ -113,8 +115,20 @@ export default function Page({ params }: { params: { slug: string } }) {
         };
     }, []);
 
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <Image
+                    src={Loading}
+                    alt={''}
+                    width={30}
+                    height={30}
 
-   
+                />
+            </div>
+        );
+    }
+
     if (linkState) {
 
         if (isFullScreen) {
@@ -135,7 +149,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                             });
                         }} />
                         <CopyToClipboard text={fullScreenSnippet.code}>
-                            <IconButton icon="content_copy" text="Copy" elementAfterClick={(
+                            <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={(
                                 <p className="pt-1">
                                     Copied!
                                 </p>
@@ -175,8 +189,10 @@ export default function Page({ params }: { params: { slug: string } }) {
             );
         }
 
+
+
         return <div>
-            {/* <p>{link.id}</p> */}
+
             <div className="bg-black text-white p-4">
                 <p className="text-2xl">{collection?.title}</p>
                 <p className="text-xs">Read Only</p>
@@ -192,7 +208,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     <div className="flex ">
                                         {/* // Snippet's Title */}
                                         <input
-                                            className="flex-1 text-2xl bg-slate-100"
+                                            className="flex-1 text-2xl bg-slate-100 w-full"
                                             name="title"
                                             type="text"
                                             disabled={true}
@@ -224,7 +240,7 @@ export default function Page({ params }: { params: { slug: string } }) {
                                     }} />
 
                                     <CopyToClipboard text={value.code}>
-                                        <IconButton icon="content_copy" text="Copy" elementAfterClick={
+                                        <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={
                                             (<p>
                                                 Copied!
                                             </p>)

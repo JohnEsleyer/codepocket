@@ -5,7 +5,7 @@ interface IconButtonProps {
   text: string;
   isDark?: boolean;
   noBackground?: boolean;
-  onClick?: () => void;
+  onClick: () => void;
   iconColor?: string;
   disabled?: boolean;
   elementAfterClick?: ReactNode;
@@ -36,12 +36,18 @@ const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded`} onClick={() => {
-      setChangeElement(true);
-      onClick!();
       
-      setTimeout(() => {
-        setChangeElement(false);
-      }, 2000);
+      if (elementAfterClick){
+        setChangeElement(true);
+        onClick!();
+        
+        setTimeout(() => {
+          setChangeElement(false);
+        }, 2000);
+      }else{
+        onClick!();
+      }
+    
 
 
     }}>
