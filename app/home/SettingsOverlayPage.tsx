@@ -8,7 +8,7 @@ import IconButton from "../components/IconButton";
 export default function SettingsOverlayPage() {
     const [email, setEmail] = useState<string | undefined>('');
     const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [isLoading, setIsloading] = useState(true);
 
     useEffect(() => {
@@ -19,6 +19,7 @@ export default function SettingsOverlayPage() {
             } else {
                 console.log(data);
                 setEmail(data.user.email);
+                setUsername(data.user.user_metadata.username);
                 setIsloading(false);
             }
         }
@@ -40,11 +41,19 @@ export default function SettingsOverlayPage() {
     }
 
     return (
-        <div className="h-96">
-            <p>Email:{email}</p>
-            <p>Display Name:</p>
-            <div className="flex flex-col">
+        <div className="h-96 p-2">
+            <div className="flex justify-between">
+                <span className="flex items-center">Email Address</span>
+                <input className="p-1 border" disabled={true} value={email}/>
+            </div>
+            <div className="flex justify-between">
+                <span className="flex items-center">Username</span>
+                <input className="p-1 border"value={username}/>
+            </div>
+            <div className="flex flex-col w-44">
+            <a href="/update-password">
             <IconButton icon="password" text="Change Password" onClick={() => { }} />
+            </a>
             <IconButton icon="delete" text="Delete Account" onClick={() => { }} />
             </div>
         </div>
