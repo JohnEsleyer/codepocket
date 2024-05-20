@@ -30,6 +30,7 @@ export default function Home() {
 
     const router = useRouter();
     const scrollableDiv = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const [collections, setCollections] = useState<Collection[]>([])
     const [snippets, setSnippets] = useState<Snippet[]>([]);
@@ -44,7 +45,8 @@ export default function Home() {
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
     const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
-    const [isCopied, setIsCopied] = useState(false);
+    const [linkId, setLinkId] = useState('');
+   
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -131,6 +133,9 @@ export default function Home() {
             scrollableDiv.current.scrollTop = scrollableDiv.current.scrollHeight;
         }
     }
+
+
+
 
     const handleAddCollection = async () => {
         setLoadingAddCollection(true);
@@ -341,7 +346,7 @@ export default function Home() {
         switch (currentOverlayMenuPage) {
             case "search":
                 return (
-                    <OverlayMenuPage title="Search" onClose={() => {
+                    <OverlayMenuPage width="w-4/5" title="Search" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>What are you looking for?</p>
@@ -375,19 +380,19 @@ export default function Home() {
                                     </button>
                                 </li>
 
-                            )) : <p className="flex justify-center items-center p-16">Press "Enter" to request a search result</p>}
+                            )) : <p className="flex justify-center items-center p-16">Press Enter to request a search result</p>}
                         </ul>
                     </OverlayMenuPage>);
             case "settings":
                 return (
-                    <OverlayMenuPage title="Settings" onClose={() => {
+                    <OverlayMenuPage width="w-4/5" title="Settings" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <SettingsOverlayPage />
                     </OverlayMenuPage>);
             case "signout":
                 return (
-                    <OverlayMenuPage title="Sign Out" dialogMode={true} disableCloseButton={true} onClose={() => {
+                    <OverlayMenuPage width="w-80" title="Sign Out" disableCloseButton={true} onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to sign out?</p>
@@ -409,7 +414,7 @@ export default function Home() {
                     </OverlayMenuPage>);
             case "deleteCollectionConfirmation":
                 return (
-                    <OverlayMenuPage title="Delete collection" dialogMode={true} disableCloseButton={true} onClose={() => {
+                    <OverlayMenuPage width="w-80" title="Delete collection"  disableCloseButton={true} onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to delete this collection?</p>
@@ -444,7 +449,7 @@ export default function Home() {
                     </OverlayMenuPage>);
             case "move":
                 return (
-                    <OverlayMenuPage title="Move to collection" onClose={() => {
+                    <OverlayMenuPage width="w-4/5" title="Move to collection" onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Select a collection</p>
@@ -491,6 +496,33 @@ export default function Home() {
                         </div>
 
                     </OverlayMenuPage>);
+            case "share":
+                return (
+                    <OverlayMenuPage width="w-96" title="Share" onClose={() => {
+                        setShowOverlayMenuPage(false);
+                    }}>
+                        <div>
+                            <p className="">Collection is shared publicly.</p>
+                            <p> You can access it here:</p>
+                            
+                            <input ref={inputRef} className="p-2 w-full border border-black rounded" value={(window.location.hostname as string) + '/share/' + linkId}/>
+                            <div className="flex gap-2">
+                            <CopyToClipboard text={(window.location.hostname as string) + '/share/' + linkId}>
+                            <IconButton icon="content_copy" text="Copy" onClick={()=>{
+                                if (inputRef.current){
+                                    inputRef.current.select();
+                                }
+                            }} elementAfterClick={(
+                                <p className="pt-1">
+                                    Copied!
+                                </p>
+                            )} />
+                            </CopyToClipboard>
+                            <a href={'/share/' + linkId} target="_blank"><IconButton icon="open_in_new" text="Visit" onClick={()=>{}}/></a>
+                            </div>
+                        </div>
+                    </OverlayMenuPage>
+                );
         }
 
     }
@@ -502,52 +534,69 @@ export default function Home() {
     };
 
     const copyTrigger = async () => {
-        setIsCopied(true);
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setIsCopied(false);
     }
 
     const handleShare = async () => {
-        const updateCollectionAccessibility = async () => {
-            const { data, error } = await supabase
-            .from('collection')
-            .update({ shared: true })
-            .eq('id', activeCollection?.id)
-            .select();
-        };
 
-        const insertLink = async () => {
-            const { data, error } = await supabase
+        if (!activeCollection?.shared) {
+            const updateCollectionAccessibility = async () => {
+                const { data, error } = await supabase
+                    .from('collection')
+                    .update({ shared: true })
+                    .eq('id', activeCollection?.id)
+                    .select();
+            };
+
+            const insertLink = async () => {
+                const { data, error } = await supabase
+                    .from('link')
+                    .insert([
+                        {
+                            accessibility: 'public',
+                            collection_id: activeCollection?.id,
+
+                        },
+                    ])
+                    .select()
+
+                console.log((data as Link[])[0].id);
+                setLinkId((data as Link[])[0].id);
+            };
+
+
+            updateCollectionAccessibility();
+            insertLink();
+
+            // Update the active collection shared attribute
+            const tempCollection = { ...activeCollection, shared: true } as Collection;
+            setActiveCollection(tempCollection);
+            setCollections((prevValue) => (
+                prevValue.map((value) => {
+                    if (value.id == activeCollection?.id) {
+                        return { ...value, shared: true };
+                    } else {
+                        return value;
+                    }
+                })
+            ));
+        }else{
+
+            let { data: link, error } = await supabase
             .from('link')
-            .insert([
-                {
-                    accessibility: 'public',
-                    collection_id: activeCollection?.id,
+            .select('*')
+            .eq('collection_id', activeCollection.id);
 
-                },
-            ])
-            .select()
-        
-        console.log((data as Link[])[0].id);
-        };
-
-        if (!activeCollection?.shared){
-           updateCollectionAccessibility();
-           insertLink();
-
-           // Update the active collection shared attribute
-           const tempCollection = {...activeCollection, shared: true} as Collection;
-           setActiveCollection(tempCollection);
-           setCollections((prevValue) => (
-            prevValue.map((value) => {
-                if (value.id == activeCollection?.id){
-                    return {...value, shared: true};
-                }else{
-                    return value;
-                }
-            })
-           ));
+            if (error){
+                console.log(error);
+            }else{
+                setLinkId((link as Link[])[0].id);
+            }
+                    
         }
+
+        setShowOverlayMenuPage(true);
+        setCurrentOverlayMenuPage("share");
         
 
     }
@@ -597,9 +646,15 @@ export default function Home() {
                         <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
                             copyTrigger();
                         }}>
-                            {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+                            <IconButton icon="content_copy" text="Copy" onClick={()=>{}} elementAfterClick={(
+                                <p className="pt-1">
+                                    Copied!
+                                </p>
+                            )} />
 
                         </CopyToClipboard>
+                        {fullScreenSnippet.code.length >= 3000 && <p className="flex items-center text-red-500">Max characters reached!</p>}
+
                     </div>
                     <CodeBlock
                         full={true}
@@ -746,7 +801,7 @@ export default function Home() {
                             {/* // New code snippet */}
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
                             {/* // Share collection */}
-                            {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true}/> :<IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
+                            {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true} onClick={handleShare} /> : <IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
                             <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
@@ -808,7 +863,9 @@ export default function Home() {
 
 
                                             </form>
+                                            
                                             <div className="flex justify-end items-center space-x-2">
+                                            {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
                                                 <div className="hover:bg-slate-300 rounded">
                                                     <DropdownMenu buttonText={value.language} >
 
@@ -829,11 +886,16 @@ export default function Home() {
                                                 <CopyToClipboard text={value.code} onCopy={() => {
                                                     copyTrigger();
                                                 }}>
-                                                    {isCopied ? <p className="text-black flex items-center ">Copied!</p> : <IconButton icon="content_copy" text="Copy" />}
+                                                    <IconButton icon="content_copy" text="Copy" onClick={()=>{}} elementAfterClick={
+                                                        (<p>
+                                                            Copied!
+                                                        </p>)
+                                                    } />
 
                                                 </CopyToClipboard>
                                             </div>
 
+                                        
 
                                             <div className="h-60 overflow-x-hidden rounded-2xl ">
                                                 <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {

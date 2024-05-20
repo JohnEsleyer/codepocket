@@ -52,7 +52,7 @@ export default function Home() {
     <div className="flex justify-center flex-col text-black h-screen">
       <p className="text-4xl font-bold p-2 flex justify-center">CodePocket</p>
       <div className="flex justify-center p-4">
-        <div className="rounded bg-slate-200 p-4">
+        <div className="rounded bg-slate-200 p-4 flex justify-center flex-col">
           <h1 className="flex justify-center text-xl font-bold">Login</h1>
           <form onSubmit={handleSubmit} className="flex justify-center flex-col">
             <label>
@@ -65,10 +65,11 @@ export default function Home() {
             </label>
             <br />
             <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
-            <button onClick={() => {
+           
+          </form>
+          <button onClick={() => {
               router.push('/register');
             }}><span className="underline">Create new account</span></button>
-          </form>
           {errorText && <p className="text-red-500 flex justify-center">{errorText}</p>}
           {isLoading &&
             <div className="flex justify-center">

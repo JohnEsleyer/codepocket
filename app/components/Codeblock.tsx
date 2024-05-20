@@ -44,12 +44,15 @@ interface Props {
     codeValue: string;
     language: string;
     full?: boolean;
+    readOnly?: boolean;
     onCodeChange: (value: string, event?: any) => void;
 }
 
-const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) => {
+const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange, readOnly}) => {
     const [maxScreenHeight, setMaxScreenHeight] = useState<number | null>(null);
     const [maxScreenWidth, setMaxScreenWidth] = useState<number | null>(null);
+    const [characterCounter, setCharacterCounter] = useState(0);
+    const [maxCode, setMaxCode] = useState('');
 
     useEffect(() => {
       const updateMaxScreen = () => {
@@ -65,6 +68,15 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) 
         window.removeEventListener('resize', updateMaxScreen);
       };
     }, []);
+
+    function reduceString(input: string): string {
+      const maxLength = 3000;
+      if (input.length <= maxLength) {
+          return input;
+      } else {
+          return input.slice(0, maxLength);
+      }
+  }
     
     return (
         <AceEditor
@@ -72,13 +84,20 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange}) 
             height={full ? maxScreenHeight!-50 + "px" : "240px"}
             width={full ? maxScreenWidth + "px" : "650px"}
             onChange={(value, event) => {
-                onCodeChange(value, event);
+              onCodeChange(value, event);
+              if (value.length >= 3000){
+                setMaxCode(reduceString(value));
+              }
+              onCodeChange(value, event);
+
+              setCharacterCounter(value.length);
             }}
-            readOnly={false}
-            value={codeValue}
+            readOnly={readOnly}
+            value={characterCounter > 3000 ? maxCode : codeValue}
             mode={language}
             theme="tomorrow_night"
             fontSize="18px"
+            
             highlightActiveLine={false}
             setOptions={{
                 enableLiveAutocompletion: false,
