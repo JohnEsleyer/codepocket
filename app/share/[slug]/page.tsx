@@ -102,7 +102,6 @@ export default function Page({ params }: { params: { slug: string } }) {
                 setLinkState((link as Link[])[0]);
                 fetchCollection((link as Link[])[0].collection_id);
             }
-
         };
 
 

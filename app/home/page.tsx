@@ -380,7 +380,7 @@ export default function Home() {
                                     </button>
                                 </li>
 
-                            )) : <p className="flex justify-center items-center p-16">Press "Enter" to request a search result</p>}
+                            )) : <p className="flex justify-center items-center p-16">Press Enter to request a search result</p>}
                         </ul>
                     </OverlayMenuPage>);
             case "settings":

@@ -4,7 +4,6 @@ import Loading from "/public/loading.svg";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
 
-
 export default function SettingsOverlayPage() {
     const [email, setEmail] = useState<string | undefined>('');
     const [password, setPassword] = useState('');
@@ -48,13 +47,15 @@ export default function SettingsOverlayPage() {
             </div>
             <div className="flex justify-between">
                 <span className="flex items-center">Username</span>
-                <input className="p-1 border"value={username}/>
+                <input className="p-1 border" disabled={true} value={username}/>
             </div>
             <div className="flex flex-col w-44">
             <a href="/update-password">
             <IconButton icon="password" text="Change Password" onClick={() => { }} />
             </a>
-            <IconButton icon="delete" text="Delete Account" onClick={() => { }} />
+            <a  href="/delete-account">
+            <IconButton iconColor="red" textColor="red" icon="delete" text="Delete Account" onClick={() => { }} />
+            </a>
             </div>
         </div>
     );

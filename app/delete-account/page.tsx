@@ -8,17 +8,19 @@ import supabase from "../utils/supabase";
 import { User } from "@supabase/supabase-js";
 
 type FormState = {
-    currentPass: string;
-    newPass: string;
-    confirmPass: string;
+    password: string;
 };
+
+type ResponseMessage = {
+    message: string;
+}
 
 
 export default function Home() {
 
     const router = useRouter();
 
-    const [formState, setFormState] = useState<FormState>({ currentPass: '', newPass: '', confirmPass: '' });
+    const [formState, setFormState] = useState<FormState>({ password: '' });
     const [errorText, setErrorText] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -36,10 +38,10 @@ export default function Home() {
 
         // Check if password is correct by signing the user again.
         const signIn = async (user: User | null) => {
-
+            console.log(user?.email as string);
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: user?.email as string,
-                password: formState.currentPass,
+                password: formState.password,
             });
 
             if (error) {
@@ -56,28 +58,40 @@ export default function Home() {
             const { data: { user }, error } = await supabase.auth.getUser();
             if (error) {
                 console.log(error);
-            }else{
-                console.log('user.email:' + user?.email);
+            } else {
+                
                 // Check if user password is correct
                 if (!signIn(user)) {
                     return false;
                 }
+                return user?.id as string
             }
         }
 
-        if (!getUser) {
+        const userId = getUser();
+        if (!userId) {
             return;
         }
 
-        const { data, error } = await supabase.auth.updateUser({
-            password: formState.newPass,
-        })
+        try {
+            console.log('userId:' + userId);
+            const response = await fetch('/api/deleteUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId }),
+            });
 
-        if (!error) {
-            router.push('/home');
-            console.log("success");
-        } else {
-            setErrorText(error.message);
+            if (response.status !== 200) {
+                router.push('/');
+                console.log("success");
+            } else {
+                const message = (await (response.json() as Promise<ResponseMessage>)).message;
+                setErrorText(message);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
         }
 
         setIsLoading(false);
@@ -86,21 +100,14 @@ export default function Home() {
 
     return (
         <div className="flex justify-center flex-col text-black h-screen">
-            <p className="text-xl font-bold p-2 flex justify-center">Update Password</p>
+            <p className="text-xl font-bold p-2 flex justify-center">Account Deletion Confirmation</p>
             <div className="flex justify-center p-4">
                 <div className="rounded bg-slate-200 p-4 flex justify-center flex-col">
                     <form onSubmit={handleSubmit} className="flex justify-center flex-col">
+
                         <label>
-                            <p>Current Password</p>
-                            <input required className="p-1 w-full text-black" type="password" name="currentPass" value={formState.currentPass} onChange={handleInputChange} />
-                        </label>
-                        <label>
-                            <p>New Password</p>
-                            <input required className="p-1 w-full text-black" type="password" name="newPass" value={formState.newPass} onChange={handleInputChange} />
-                        </label>
-                        <label>
-                            <p>Confirm New Password</p>
-                            <input required className="p-1 w-full text-black" type="password" name="confirmPass" value={formState.confirmPass} onChange={handleInputChange} />
+                            <p>Password</p>
+                            <input required className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
                         </label>
                         <br />
                         <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
