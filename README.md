@@ -10,7 +10,13 @@ I build this web app to aid my learning journey across different programming lan
 - [x] Share collections online
 
 ### How to run this project?
-Navigate to the project directory and run the following commands:
+Create a env.local file and provide the following:
+```
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_KEY=YOUR_SUPABASE_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+```
+In the project directory and run the following commands:
 ```
 npm run build
 ```
