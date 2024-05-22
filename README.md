@@ -9,6 +9,19 @@ I build this web app to aid my learning journey across different programming lan
 - [x] Create collections of snippets
 - [x] Share collections online
 
+### How to run this project?
+Navigate to the project directory and run the following commands:
+```
+npm run build
+```
+```
+npm run start
+```
+
+### Supabase Database Schema
+![image](https://github.com/JohnEsleyer/codepocket/assets/66754038/814e83e5-9c60-44e4-908b-6086bb7fe67c)
+
+
 ### Screenshots 
 ![Screenshot from 2024-05-22 06-22-20](https://github.com/JohnEsleyer/codepocket/assets/66754038/1eeb4fa9-b26b-472d-a907-fdea46714686)
 
