@@ -1,4 +1,4 @@
-### CodePocket
+# CodePocket
 A web application for storing and sharing code snippets.
 
 #### Motivation for building this app
