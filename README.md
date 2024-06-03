@@ -1,4 +1,4 @@
-### CodePocket
+# CodePocket
 A web application for storing and sharing code snippets.
 
 #### Motivation for building this app
@@ -8,6 +8,25 @@ I build this web app to aid my learning journey across different programming lan
 - [x] Store and organize code snippets
 - [x] Create collections of snippets
 - [x] Share collections online
+
+### How to run this project?
+Create a env.local file and provide the following:
+```
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_KEY=YOUR_SUPABASE_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+```
+In the project directory and run the following commands:
+```
+npm run build
+```
+```
+npm run start
+```
+
+### Supabase Database Schema
+![image](https://github.com/JohnEsleyer/codepocket/assets/66754038/814e83e5-9c60-44e4-908b-6086bb7fe67c)
+
 
 ### Screenshots 
 ![Screenshot from 2024-05-22 06-22-20](https://github.com/JohnEsleyer/codepocket/assets/66754038/1eeb4fa9-b26b-472d-a907-fdea46714686)
