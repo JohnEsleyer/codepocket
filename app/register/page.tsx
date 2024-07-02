@@ -86,7 +86,7 @@ export default function Register() {
           <input required className="p-1 w-full text-black" type="password" name="confirm_password" value={formState.confirm_password} onChange={handleInputChange} />
         </label>
         <br />
-        <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
+        <button className="bg-black text-white p-1 rounded" type="submit">Register</button>
       </form>
       {errorText && <p className="text-red-500 flex justify-center">{errorText}</p>}
       {isLoading &&

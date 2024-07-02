@@ -806,8 +806,11 @@ export default function Home() {
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
                     </div>
-
+                    
                     {/* // Snippets Section */}
+                    {!activeCollection ? <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
+                        <span>Select or create a collection to start adding new code snippets</span>
+                    </div> :
                     <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
                         {snippets.map((value, index) => (
                             <>
@@ -912,6 +915,7 @@ export default function Home() {
                             </>
                         ))}
                     </div>
+}
 
                 </div>
                 {/* // End Code Snippets Section */}
