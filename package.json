@@ -25,7 +25,9 @@
     "react-markdown-renderer": "^1.4.0",
     "react-showdown": "^2.3.1",
     "react-simple-code-editor": "^0.13.1",
-    "react-syntax-highlighter": "^15.5.0"
+    "react-syntax-highlighter": "^15.5.0",
+    "swappy": "^0.0.0",
+    "swapy": "^0.0.5"
   },
   "devDependencies": {
     "@types/node": "^20",

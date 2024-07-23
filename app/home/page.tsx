@@ -9,13 +9,15 @@ import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import DropdownMenu from "../components/DropdownMenu";
 import { languages } from "./constants";
-import SidebarButton from "./SidebarButton";
+import SidebarButton from "./_components/SidebarButton";
 import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import OverlayMenuPage from "./OverlayMenuPage";
+import OverlayMenuPage from "./_components/OverlayMenuPage";
 import { Collection, Link, Snippet } from "./types";
-import SettingsOverlayPage from "./SettingsOverlayPage";
+import SettingsOverlayPage from "./_components/SettingsOverlayPage";
+import SnippetCard from "./_components/SnippetCard";
+import LanguageDropdown from "./_components/LanguageDropdown";
 
 export default function Home() {
 
@@ -46,7 +48,7 @@ export default function Home() {
     const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
     const [linkId, setLinkId] = useState('');
-   
+
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -414,7 +416,7 @@ export default function Home() {
                     </OverlayMenuPage>);
             case "deleteCollectionConfirmation":
                 return (
-                    <OverlayMenuPage width="w-80" title="Delete collection"  disableCloseButton={true} onClose={() => {
+                    <OverlayMenuPage width="w-80" title="Delete collection" disableCloseButton={true} onClose={() => {
                         setShowOverlayMenuPage(false);
                     }}>
                         <p>Are you sure, you want to delete this collection?</p>
@@ -504,21 +506,21 @@ export default function Home() {
                         <div>
                             <p className="">Collection is shared publicly.</p>
                             <p> You can access it here:</p>
-                            
-                            <input ref={inputRef} className="p-2 w-full border border-black rounded" value={(window.location.hostname as string) + '/share/' + linkId}/>
+
+                            <input ref={inputRef} className="p-2 w-full border border-black rounded" value={(window.location.hostname as string) + '/share/' + linkId} />
                             <div className="flex gap-2">
-                            <CopyToClipboard text={(window.location.hostname as string) + '/share/' + linkId}>
-                            <IconButton icon="content_copy" text="Copy" onClick={()=>{
-                                if (inputRef.current){
-                                    inputRef.current.select();
-                                }
-                            }} elementAfterClick={(
-                                <p className="pt-1">
-                                    Copied!
-                                </p>
-                            )} />
-                            </CopyToClipboard>
-                            <a href={'/share/' + linkId} target="_blank"><IconButton icon="open_in_new" text="Visit" onClick={()=>{}}/></a>
+                                <CopyToClipboard text={(window.location.hostname as string) + '/share/' + linkId}>
+                                    <IconButton icon="content_copy" text="Copy" onClick={() => {
+                                        if (inputRef.current) {
+                                            inputRef.current.select();
+                                        }
+                                    }} elementAfterClick={(
+                                        <p className="pt-1">
+                                            Copied!
+                                        </p>
+                                    )} />
+                                </CopyToClipboard>
+                                <a href={'/share/' + linkId} target="_blank"><IconButton icon="open_in_new" text="Visit" onClick={() => { }} /></a>
                             </div>
                         </div>
                     </OverlayMenuPage>
@@ -580,24 +582,24 @@ export default function Home() {
                     }
                 })
             ));
-        }else{
+        } else {
 
             let { data: link, error } = await supabase
-            .from('link')
-            .select('*')
-            .eq('collection_id', activeCollection.id);
+                .from('link')
+                .select('*')
+                .eq('collection_id', activeCollection.id);
 
-            if (error){
+            if (error) {
                 console.log(error);
-            }else{
+            } else {
                 setLinkId((link as Link[])[0].id);
             }
-                    
+
         }
 
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("share");
-        
+
 
     }
 
@@ -612,30 +614,14 @@ export default function Home() {
                         }} />
                         {/* // Fullscreen language selection dropdown */}
                         <div className="hover:bg-slate-100 rounded w-26 text-black">
-                            <DropdownMenu buttonText={fullScreenSnippet.language} >
-
-                                <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
-                                    {languages.map((lang, index) => (
-                                        <button key={index} onClick={async () => {
-                                            setSnippets((prevItems) =>
-                                                prevItems.map((item) => (item.id === fullScreenSnippet.id ? { ...item, language: lang } : item))
-                                            );
-                                            setFullScreenSnippet((prevValue) => {
-                                                return { ...fullScreenSnippet, language: lang }
-                                            });
-                                            const { error } = await supabase
-                                                .from('snippet')
-                                                .update({ language: lang })
-                                                .eq('id', fullScreenSnippet.id);
-
-
-                                            if (error) {
-                                                console.log(error);
-                                            }
-                                        }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
-                                    ))}
-                                </div>
-                            </DropdownMenu>
+                            <LanguageDropdown
+                                buttonText={fullScreenSnippet.language}
+                                languages={languages}
+                                fullScreenSnippet={fullScreenSnippet}
+                                setSnippets={setSnippets}
+                                setFullScreenSnippet={setFullScreenSnippet}
+                                supabase={supabase}
+                            />
                         </div>
                         {/* //  Fullscreen delete button */}
                         <IconButton icon="delete" text="Delete" onClick={() => {
@@ -646,7 +632,7 @@ export default function Home() {
                         <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
                             copyTrigger();
                         }}>
-                            <IconButton icon="content_copy" text="Copy" onClick={()=>{}} elementAfterClick={(
+                            <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={(
                                 <p className="pt-1">
                                     Copied!
                                 </p>
@@ -806,116 +792,30 @@ export default function Home() {
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
                     </div>
-                    
+
                     {/* // Snippets Section */}
                     {!activeCollection ? <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
                         <span>Select or create a collection to start adding new code snippets</span>
                     </div> :
-                    <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
-                        {snippets.map((value, index) => (
-                            <>
-                                {value.collection_id == activeCollection?.id &&
-                                    <div
-                                        key={index}
-                                        className="bg-slate-100 border border-black rounded h-96">
-                                        <div key={index} className="m-2">
-                                            <form className="flex flex-col">
-                                                <div className="flex ">
-                                                    {/* // Snippet's Title */}
-                                                    <input
-                                                        className="flex-1 text-2xl bg-slate-100"
-                                                        name="title"
-                                                        type="text"
-                                                        disabled={false}
-                                                        value={value.title}
-                                                        onChange={(event) => {
-                                                            handleUpdateSnippetTitle(event, value);
-                                                        }}
-                                                    />
-                                                    <input
-                                                        className="w-6 accent-black"
-                                                        type="checkbox"
-                                                        id="Checkbox"
-                                                        name="myCheckbox"
-                                                        key={value.id}
-                                                        onChange={(event) => {
-                                                            setSelectedSnippetsId((prevItemsId) => {
-                                                                if (prevItemsId.includes(value.id)) {
-                                                                    return prevItemsId.filter((snippetId) => (
-                                                                        snippetId !== value.id
-                                                                    ));
-                                                                } else {
-                                                                    return [...prevItemsId, value.id];
-                                                                }
-                                                            });
-                                                            // console.log('Selected:' + selectedSnippetsId);
-
-                                                        }} />
-
-                                                </div>
-                                                {/* // Snippet's Description */}
-                                                <textarea
-                                                    className="bg-slate-100 w-full"
-                                                    name="description"
-                                                    maxLength={110}
-                                                    value={value.description}
-                                                    onChange={(event) => {
-                                                        handleUpdateSnippetDescription(event, value);
-                                                    }}
-                                                />
-
-
-                                            </form>
-                                            
-                                            <div className="flex justify-end items-center space-x-2">
-                                            {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
-                                                <div className="hover:bg-slate-300 rounded">
-                                                    <DropdownMenu buttonText={value.language} >
-
-                                                        <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
-                                                            {languages.map((lang, index) => (
-                                                                <button key={index} onClick={() => {
-                                                                    handleUpdateSnippetLanguage(value, lang);
-                                                                }}><p className=" hover:bg-slate-300 p-1">{lang}</p></button>
-                                                            ))}
-                                                        </div>
-                                                    </DropdownMenu>
-                                                </div>
-                                                <IconButton icon="open_in_full" text="Full screen" onClick={() => {
-                                                    setIsFullscreen(true);
-                                                    setFullScreenSnippet(value);
-                                                }} />
-
-                                                <CopyToClipboard text={value.code} onCopy={() => {
-                                                    copyTrigger();
-                                                }}>
-                                                    <IconButton icon="content_copy" text="Copy" onClick={()=>{}} elementAfterClick={
-                                                        (<p>
-                                                            Copied!
-                                                        </p>)
-                                                    } />
-
-                                                </CopyToClipboard>
-                                            </div>
-
-                                        
-
-                                            <div className="h-60 overflow-x-hidden rounded-2xl ">
-                                                <CodeBlock codeValue={value.code} language={value.language} onCodeChange={(codeValue) => {
-
-                                                    handleUpdateSnippetCode(value, codeValue);
-                                                }} />
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                }
-                            </>
-                        ))}
-                    </div>
-}
+                        <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
+                            {snippets.map((value, index) => (
+                                <SnippetCard
+                                    key={index}
+                                    index={index}
+                                    value={value}
+                                    languages={languages}
+                                    handleUpdateSnippetTitle={handleUpdateSnippetTitle}
+                                    handleUpdateSnippetDescription={handleUpdateSnippetDescription}
+                                    handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
+                                    handleUpdateSnippetCode={handleUpdateSnippetCode}
+                                    setSelectedSnippetsId={setSelectedSnippetsId}
+                                    setIsFullscreen={setIsFullscreen}
+                                    setFullScreenSnippet={setFullScreenSnippet}
+                                    copyTrigger={copyTrigger}
+                                />
+                            ))}
+                        </div>
+                    }
 
                 </div>
                 {/* // End Code Snippets Section */}
