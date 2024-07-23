@@ -2,7 +2,7 @@
 'use client'
 import Image from "next/image";
 import { useState } from "react";
-import supabase from "./utils/supabase";
+import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import Loading from "/public/loading.svg";
 
@@ -13,7 +13,7 @@ type FormState = {
 };
 
 
-export default function Home() {
+export default function Login() {
 
   const router = useRouter();
 
