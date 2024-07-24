@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import OverlayMenuPage from '../OverlayMenuPage';
+import OverlayMenuPage from '../OverlayMenuContent';
 import supabase from '@/app/utils/supabase';
 
 interface SignOutOverlayPageProps {

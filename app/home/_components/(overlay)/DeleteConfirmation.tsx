@@ -1,5 +1,5 @@
 import React from 'react';
-import OverlayMenuPage from '../OverlayMenuPage';
+import OverlayMenuPage from '../OverlayMenuContent';
 import supabase from '@/app/utils/supabase';
 
 interface DeleteCollectionConfirmationOverlayPageProps {

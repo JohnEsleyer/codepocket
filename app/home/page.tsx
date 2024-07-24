@@ -15,14 +15,18 @@ import { Collection, Link, Snippet } from "./types";
 import SnippetCard from "./_components/SnippetCard";
 import LanguageDropdown from "./_components/LanguageDropdown";
 import DeleteCollectionConfirmationOverlayPage from "./_components/(overlay)/DeleteConfirmation";
-import MoveOverlayPage from "./_components/(overlay)/MoveOverlayPage";
-import SearchOverlayPage from "./_components/(overlay)/SearchOverlayPage";
-import SettingsOverlayPageWrapper from "./_components/(overlay)/SettingsOverlayPage";
-import ShareOverlayPage from "./_components/(overlay)/ShareOverlayPage";
-import SignOutOverlayPage from "./_components/(overlay)/SignOutOverlayPage";
+import MoveOverlayPage from "./_components/(overlay)/MoveOverlayContent";
+import SearchOverlayPage from "./_components/(overlay)/SearchOverlayContent";
+import SettingsOverlayPageWrapper from "./_components/(overlay)/SettingsOverlayContent";
+import ShareOverlayPage from "./_components/(overlay)/ShareOverlayContent";
+import SignOutOverlayPage from "./_components/(overlay)/SignOutOverlayContent";
 import { fetchAllCollections, fetchAllSnippets } from "./_utility/fetchData";
 import { handleDeleteCollection, handleDeleteSnippets } from "./_utility/deleteData";
 import { handleUpdateCollectionTitle, handleUpdateSnippetCode, handleUpdateSnippetDescription, handleUpdateSnippetLanguage, handleUpdateSnippetTitle } from "./_utility/updateData";
+import Sidebar from "./(sections)/Sidebar";
+import Toolbar from "./(sections)/Toolbar";
+import Snippets from "./(sections)/Snippets";
+import OverlayMenu from "./(sections)/OverlayMenu";
 
 export default function Home() {
 
@@ -44,7 +48,6 @@ export default function Home() {
     const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
     const [linkId, setLinkId] = useState('');
-
 
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
@@ -87,7 +90,7 @@ export default function Home() {
         };
     }, []);
 
-    
+
 
     const scrollToBottom = () => {
         if (scrollableDiv.current) {
@@ -125,9 +128,9 @@ export default function Home() {
         }, 1000);
     };
 
-   
-    
-    
+
+
+
 
 
 
@@ -410,6 +413,7 @@ export default function Home() {
                             }
 
                         }} />
+                       
                 </div>
             </ProtectedPage>
         );
@@ -417,159 +421,56 @@ export default function Home() {
 
     return (
         <ProtectedPage>
-            <div className={`${!showOverlayMenuPage && "hidden"} z-10 absolute top-0 left-0 w-full h-full bg-neutral-800 opacity-50`}>
-            </div>
-            <div className={`${!showOverlayMenuPage && "hidden"} z-20 h-full w-full p-4 font-sans absolute flex justify-center items-center opacity-100`}>
-                {displayCurrentOverlayMenuPage()}
-            </div>
+            <OverlayMenu showOverlayMenuPage={showOverlayMenuPage} displayCurrentOverlayMenuPage={displayCurrentOverlayMenuPage} />
 
             <div className="relative z-1 bg-slate-100 text-black h-screen flex font-sans">
-                <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
-                    <div className="shadow">
-                        <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
-                        <div className="pt-4 pb-2 flex flex-col">
-                            {/* // Search */}
-                            <SidebarButton
-                                icon="search"
-                                text="Search"
-                                onClick={() => {
-                                    setShowOverlayMenuPage(true);
-                                    setFilteredSnippets([]);
-                                    setCurrentOverlayMenuPage("search");
-                                }}
-                            />
-                            {/* // Settings */}
-                            <SidebarButton
-                                icon="settings"
-                                text="Settings"
-                                onClick={() => {
-                                    setShowOverlayMenuPage(true);
-                                    setCurrentOverlayMenuPage("settings");
-                                }}
-                            />
-                            {/* // Signout */}
-                            <SidebarButton
-                                icon="logout"
-                                text="Sign out"
-                                onClick={handleSignOut}
-                            />
-                            {/* // Add a collection Button */}
-                            <SidebarButton
-                                icon="add"
-                                text="Add a collection"
-                                onClick={handleAddCollection}
-                                loading={loadingAddCollection}
-                            />
-                        </div>
-                    </div>
+                <Sidebar
+                    orientation={orientation}
+                    setShowOverlayMenuPage={setShowOverlayMenuPage}
+                    setFilteredSnippets={setFilteredSnippets}
+                    setCurrentOverlayMenuPage={setCurrentOverlayMenuPage}
+                    handleSignOut={handleSignOut}
+                    handleAddCollection={handleAddCollection}
+                    loadingAddCollection={loadingAddCollection}
+                    collections={collections}
+                    setSelectedSnippetsId={setSelectedSnippetsId}
+                    setActiveCollection={setActiveCollection}
+                    activeCollection={activeCollection}
+                    handleDeleteCollection={handleDeleteCollection}
+                />
 
-                    <div className="flex flex-col overflow-y-auto pl-2">
-                        {/* // Collections */}
-                        {collections.map((value, index) => (
-                            <button
-                                key={index}
-                                className="flex justify-start"
-                                onClick={() => {
-                                    setSelectedSnippetsId([]);
-                                    setActiveCollection(value);
-                                }}
-                            >
-                                <div className={`w-full flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>
-                                    <div className="flex overflow-x-auto w-80">
-                                        <div className="truncate flex">
-                                            <div className="flex items-center">
-                                                <span className="material-symbols-outlined">folder</span>
-                                            </div>
-
-                                            <p className="truncate">{value.title}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex-1 flex justify-end pr-2 ">
-                                        <button onClick={() => handleDeleteCollection(value, setShowOverlayMenuPage, setCurrentOverlayMenuPage, setToDeleteCollection)}>
-                                            <span className="material-symbols-outlined flex items-center">delete</span>
-
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </button>
-
-                        ))}
-
-
-                    </div>
-                    {/* // End of collections */}
-                </div>
-                {/* // Right Section */}
                 <div className="flex-1 flex flex-col">
-                    <div className="p-2 border-b border-black bg-neutral-900  text-white ">
-                        <p className="text-2xl font-bold flex">
-                            <input
-                                className="text-2xl bg-neutral-900 w-full text-2xl font-bold"
-                                name="title"
-                                type="text"
-                                disabled={activeCollection ? false : true}
-                                value={activeCollection?.title}
-                                onChange={(event) => {
-                                    handleUpdateCollectionTitle(event, activeCollection, setCollections, setActiveCollection);
-                                }}
-                            />{loadingAddSnippet && <span className="pl-2">
+                    <Toolbar
+                        activeCollection={activeCollection}
+                        loadingAddSnippet={loadingAddSnippet}
+                        handleUpdateCollectionTitle={handleUpdateCollectionTitle}
+                        handleAddSnippet={handleAddSnippet}
+                        handleShare={handleShare}
+                        handleDeleteSnippets={handleDeleteSnippets}
+                        selectedSnippetsId={selectedSnippetsId}
+                        handleMoveSnippets={handleMoveSnippets}
+                        setCollections={setCollections}
+                        setActiveCollection={setActiveCollection}
+                        setSnippets={setSnippets}
+                    />
 
-                                <Image
-                                    src={WhiteLoading}
-                                    alt={''}
-                                    width={30}
-                                    height={30}
-
-                                />
-                            </span>} </p>
-
-                        <div className="flex space-x-4">
-                            {/* // New code snippet */}
-                            <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
-                            {/* // Share collection */}
-                            {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true} onClick={handleShare} /> : <IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
-                            <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={()=>{
-                                handleDeleteSnippets(selectedSnippetsId, setSnippets);
-                            }} />
-                            <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
-                        </div>
-                    </div>
-
-                    {/* // Snippets Section */}
-                    {!activeCollection ? <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
-                        <span>Select or create a collection to start adding new code snippets</span>
-                    </div> :
-                        <div className={`swapy-container flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
-                            {snippets.map((value, index) => {
-
-                                if (value.collection_id != activeCollection.id){
-                                    return;
-                                }
-                                return (
-                                    <SnippetCard
-                                        key={index}
-                                        index={index}
-                                        value={value}
-                                        languages={languages}
-                                        handleUpdateSnippetTitle={handleUpdateSnippetTitle}
-                                        handleUpdateSnippetDescription={handleUpdateSnippetDescription}
-                                        handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
-                                        handleUpdateSnippetCode={handleUpdateSnippetCode}
-                                        setSelectedSnippetsId={setSelectedSnippetsId}
-                                        setIsFullscreen={setIsFullscreen}
-                                        setFullScreenSnippet={setFullScreenSnippet}
-                                        copyTrigger={copyTrigger}
-                                        setSnippets={setSnippets}
-                                    />);
-
-                            })}
-                        </div>
-                    }
-
+                    <Snippets
+                        activeCollection={activeCollection}
+                        snippets={snippets}
+                        singleColumn={singleColumn}
+                        scrollableDiv={scrollableDiv}
+                        handleUpdateSnippetTitle={handleUpdateSnippetTitle}
+                        handleUpdateSnippetDescription={handleUpdateSnippetDescription}
+                        handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
+                        handleUpdateSnippetCode={handleUpdateSnippetCode}
+                        setSelectedSnippetsId={setSelectedSnippetsId}
+                        setIsFullscreen={setIsFullscreen}
+                        setFullScreenSnippet={setFullScreenSnippet} 
+                        copyTrigger={copyTrigger} 
+                        setSnippets={setSnippets}
+                        languages={languages}
+                    />
                 </div>
-                {/* // End Code Snippets Section */}
             </div>
 
         </ProtectedPage>

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import OverlayMenuPage from '../OverlayMenuPage';
+import OverlayMenuPage from '../OverlayMenuContent';
 import IconButton from '@/app/components/IconButton';
 
 interface ShareOverlayPageProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import SettingsOverlayPage from './SettingsOverlay';
-import OverlayMenuPage from '../OverlayMenuPage';
+import OverlayMenuPage from '../OverlayMenuContent';
 
 interface SettingsOverlayPageWrapperProps {
     setShowOverlayMenuPage: (value: boolean) => void;
