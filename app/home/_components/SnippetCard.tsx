@@ -9,14 +9,32 @@ interface SnippetCardProps {
     index: number;
     value: Snippet;
     languages: string[];
-    handleUpdateSnippetTitle: (event: React.ChangeEvent<HTMLInputElement>, value: any) => void;
-    handleUpdateSnippetDescription: (event: React.ChangeEvent<HTMLTextAreaElement>, value: any) => void;
-    handleUpdateSnippetLanguage: (value: any, lang: string) => void;
-    handleUpdateSnippetCode: (value: any, codeValue: string) => void;
+    handleUpdateSnippetTitle: (
+        event: React.ChangeEvent<HTMLInputElement>,
+        value: Snippet,
+        setSnippets: Dispatch<SetStateAction<Snippet[]>>
+    ) => void;
+    handleUpdateSnippetDescription: (
+        event: React.ChangeEvent<HTMLTextAreaElement>,
+        value: Snippet,
+        setSnippets: Dispatch<SetStateAction<Snippet[]>>
+    ) => void;
+    handleUpdateSnippetLanguage: (
+        value: Snippet,
+        language: string,
+        setSnippets: Dispatch<SetStateAction<Snippet[]>>
+    ) => void;
+    handleUpdateSnippetCode: (
+        value: Snippet,
+        code: string,
+        setSnippets: Dispatch<SetStateAction<Snippet[]>>
+    ) => void;
     setSelectedSnippetsId: Dispatch<SetStateAction<number[]>>;
-    setIsFullscreen: React.Dispatch<React.SetStateAction<boolean>>;
-    setFullScreenSnippet: React.Dispatch<React.SetStateAction<any>>;
+    setIsFullscreen: Dispatch<SetStateAction<boolean>>;
+    setFullScreenSnippet: Dispatch<SetStateAction<Snippet>>;
     copyTrigger: () => void;
+    setSnippets:  Dispatch<SetStateAction<Snippet[]>>,
+
 }
 
 const SnippetCard: React.FC<SnippetCardProps> = ({
@@ -31,19 +49,19 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
     setIsFullscreen,
     setFullScreenSnippet,
     copyTrigger,
+    setSnippets,
 }) => {
     return (
         <div key={index} className="bg-slate-100 border border-black rounded h-96">
-            <div key={index} className="m-2">
+            <div className="m-2">
                 <form className="flex flex-col">
                     <div className="flex">
                         <input
                             className="flex-1 text-2xl bg-slate-100"
                             name="title"
                             type="text"
-                            disabled={false}
                             value={value.title}
-                            onChange={(event) => handleUpdateSnippetTitle(event, value)}
+                            onChange={(event) => handleUpdateSnippetTitle(event, value, setSnippets)}
                         />
                         <input
                             className="w-6 accent-black"
@@ -67,7 +85,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         name="description"
                         maxLength={110}
                         value={value.description}
-                        onChange={(event) => handleUpdateSnippetDescription(event, value)}
+                        onChange={(event) => handleUpdateSnippetDescription(event, value, setSnippets)}
                     />
                 </form>
 
@@ -77,7 +95,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         <DropdownMenu buttonText={value.language}>
                             <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                                 {languages.map((lang, index) => (
-                                    <button key={index} onClick={() => handleUpdateSnippetLanguage(value, lang)}>
+                                    <button key={index} onClick={() => handleUpdateSnippetLanguage(value, lang, setSnippets)}>
                                         <p className="hover:bg-slate-300 p-1">{lang}</p>
                                     </button>
                                 ))}
@@ -93,7 +111,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         }}
                     />
                     <CopyToClipboard text={value.code} onCopy={copyTrigger}>
-                        <IconButton icon="content_copy" text="Copy" onClick={() => {}} elementAfterClick={<p>Copied!</p>} />
+                        <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={<p>Copied!</p>} />
                     </CopyToClipboard>
                 </div>
 
@@ -101,7 +119,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     <CodeBlock
                         codeValue={value.code}
                         language={value.language}
-                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue)}
+                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue, setSnippets)}
                     />
                 </div>
             </div>

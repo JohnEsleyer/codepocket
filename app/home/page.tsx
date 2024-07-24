@@ -2,33 +2,29 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
-import { testCollections, testSnippets } from "./testdata";
 import CodeBlock from "../components/Codeblock";
 import WhiteLoading from "/public/loadingWhite.svg";
 import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import DropdownMenu from "../components/DropdownMenu";
-import { languages } from "./constants";
+import { defaultFullscreenSnippet, languages } from "./constants";
 import SidebarButton from "./_components/SidebarButton";
 import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import OverlayMenuPage from "./_components/OverlayMenuPage";
 import { Collection, Link, Snippet } from "./types";
-import SettingsOverlayPage from "./_components/SettingsOverlayPage";
 import SnippetCard from "./_components/SnippetCard";
 import LanguageDropdown from "./_components/LanguageDropdown";
+import DeleteCollectionConfirmationOverlayPage from "./_components/(overlay)/DeleteConfirmation";
+import MoveOverlayPage from "./_components/(overlay)/MoveOverlayPage";
+import SearchOverlayPage from "./_components/(overlay)/SearchOverlayPage";
+import SettingsOverlayPageWrapper from "./_components/(overlay)/SettingsOverlayPage";
+import ShareOverlayPage from "./_components/(overlay)/ShareOverlayPage";
+import SignOutOverlayPage from "./_components/(overlay)/SignOutOverlayPage";
+import { fetchAllCollections, fetchAllSnippets } from "./_utility/fetchData";
+import { handleDeleteCollection, handleDeleteSnippets } from "./_utility/deleteData";
+import { handleUpdateCollectionTitle, handleUpdateSnippetCode, handleUpdateSnippetDescription, handleUpdateSnippetLanguage, handleUpdateSnippetTitle } from "./_utility/updateData";
 
 export default function Home() {
-
-    const defaultFullscreenSnippet = {
-        id: 0,
-        title: 'untitled',
-        collection_id: 0,
-        code: '',
-        language: 'python',
-        description: '',
-    };
 
     const router = useRouter();
     const scrollableDiv = useRef<HTMLDivElement>(null);
@@ -55,52 +51,21 @@ export default function Home() {
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
 
     const fetchDbData = async () => {
-        async function fetchAllCollections() {
-            // Fetch all collections by current user
-            let { data: collection, error } = await supabase
-                .from('collection')
-                .select('*')
-
-            if (error) {
-                console.log(error);
-            } else {
-                setCollections(collection as Collection[]);
-            }
-        }
-
-        async function fetchAllSnippets() {
-            // Fetch all snippets by current user
-            let { data: snippets, error } = await supabase
-                .from('snippet')
-                .select('*')
-
-            if (error) {
-                console.log(error);
-            } else {
-                setSnippets(snippets as Snippet[]);
-            }
-        }
-
-        fetchAllCollections();
-        fetchAllSnippets();
-
+        fetchAllCollections(setCollections);
+        fetchAllSnippets(setSnippets);
     };
-
 
     useEffect(() => {
         const checkOrientation = () => {
             const screenRatio = window.innerWidth / window.innerHeight;
-
-            console.log(screenRatio);
             if (screenRatio > 1.150) {
                 setOrientation('Landscape');
             } else {
                 setOrientation('Portrait');
             }
 
-            console.log(window.innerWidth);
             if (window.innerWidth < 950) {
-                setSingleColumn(true)
+                setSingleColumn(true);
             } else {
                 setSingleColumn(false);
             }
@@ -112,23 +77,17 @@ export default function Home() {
             checkOrientation();
         };
 
-        // Fetch all user data
         fetchDbData();
-
-        // Set the first collection as the default active collection
         setActiveCollection(collections[0]);
-
 
         window.addEventListener('resize', resizeListener);
 
         return () => {
             window.removeEventListener('resize', resizeListener);
         };
-
-
-
     }, []);
 
+    
 
     const scrollToBottom = () => {
         if (scrollableDiv.current) {
@@ -166,124 +125,11 @@ export default function Home() {
         }, 1000);
     };
 
-    const handleDeleteCollection = async (value: Collection) => {
-
-        setShowOverlayMenuPage(true);
-        setCurrentOverlayMenuPage("deleteCollectionConfirmation");
-        setToDeleteCollection(value);
-
-    }
-
-    const handleDeleteSnippets = async () => {
-
-        selectedSnippetsId.map(async (itemId) => {
-            console.log('itemId:' + itemId);
-            const { error } = await supabase
-                .from('snippet')
-                .delete()
-                .eq('id', itemId);
-
-            if (error) {
-                console.log(error);
-            } else {
-                setSnippets((prevItems) => (
-                    prevItems.filter((item, index) => (
-                        !selectedSnippetsId.includes(item.id)
-                    ))
-                ));
-            }
-        });
-
-        setSelectedSnippetsId([]);
-
-    };
-
-    // This handler does not execute from fullscreen mode, only preview.
-    const handleUpdateSnippetLanguage = async (value: Snippet, language: string) => {
-        setSnippets((prevItems) =>
-            prevItems.map((item) => (item.id === value.id ? { ...item, language: language } : item))
-        );
-
-        const { error } = await supabase
-            .from('snippet')
-            .update({ language: language })
-            .eq('id', value.id)
+   
+    
+    
 
 
-        if (error) {
-            console.log(error);
-        }
-
-    };
-
-    const handleUpdateCollectionTitle = async (event: any) => {
-
-
-        setCollections((prevItems) =>
-            prevItems.map((item) => (item.id === activeCollection?.id ? { ...item, title: event.target.value } : item))
-        );
-        setActiveCollection((prevValue) => {
-            return { ...prevValue!, title: event.target.value }
-        }
-        );
-        const { error } = await supabase
-            .from('collection')
-            .update({ title: event.target.value })
-            .eq('id', activeCollection?.id)
-
-        if (error) {
-            console.log(error);
-        }
-
-    }
-
-    // This handler does not execute from fullscreen mode, only preview.
-    const handleUpdateSnippetCode = async (value: Snippet, code: string) => {
-        setSnippets((prevItems) =>
-            prevItems.map((item) => (item.id === value.id ? { ...item, code: code } : item))
-        );
-        const { error } = await supabase
-            .from('snippet')
-            .update({ code: code })
-            .eq('id', value.id);
-
-
-        if (error) {
-            console.log(error);
-        }
-    };
-
-    const handleUpdateSnippetDescription = async (event: any, value: Snippet) => {
-        setSnippets((prevItems) =>
-            prevItems.map((item) => (item.id === value.id ? { ...item, description: event?.target.value } : item))
-        );
-
-        const { error } = await supabase
-            .from('snippet')
-            .update({ description: event.target.value })
-            .eq('id', value.id);
-
-
-        if (error) {
-            console.log(error);
-        }
-    };
-
-    const handleUpdateSnippetTitle = async (event: any, value: Snippet) => {
-        setSnippets((prevItems) =>
-            prevItems.map((item) => (item.id === value.id ? { ...item, title: event.target.value } : item))
-        );
-
-        const { error } = await supabase
-            .from('snippet')
-            .update({ title: event.target.value })
-            .eq('id', value.id)
-
-        if (error) {
-            console.log(error);
-        }
-
-    };
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {
@@ -296,6 +142,7 @@ export default function Home() {
         }, 1000);
         return () => clearTimeout(timeoutId);
     }, [query]);
+
 
     const handleInputChange = (event: any) => {
         setQuery(event.target.value);
@@ -340,194 +187,89 @@ export default function Home() {
     const handleSignOut = async () => {
         setShowOverlayMenuPage(true);
         setCurrentOverlayMenuPage("signout");
-
-
     };
 
     const displayCurrentOverlayMenuPage = () => {
         switch (currentOverlayMenuPage) {
             case "search":
                 return (
-                    <OverlayMenuPage width="w-4/5" title="Search" onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <p>What are you looking for?</p>
-                        <input
-                            className="text-2xl p-1 bg-slate-100 border border-black rounded w-full text-2xl"
-                            name="search"
-                            type="text"
-                            placeholder="Type the snippet's title or description"
-                            onChange={handleInputChange}
-                        />
-
-                        <ul className="h-80 overflow-y-auto">
-                            {filteredSnippets.length !== 0 ? filteredSnippets.map(item => (
-
-                                <li key={item.id} className="shadow hover:bg-slate-200 bg-slate-100 p-1 border m-1 ">
-                                    <button
-                                        className="w-full flex flex-col "
-                                        onClick={() => {
-                                            setShowOverlayMenuPage(false);
-                                            setActiveCollection(collections.find(obj => obj.id === item.collection_id));
-                                        }}
-                                    >
-                                        <div className="w-full flex flex-col">
-                                            <p className="flex justify-start"><strong>{item.title}</strong></p>
-                                            <p className="flex justify-start truncate">{item.description}</p>
-                                        </div>
-                                        <p className="flex items-center ">
-                                            <span className="material-symbols-outlined">folder</span>
-                                            {collections.find(obj => obj.id === item.collection_id)?.title}
-                                        </p>
-                                    </button>
-                                </li>
-
-                            )) : <p className="flex justify-center items-center p-16">Press Enter to request a search result</p>}
-                        </ul>
-                    </OverlayMenuPage>);
+                    <SearchOverlayPage
+                        filteredSnippets={filteredSnippets}
+                        collections={collections}
+                        setShowOverlayMenuPage={setShowOverlayMenuPage}
+                        handleInputChange={handleInputChange}
+                        setActiveCollection={setActiveCollection}
+                    />
+                );
             case "settings":
                 return (
-                    <OverlayMenuPage width="w-4/5" title="Settings" onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <SettingsOverlayPage />
-                    </OverlayMenuPage>);
+                    <SettingsOverlayPageWrapper setShowOverlayMenuPage={setShowOverlayMenuPage} />
+                );
             case "signout":
                 return (
-                    <OverlayMenuPage width="w-80" title="Sign Out" disableCloseButton={true} onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <p>Are you sure, you want to sign out?</p>
-                        <button
-                            className="bg-black text-white p-2 border rounded"
-                            onClick={async () => {
-                                const { error } = await supabase.auth.signOut();
-                                router.replace('/');
-                            }}
-                        >Continue</button>
-                        <button
-                            className=" p-2 border rounded"
-                            onClick={async () => {
-
-                                setShowOverlayMenuPage(false);
-                            }}
-
-                        >Cancel</button>
-                    </OverlayMenuPage>);
+                    <SignOutOverlayPage setShowOverlayMenuPage={setShowOverlayMenuPage} />
+                );
             case "deleteCollectionConfirmation":
                 return (
-                    <OverlayMenuPage width="w-80" title="Delete collection" disableCloseButton={true} onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <p>Are you sure, you want to delete this collection?</p>
-                        <button
-                            className="bg-black text-white p-2 border rounded"
-                            onClick={async () => {
-                                const { error } = await supabase
-                                    .from('collection')
-                                    .delete()
-                                    .eq('id', toDeleteCollection?.id);
+                    <DeleteCollectionConfirmationOverlayPage
+                        toDeleteCollection={toDeleteCollection}
+                        setShowOverlayMenuPage={setShowOverlayMenuPage}
+                        setCollections={setCollections}
+                        buttonOnClick={async () => {
+                            const { error } = await supabase
+                                .from('collection')
+                                .delete()
+                                .eq('id', toDeleteCollection?.id);
 
-                                if (error) {
-                                    console.log(error);
-                                } else {
-                                    setCollections((prevItems) => {
-                                        return prevItems.filter((item) => item.id !== toDeleteCollection?.id);
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                setCollections((prevItems) => {
+                                    return prevItems.filter((item) => item.id !== toDeleteCollection?.id);
 
-                                    });
-                                }
-                                setShowOverlayMenuPage(false);
-                            }}
-
-                        >Continue</button>
-                        <button
-                            className=" p-2 border rounded"
-                            onClick={async () => {
-
-                                setShowOverlayMenuPage(false);
-                            }}
-
-                        >Cancel</button>
-                    </OverlayMenuPage>);
+                                });
+                            }
+                            setShowOverlayMenuPage(false);
+                        }}
+                    />
+                );
             case "move":
                 return (
-                    <OverlayMenuPage width="w-4/5" title="Move to collection" onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <p>Select a collection</p>
-                        <div>
-                            {collections.map((value, index) => (
-                                <button
-                                    key={index}
-                                    className="flex justify-start w-full"
-                                    onClick={() => {
-
-                                        setSnippets((prevItems) =>
-                                            prevItems.map((item) => {
-                                                const updateDb = async () => {
-                                                    const { data, error } = await supabase
-                                                        .from('snippet')
-                                                        .update({ collection_id: value.id })
-                                                        .eq('id', item.id);
-                                                }
+                    <MoveOverlayPage
+                        collections={collections}
+                        setShowOverlayMenuPage={setShowOverlayMenuPage}
+                        setSnippets={setSnippets}
+                        selectedSnippetsId={selectedSnippetsId}
+                        onClick={(value, index) => {
+                            setSnippets((prevItems) =>
+                                prevItems.map((item) => {
+                                    const updateDb = async () => {
+                                        const { data, error } = await supabase
+                                            .from('snippet')
+                                            .update({ collection_id: value.id })
+                                            .eq('id', item.id);
+                                    }
 
 
-                                                if (selectedSnippetsId.includes(item.id)) {
-                                                    updateDb();
-                                                    return { ...item, collection_id: value.id }
-                                                }
-                                                return item;
-                                            })
-                                        );
-                                        setShowOverlayMenuPage(false);
-                                    }}
-                                >
-                                    <div className={`w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded`}>
-                                        <div className="flex overflow-x-auto ">
-                                            <p className="flex items-center">
-                                                <span className=" material-symbols-outlined">folder</span>
-                                                {value.title}
-                                            </p>
-                                        </div>
-
-
-                                    </div>
-                                </button>
-
-                            ))}
-                        </div>
-
-                    </OverlayMenuPage>);
+                                    if (selectedSnippetsId.includes(item.id)) {
+                                        updateDb();
+                                        return { ...item, collection_id: value.id }
+                                    }
+                                    return item;
+                                })
+                            );
+                            setShowOverlayMenuPage(false);
+                        }}
+                    />
+                );
             case "share":
                 return (
-                    <OverlayMenuPage width="w-96" title="Share" onClose={() => {
-                        setShowOverlayMenuPage(false);
-                    }}>
-                        <div>
-                            <p className="">Collection is shared publicly.</p>
-                            <p> You can access it here:</p>
-
-                            <input ref={inputRef} className="p-2 w-full border border-black rounded" value={(window.location.hostname as string) + '/share/' + linkId} />
-                            <div className="flex gap-2">
-                                <CopyToClipboard text={(window.location.hostname as string) + '/share/' + linkId}>
-                                    <IconButton icon="content_copy" text="Copy" onClick={() => {
-                                        if (inputRef.current) {
-                                            inputRef.current.select();
-                                        }
-                                    }} elementAfterClick={(
-                                        <p className="pt-1">
-                                            Copied!
-                                        </p>
-                                    )} />
-                                </CopyToClipboard>
-                                <a href={'/share/' + linkId} target="_blank"><IconButton icon="open_in_new" text="Visit" onClick={() => { }} /></a>
-                            </div>
-                        </div>
-                    </OverlayMenuPage>
+                    <ShareOverlayPage linkId={linkId} setShowOverlayMenuPage={setShowOverlayMenuPage} />
                 );
         }
+    };
 
-    }
+
 
 
     const handleMoveSnippets = () => {
@@ -744,7 +486,7 @@ export default function Home() {
                                     </div>
 
                                     <div className="flex-1 flex justify-end pr-2 ">
-                                        <button onClick={() => handleDeleteCollection(value)}>
+                                        <button onClick={() => handleDeleteCollection(value, setShowOverlayMenuPage, setCurrentOverlayMenuPage, setToDeleteCollection)}>
                                             <span className="material-symbols-outlined flex items-center">delete</span>
 
                                         </button>
@@ -759,7 +501,7 @@ export default function Home() {
                     </div>
                     {/* // End of collections */}
                 </div>
-                {/* // Left Section */}
+                {/* // Right Section */}
                 <div className="flex-1 flex flex-col">
                     <div className="p-2 border-b border-black bg-neutral-900  text-white ">
                         <p className="text-2xl font-bold flex">
@@ -770,7 +512,7 @@ export default function Home() {
                                 disabled={activeCollection ? false : true}
                                 value={activeCollection?.title}
                                 onChange={(event) => {
-                                    handleUpdateCollectionTitle(event);
+                                    handleUpdateCollectionTitle(event, activeCollection, setCollections, setActiveCollection);
                                 }}
                             />{loadingAddSnippet && <span className="pl-2">
 
@@ -788,7 +530,9 @@ export default function Home() {
                             <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark={true} />
                             {/* // Share collection */}
                             {activeCollection?.shared ? <IconButton icon="public" text="Public" isDark={true} onClick={handleShare} /> : <IconButton icon="share" text="Share" isDark={true} disabled={!activeCollection} onClick={handleShare} />}
-                            <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleDeleteSnippets} />
+                            <IconButton icon="delete" text="Delete" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={()=>{
+                                handleDeleteSnippets(selectedSnippetsId, setSnippets);
+                            }} />
                             <IconButton icon="folder" text="Move" isDark={true} disabled={selectedSnippetsId.length == 0} onClick={handleMoveSnippets} />
                         </div>
                     </div>
@@ -797,23 +541,30 @@ export default function Home() {
                     {!activeCollection ? <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
                         <span>Select or create a collection to start adding new code snippets</span>
                     </div> :
-                        <div className={`flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
-                            {snippets.map((value, index) => (
-                                <SnippetCard
-                                    key={index}
-                                    index={index}
-                                    value={value}
-                                    languages={languages}
-                                    handleUpdateSnippetTitle={handleUpdateSnippetTitle}
-                                    handleUpdateSnippetDescription={handleUpdateSnippetDescription}
-                                    handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
-                                    handleUpdateSnippetCode={handleUpdateSnippetCode}
-                                    setSelectedSnippetsId={setSelectedSnippetsId}
-                                    setIsFullscreen={setIsFullscreen}
-                                    setFullScreenSnippet={setFullScreenSnippet}
-                                    copyTrigger={copyTrigger}
-                                />
-                            ))}
+                        <div className={`swapy-container flex-1 bg-slate-300 grid ${singleColumn ? 'grid-cols-1' : 'grid-cols-2'} p-2 gap-2 overflow-y-auto justify-center`} ref={scrollableDiv}>
+                            {snippets.map((value, index) => {
+
+                                if (value.collection_id != activeCollection.id){
+                                    return;
+                                }
+                                return (
+                                    <SnippetCard
+                                        key={index}
+                                        index={index}
+                                        value={value}
+                                        languages={languages}
+                                        handleUpdateSnippetTitle={handleUpdateSnippetTitle}
+                                        handleUpdateSnippetDescription={handleUpdateSnippetDescription}
+                                        handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
+                                        handleUpdateSnippetCode={handleUpdateSnippetCode}
+                                        setSelectedSnippetsId={setSelectedSnippetsId}
+                                        setIsFullscreen={setIsFullscreen}
+                                        setFullScreenSnippet={setFullScreenSnippet}
+                                        copyTrigger={copyTrigger}
+                                        setSnippets={setSnippets}
+                                    />);
+
+                            })}
                         </div>
                     }
 
