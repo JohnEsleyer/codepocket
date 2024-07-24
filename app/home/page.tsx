@@ -3,16 +3,12 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
 import CodeBlock from "../components/Codeblock";
-import WhiteLoading from "/public/loadingWhite.svg";
-import Image from "next/image";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { defaultFullscreenSnippet, languages } from "./constants";
-import SidebarButton from "./_components/SidebarButton";
 import IconButton from "../components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import { Collection, Link, Snippet } from "./types";
-import SnippetCard from "./_components/SnippetCard";
 import LanguageDropdown from "./_components/LanguageDropdown";
 import DeleteCollectionConfirmationOverlayPage from "./_components/(overlay)/DeleteConfirmation";
 import MoveOverlayPage from "./_components/(overlay)/MoveOverlayContent";
