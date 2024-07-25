@@ -30,10 +30,13 @@ export const handleDeleteSnippets = async (selectedSnippetsId: number[], setSnip
 export const handleDeleteLink = async (
     linkId: string,
 ) => {
+
     const { error } = await supabase
         .from('link')
         .delete()
         .eq('id', linkId);
+
+
 
     if (error) {
         console.log(error);

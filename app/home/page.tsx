@@ -265,7 +265,14 @@ export default function Home() {
                 );
             case "share":
                 return (
-                    <ShareOverlayPage linkId={linkId} setShowOverlayMenuPage={setShowOverlayMenuPage} />
+                    <ShareOverlayPage 
+                        linkId={linkId} 
+                        setShowOverlayMenuPage={setShowOverlayMenuPage} 
+                        setCollections={setCollections}
+                        collections={collections}
+                        activeCollection={activeCollection}
+                        setActiveCollection={setActiveCollection}
+                        />
                 );
         }
     };

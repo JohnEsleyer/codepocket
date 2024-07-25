@@ -53,7 +53,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
     <div className="flex space-x-4">
       <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark />
       {activeCollection?.shared
-        ? <IconButton icon="public" text="Public" isDark onClick={handleShare} />
+        ? <IconButton iconColor="green" textColor="green" icon="public" text="Public" isDark onClick={handleShare} />
         : <IconButton icon="share" text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
       <IconButton icon="delete" text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets(selectedSnippetsId, setSnippets)} />
       <IconButton icon="folder" text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
