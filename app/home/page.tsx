@@ -41,10 +41,10 @@ export default function Home() {
     const [currentOverlayMenuPage, setCurrentOverlayMenuPage] = useState('search');
     const [selectedSnippetsId, setSelectedSnippetsId] = useState<number[]>([]);
     const [filteredSnippets, setFilteredSnippets] = useState<Snippet[]>([]);
-    const [toDeleteCollection, setToDeleteCollection] = useState<Collection>();
     const [query, setQuery] = useState('');
     const [linkId, setLinkId] = useState('');
-
+    const [disableSnippets, setDisableSnippets] = useState(false);
+    
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
@@ -93,9 +93,6 @@ export default function Home() {
             scrollableDiv.current.scrollTop = scrollableDiv.current.scrollHeight;
         }
     }
-
-
-
 
     const handleAddCollection = async () => {
         setLoadingAddCollection(true);
@@ -211,22 +208,27 @@ export default function Home() {
             case "deleteCollectionConfirmation":
                 return (
                     <DeleteCollectionConfirmationOverlayPage
-                        toDeleteCollection={toDeleteCollection}
+                        toDeleteCollection={activeCollection}
                         setShowOverlayMenuPage={setShowOverlayMenuPage}
                         setCollections={setCollections}
                         buttonOnClick={async () => {
                             const { error } = await supabase
                                 .from('collection')
                                 .delete()
-                                .eq('id', toDeleteCollection?.id);
+                                .eq('id', activeCollection?.id);
 
                             if (error) {
                                 console.log(error);
                             } else {
                                 setCollections((prevItems) => {
-                                    return prevItems.filter((item) => item.id !== toDeleteCollection?.id);
+                                    return prevItems.filter((item) => item.id !== activeCollection?.id);
 
                                 });
+                                setSnippets((prevValues) => (prevValues.filter((value) => {
+                                    value.collection_id !== activeCollection?.id
+                                     return value;
+                                })));
+                                setDisableSnippets(true);
                             }
                             setShowOverlayMenuPage(false);
                         }}
@@ -433,6 +435,7 @@ export default function Home() {
                     setActiveCollection={setActiveCollection}
                     activeCollection={activeCollection}
                     handleDeleteCollection={handleDeleteCollection}
+                    setDisableSnippets={setDisableSnippets}
                 />
 
                 <div className="flex-1 flex flex-col">
@@ -465,6 +468,7 @@ export default function Home() {
                         copyTrigger={copyTrigger} 
                         setSnippets={setSnippets}
                         languages={languages}
+                        disable={disableSnippets}
                     />
                 </div>
             </div>

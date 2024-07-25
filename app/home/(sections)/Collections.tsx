@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
+import { Collection } from '../types';
 
 interface CollectionsProps {
   collections: any[];
@@ -8,6 +9,7 @@ interface CollectionsProps {
   handleDeleteCollection: (value: any, setShowOverlayMenuPage: any, setCurrentOverlayMenuPage: any, setToDeleteCollection: any) => void;
   setShowOverlayMenuPage: (show: boolean) => void;
   setCurrentOverlayMenuPage: (page: string) => void;
+  setDisableSnippets: Dispatch<SetStateAction<boolean>>;
 }
 
 const Collections: React.FC<CollectionsProps> = ({
@@ -17,7 +19,8 @@ const Collections: React.FC<CollectionsProps> = ({
   activeCollection,
   handleDeleteCollection,
   setShowOverlayMenuPage,
-  setCurrentOverlayMenuPage
+  setCurrentOverlayMenuPage,
+  setDisableSnippets,
 }) => (
   <div className="flex flex-col overflow-y-auto pl-2">
     {collections.map((value, index) => (
@@ -27,6 +30,7 @@ const Collections: React.FC<CollectionsProps> = ({
         onClick={() => {
           setSelectedSnippetsId([]);
           setActiveCollection(value);
+          setDisableSnippets(false);
         }}
       >
         <div className={`w-full flex text-xl pl-2 ${activeCollection?.id == value.id ? "bg-neutral-900 text-white" : "hover:bg-slate-300 text-black"} hover:rounded`}>

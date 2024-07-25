@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import OverlayMenuPage from '../OverlayMenuContent';
 import IconButton from '@/app/components/IconButton';
+import { handleDeleteLink } from '../../_utility/deleteData';
 
 interface ShareOverlayPageProps {
     linkId: string;
@@ -33,9 +34,23 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                             elementAfterClick={<p className="pt-1">Copied!</p>}
                         />
                     </CopyToClipboard>
+                    <div className="flex items-center">
                     <a href={`/share/${linkId}`} target="_blank" rel="noopener noreferrer">
                         <IconButton icon="open_in_new" text="Visit" onClick={() => { }}/>
                     </a>
+                    </div>
+                    <div className="bg-black rounded p-1 m-2">
+                    <IconButton
+                            noBackground={true}
+                            isDark={true}
+                            icon="lock"
+                            text="Set to private"
+                            onClick={() => {
+                                handleDeleteLink(linkId,)
+                            }}
+                            elementAfterClick={<p className="pt-1">Copied!</p>}
+                        />
+                        </div>
                 </div>
             </div>
         </OverlayMenuPage>

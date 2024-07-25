@@ -17,6 +17,7 @@ interface SnippetsProps {
   copyTrigger: () => void;
   setSnippets: Dispatch<SetStateAction<Snippet[]>>;
   languages: string[];
+  disable: boolean;
 }
 
 const Snippets: React.FC<SnippetsProps> = ({
@@ -34,8 +35,9 @@ const Snippets: React.FC<SnippetsProps> = ({
   copyTrigger,
   setSnippets,
   languages,
+  disable,
 }) => (
-  !activeCollection ? 
+  !activeCollection || disable ? 
     <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
       <span>Select or create a collection to start adding new code snippets</span>
     </div>
