@@ -91,17 +91,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
 
                 <div className="flex justify-end items-center space-x-2">
                     {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
-                    <div className="hover:bg-slate-300 rounded">
-                        <DropdownMenu buttonText={value.language}>
-                            <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
-                                {languages.map((lang, index) => (
-                                    <button key={index} onClick={() => handleUpdateSnippetLanguage(value, lang, setSnippets)}>
-                                        <p className="hover:bg-slate-300 p-1">{lang}</p>
-                                    </button>
-                                ))}
-                            </div>
-                        </DropdownMenu>
-                    </div>
+                   
                     <IconButton
                         icon="open_in_full"
                         text="Full screen"

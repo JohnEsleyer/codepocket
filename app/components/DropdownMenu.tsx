@@ -3,10 +3,15 @@ import React, { ReactNode, useState } from 'react';
 interface DropdownMenuProps {
   buttonText: string;
   children: ReactNode;
+  disabled?: boolean;
 }
 
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ buttonText, children }) => {
+const DropdownMenu: React.FC<DropdownMenuProps> = ({ 
+  buttonText, 
+  children,
+  disabled,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   
   const toggleDropdown = () => {
@@ -14,8 +19,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ buttonText, children }) => 
   };
 
   return (
-    <div className="dropdown" style={{ position: 'relative', display: 'inline-block' }}>
-      <button className="dropdown-toggle flex items-center" onClick={toggleDropdown}>
+    <div className={disabled ? `dropdown text-gray-500`:`dropdown`} style={{ position: 'relative', display: 'inline-block' }}>
+      <button className="dropdown-toggle flex items-center" onClick={toggleDropdown} disabled={disabled}>
       <span className="text-2xl material-symbols-outlined">expand_more</span>
         {buttonText}
       </button>

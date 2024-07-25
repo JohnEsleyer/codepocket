@@ -24,6 +24,38 @@ export const handleUpdateSnippetLanguage = async (
         console.log(error);
     }
 };
+export const handleUpdateSelectedSnippetLanguage = async (
+    language: string,
+    setSnippets: Dispatch<SetStateAction<Snippet[]>>,
+    selectedSnippetsId: number[],
+) => {
+    setSnippets((prevItems) =>
+        prevItems.map((item) => {
+            
+            if (selectedSnippetsId.includes(item.id))
+                 {  
+                    return  { ...item, language: language }
+                } 
+            return item;
+        }
+        )
+    );
+
+    async function updateDbSnippets(snippetId: number){
+        const { error } = await supabase
+        .from('snippet')
+        .update({ language: language })
+        .eq('id', snippetId);
+        if (error) {
+            console.log(error);
+        }
+    }
+    selectedSnippetsId.map((snippetId)=>{
+        updateDbSnippets(snippetId);
+    });
+
+    
+};
 
 // Update snippet code
 export const handleUpdateSnippetCode = async (
