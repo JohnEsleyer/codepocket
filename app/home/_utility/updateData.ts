@@ -103,7 +103,7 @@ export const handleUpdateSnippetDescription = async (
 
 // Update snippet title
 export const handleUpdateSnippetTitle = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement>,
     value: Snippet,
     setSnippets: Dispatch<SetStateAction<Snippet[]>>
 ) => {

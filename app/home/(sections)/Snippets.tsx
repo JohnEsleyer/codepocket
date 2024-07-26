@@ -7,7 +7,7 @@ interface SnippetsProps {
   snippets: any[];
   singleColumn: boolean;
   scrollableDiv: React.RefObject<HTMLDivElement>;
-  handleUpdateSnippetTitle: (event: ChangeEvent<HTMLInputElement>, value: Snippet, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
+  handleUpdateSnippetTitle: (event: ChangeEvent<HTMLTextAreaElement>, value: Snippet, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
   handleUpdateSnippetDescription: (event: React.ChangeEvent<HTMLTextAreaElement>, value: Snippet, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
   handleUpdateSnippetLanguage: (value: Snippet, code: string, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
   handleUpdateSnippetCode: (value: Snippet, code: string, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;

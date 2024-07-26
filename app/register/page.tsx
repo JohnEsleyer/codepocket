@@ -59,41 +59,43 @@ export default function Register() {
     };
 
   return (
-    <div className="flex justify-center flex-col text-black h-screen">
+    <div className="flex justify-center flex-col text-black h-screen bg-slate-700">
     <button onClick={() => {
       router.replace('/');
     }}>
-      <p className="text-4xl font-bold p-2 flex justify-center">CodePocket</p>
+      <p className="text-4xl font-bold p-2 flex justify-center text-white">CodePocket</p>
     </button>
     <div className="flex justify-center p-4">
     <div className="rounded bg-slate-200 p-4">
-      <h1 className="flex justify-center text-xl font-bold">Register</h1>
+      <h1 className="flex justify-center text-xl font-bold">Create an account</h1>
       <form onSubmit={handleSubmit} className="flex justify-center flex-col">
         <label>
           <p>Email</p>
-          <input required className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
+          <input required className="p-1 w-full" type="text" placeholder="firstname@email.com" name="email" value={formState.email} onChange={handleInputChange} />
         </label>
         <label>
           <p>Username</p>
-          <input required className="p-1 w-full" type="text" name="username" value={formState.username} onChange={handleInputChange} />
+          <input required className="p-1 w-full" type="text" name="username" placeholder="MrPool123" value={formState.username} onChange={handleInputChange} />
         </label>
         <label>
           <p>Password</p>
-          <input required className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
+          <input required className="p-1 w-full text-black" type="password" name="password" placeholder="**********" value={formState.password} onChange={handleInputChange} />
         </label>
         <label>
           <p>Confirm Password</p>
-          <input required className="p-1 w-full text-black" type="password" name="confirm_password" value={formState.confirm_password} onChange={handleInputChange} />
+          <input required className="p-1 w-full text-black" type="password" name="confirm_password" placeholder="**********" value={formState.confirm_password} onChange={handleInputChange} />
         </label>
         <br />
         <button className="bg-black text-white p-1 rounded" type="submit">Register</button>
       </form>
+      <a className="underline flex justify-center" href="/login">
+        Login
+      </a>
       {errorText && <p className="text-red-500 flex justify-center">{errorText}</p>}
       {isLoading &&
             <div className="flex justify-center">
               <Image src={Loading} alt="Loading" className="w-10 h-10" />
             </div>
-
           }
     </div>
     </div>

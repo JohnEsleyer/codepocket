@@ -1,7 +1,7 @@
 import CodeBlock from '@/app/_components/Codeblock';
 import DropdownMenu from '@/app/_components/DropdownMenu';
 import IconButton from '@/app/_components/IconButton';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Snippet } from '../types';
 
@@ -10,7 +10,7 @@ interface SnippetCardProps {
     value: Snippet;
     languages: string[];
     handleUpdateSnippetTitle: (
-        event: React.ChangeEvent<HTMLInputElement>,
+        event: ChangeEvent<HTMLTextAreaElement>,
         value: Snippet,
         setSnippets: Dispatch<SetStateAction<Snippet[]>>
     ) => void;
@@ -56,10 +56,10 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
             <div className="m-2">
                 <form className="flex flex-col">
                     <div className="flex">
-                        <input
-                            className="flex-1 text-2xl bg-slate-100"
+                        <textarea
+                            className="flex-1 h-8 text-2xl bg-slate-100"
                             name="title"
-                            type="text"
+                            maxLength={50}
                             value={value.title}
                             onChange={(event) => handleUpdateSnippetTitle(event, value, setSnippets)}
                         />
