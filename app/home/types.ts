@@ -17,4 +17,5 @@ export interface Link{
     id: string;
     accessibility: string;
     collection_id: number;
+    owner_username: string;
 }

@@ -38,7 +38,7 @@ export default function ProtectedPage({ children }: Props) {
     } else {
         return (
             <div>
-                Unauthorized Access
+                
             </div>
         );
     }

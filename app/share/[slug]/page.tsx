@@ -1,8 +1,8 @@
 'use client'
 
-import CodeBlock from "@/app/components/Codeblock";
-import DropdownMenu from "@/app/components/DropdownMenu";
-import IconButton from "@/app/components/IconButton";
+import CodeBlock from "@/app/_components/Codeblock";
+import DropdownMenu from "@/app/_components/DropdownMenu";
+import IconButton from "@/app/_components/IconButton";
 import { languages } from "@/app/home/constants";
 import { Collection, Link, Snippet } from "@/app/home/types";
 import supabase from "@/app/utils/supabase";
@@ -10,17 +10,10 @@ import { useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
+import { defaultFullscreenSnippet } from "./constants";
+import { link } from "fs";
 
 export default function Page({ params }: { params: { slug: string } }) {
-
-    const defaultFullscreenSnippet = {
-        id: 0,
-        title: 'untitled',
-        collection_id: 0,
-        code: '',
-        language: 'python',
-        description: '',
-    };
 
     const [linkState, setLinkState] = useState<Link>();
     const [collection, setCollection] = useState<Collection>();
@@ -29,18 +22,11 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
     const [isLoading, setIsLoading] = useState(true);
-
+    
     useEffect(() => {
 
         const checkOrientation = () => {
             const screenRatio = window.innerWidth / window.innerHeight;
-
-            console.log(screenRatio);
-            // if (screenRatio > 1.150) {
-            //     setOrientation('Landscape');
-            // } else {
-            //     setOrientation('Portrait');
-            // }
 
             console.log(window.innerWidth);
             if (window.innerWidth < 730) {
@@ -194,7 +180,9 @@ export default function Page({ params }: { params: { slug: string } }) {
 
             <div className="bg-black text-white p-4">
                 <p className="text-2xl">{collection?.title}</p>
+                <p>Creator: {linkState.owner_username}</p>
                 <p className="text-xs">Read Only</p>
+    
             </div>
             <div className={`grid ${singleColumn ? "grid-cols-1" : "grid-cols-2"} gap-2 p-2`}>
                 {snippets?.map((value, index) => (

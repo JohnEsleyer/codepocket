@@ -2,7 +2,7 @@
 'use client'
 import Image from "next/image";
 import { useState } from "react";
-import supabase from "./utils/supabase";
+import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import Loading from "/public/loading.svg";
 
@@ -13,7 +13,7 @@ type FormState = {
 };
 
 
-export default function Home() {
+export default function Login() {
 
   const router = useRouter();
 
@@ -49,19 +49,19 @@ export default function Home() {
   };
 
   return (
-    <div className="flex justify-center flex-col text-black h-screen">
-      <p className="text-4xl font-bold p-2 flex justify-center">CodePocket</p>
+    <div className="flex justify-center flex-col h-screen bg-slate-700">
+      <p className="text-4xl font-bold p-2 flex justify-center text-white">CodePocket</p>
       <div className="flex justify-center p-4">
         <div className="rounded bg-slate-200 p-4 flex justify-center flex-col">
           <h1 className="flex justify-center text-xl font-bold">Login</h1>
           <form onSubmit={handleSubmit} className="flex justify-center flex-col">
             <label>
               <p>Email</p>
-              <input required className="p-1 w-full" type="text" name="email" value={formState.email} onChange={handleInputChange} />
+              <input required className="p-1 w-full" type="text" name="email" placeholder="firstname@email.com" value={formState.email} onChange={handleInputChange} />
             </label>
             <label>
               <p>Password</p>
-              <input required className="p-1 w-full text-black" type="password" name="password" value={formState.password} onChange={handleInputChange} />
+              <input required className="p-1 w-full text-black" type="password" name="password" placeholder="**********"value={formState.password} onChange={handleInputChange} />
             </label>
             <br />
             <button className="bg-black text-white p-1 rounded" type="submit">Login</button>
