@@ -1,6 +1,6 @@
-import CodeBlock from '@/app/components/Codeblock';
-import DropdownMenu from '@/app/components/DropdownMenu';
-import IconButton from '@/app/components/IconButton';
+import CodeBlock from '@/app/_components/Codeblock';
+import DropdownMenu from '@/app/_components/DropdownMenu';
+import IconButton from '@/app/_components/IconButton';
 import React, { Dispatch, SetStateAction } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Snippet } from '../types';

@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useRef } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import OverlayMenuPage from '../OverlayMenuContent';
-import IconButton from '@/app/components/IconButton';
+import IconButton from '@/app/_components/IconButton';
 import { handleDeleteLink } from '../../_utility/deleteData';
 import { Collection } from '../../types';
 import supabase from '@/app/utils/supabase';

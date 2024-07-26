@@ -2,10 +2,10 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import ProtectedPage from "../templates/protectedpage";
-import CodeBlock from "../components/Codeblock";
+import CodeBlock from "../_components/Codeblock";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { defaultFullscreenSnippet, languages } from "./constants";
-import IconButton from "../components/IconButton";
+import IconButton from "../_components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import { Collection, Link, Snippet } from "./types";

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import supabase from "../../../utils/supabase";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
-import IconButton from "../../../components/IconButton";
+import IconButton from "../../../_components/IconButton";
 
 export default function SettingsOverlayPage() {
     const [email, setEmail] = useState<string | undefined>('');

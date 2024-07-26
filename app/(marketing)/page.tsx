@@ -5,19 +5,17 @@ import { useState } from "react";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import Loading from "/public/loading.svg";
-import Header from "./_components/Header";
-import Main from "./_components/Main";
-import Footer from "./_components/Footer";
+
+import Hero from "./_components/Hero";
 
 
  const Home: React.FC = () => {
 
   return (
-    
+      <div>
+      <Hero/>
 
-
-      <Main />
-
+      </div>
   );
 }
 

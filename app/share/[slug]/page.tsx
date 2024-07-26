@@ -1,8 +1,8 @@
 'use client'
 
-import CodeBlock from "@/app/components/Codeblock";
-import DropdownMenu from "@/app/components/DropdownMenu";
-import IconButton from "@/app/components/IconButton";
+import CodeBlock from "@/app/_components/Codeblock";
+import DropdownMenu from "@/app/_components/DropdownMenu";
+import IconButton from "@/app/_components/IconButton";
 import { languages } from "@/app/home/constants";
 import { Collection, Link, Snippet } from "@/app/home/types";
 import supabase from "@/app/utils/supabase";

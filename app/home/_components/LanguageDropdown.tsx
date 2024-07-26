@@ -1,4 +1,4 @@
-import DropdownMenu from '@/app/components/DropdownMenu';
+import DropdownMenu from '@/app/_components/DropdownMenu';
 import React from 'react';
 import { Snippet } from '../types';
 

@@ -1,10 +1,10 @@
 'use client'
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Image from 'next/image';
-import IconButton from '@/app/components/IconButton';
+import IconButton from '@/app/_components/IconButton';
 import WhiteLoading from "/public/loadingWhite.svg";
 import { Snippet } from '../types';
-import DropdownMenu from '@/app/components/DropdownMenu';
+import DropdownMenu from '@/app/_components/DropdownMenu';
 import { languages } from '../constants';
 import { handleUpdateSelectedSnippetLanguage, handleUpdateSnippetLanguage } from '../_utility/updateData';
 
