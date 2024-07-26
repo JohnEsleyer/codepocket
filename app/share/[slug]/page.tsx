@@ -11,6 +11,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
 import { defaultFullscreenSnippet } from "./constants";
+import { link } from "fs";
 
 export default function Page({ params }: { params: { slug: string } }) {
 
@@ -21,7 +22,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
     const [isLoading, setIsLoading] = useState(true);
-
+    
     useEffect(() => {
 
         const checkOrientation = () => {
@@ -179,7 +180,9 @@ export default function Page({ params }: { params: { slug: string } }) {
 
             <div className="bg-black text-white p-4">
                 <p className="text-2xl">{collection?.title}</p>
+                <p>Creator: {linkState.owner_username}</p>
                 <p className="text-xs">Read Only</p>
+    
             </div>
             <div className={`grid ${singleColumn ? "grid-cols-1" : "grid-cols-2"} gap-2 p-2`}>
                 {snippets?.map((value, index) => (

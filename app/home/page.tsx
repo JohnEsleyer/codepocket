@@ -300,6 +300,11 @@ export default function Home() {
                     .select();
             };
 
+            const getUser = async () => {
+                const { data, error } = await supabase.auth.getUser();
+                return data
+            }
+
             const insertLink = async () => {
                 const { data, error } = await supabase
                     .from('link')
@@ -307,8 +312,8 @@ export default function Home() {
                         {
                             accessibility: 'public',
                             collection_id: activeCollection?.id,
-
-                        },
+                            owner_username: (await getUser()).user?.user_metadata.username,
+                        },  
                     ])
                     .select()
 
