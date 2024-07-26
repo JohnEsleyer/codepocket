@@ -91,7 +91,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
 
                 <div className="flex justify-end items-center space-x-2">
                     {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
-                   
+                    <p>{value.language}</p>
                     <IconButton
                         icon="open_in_full"
                         text="Full screen"

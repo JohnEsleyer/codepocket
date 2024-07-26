@@ -10,17 +10,9 @@ import { useEffect, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
+import { defaultFullscreenSnippet } from "./constants";
 
 export default function Page({ params }: { params: { slug: string } }) {
-
-    const defaultFullscreenSnippet = {
-        id: 0,
-        title: 'untitled',
-        collection_id: 0,
-        code: '',
-        language: 'python',
-        description: '',
-    };
 
     const [linkState, setLinkState] = useState<Link>();
     const [collection, setCollection] = useState<Collection>();
@@ -34,13 +26,6 @@ export default function Page({ params }: { params: { slug: string } }) {
 
         const checkOrientation = () => {
             const screenRatio = window.innerWidth / window.innerHeight;
-
-            console.log(screenRatio);
-            // if (screenRatio > 1.150) {
-            //     setOrientation('Landscape');
-            // } else {
-            //     setOrientation('Portrait');
-            // }
 
             console.log(window.innerWidth);
             if (window.innerWidth < 730) {
