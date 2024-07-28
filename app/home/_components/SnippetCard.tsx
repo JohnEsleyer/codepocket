@@ -4,6 +4,7 @@ import IconButton from '@/app/_components/IconButton';
 import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Snippet } from '../types';
+import { Copy, Maximize2 } from 'lucide-react';
 
 interface SnippetCardProps {
     index: number;
@@ -93,7 +94,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
                     <p>{value.language}</p>
                     <IconButton
-                        icon="open_in_full"
+                        icon={ <Maximize2 />}
                         text="Full screen"
                         onClick={() => {
                             setIsFullscreen(true);
@@ -101,7 +102,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         }}
                     />
                     <CopyToClipboard text={value.code} onCopy={copyTrigger}>
-                        <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={<p>Copied!</p>} />
+                        <IconButton icon={<Copy />} text="Copy" onClick={() => { }} elementAfterClick={<p>Copied!</p>} />
                     </CopyToClipboard>
                 </div>
 

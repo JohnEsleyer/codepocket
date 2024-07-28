@@ -5,6 +5,8 @@ import IconButton from '@/app/_components/IconButton';
 import { handleDeleteLink } from '../../_utility/deleteData';
 import { Collection } from '../../types';
 import supabase from '@/app/utils/supabase';
+import { Copy, ExternalLink, GlobeLock } from 'lucide-react';
+import { LockKeyhole } from 'lucide-react';
 
 interface ShareOverlayPageProps {
     linkId: string;
@@ -34,7 +36,7 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                 <div className="flex gap-2">
                     <CopyToClipboard text={`${window.location.hostname}/share/${linkId}`}>
                         <IconButton
-                            icon="content_copy"
+                            icon={<Copy/>}
                             text="Copy"
                             onClick={() => {
                                 if (inputRef.current) {
@@ -46,14 +48,14 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                     </CopyToClipboard>
                     <div className="flex items-center">
                         <a href={`/share/${linkId}`} target="_blank" rel="noopener noreferrer">
-                            <IconButton icon="open_in_new" text="Visit" onClick={() => { }} />
+                            <IconButton icon={ <ExternalLink />}text="Visit" onClick={() => { }} />
                         </a>
                     </div>
                     <div className="bg-black rounded p-1 m-2">
                         <IconButton
                             noBackground={true}
                             isDark={true}
-                            icon="lock"
+                            icon={<GlobeLock />}
                             textColor='slate'
                             text="Set to private"
                             disableHover={true}

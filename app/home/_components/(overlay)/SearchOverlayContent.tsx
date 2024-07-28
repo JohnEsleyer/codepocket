@@ -1,5 +1,6 @@
 import React from 'react';
 import OverlayMenuPage from '../OverlayMenuContent';
+import { Folder } from 'lucide-react';
 
 interface SearchOverlayPageProps {
     filteredSnippets: any[];
@@ -41,7 +42,7 @@ const SearchOverlayPage: React.FC<SearchOverlayPageProps> = ({
                                 <p className="flex justify-start truncate">{item.description}</p>
                             </div>
                             <p className="flex items-center">
-                                <span className="material-symbols-outlined">folder</span>
+                                <Folder/>
                                 {collections.find(obj => obj.id === item.collection_id)?.title}
                             </p>
                         </button>

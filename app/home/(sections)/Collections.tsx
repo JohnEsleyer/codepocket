@@ -1,5 +1,8 @@
+'use client'
 import React, { Dispatch, SetStateAction } from 'react';
 import { Collection } from '../types';
+import { Folder, Trash2 } from 'lucide-react';
+
 
 interface CollectionsProps {
   collections: any[];
@@ -37,14 +40,16 @@ const Collections: React.FC<CollectionsProps> = ({
           <div className="flex overflow-x-auto w-80">
             <div className="truncate flex">
               <div className="flex items-center">
-                <span className="material-symbols-outlined">folder</span>
+              <div className="pr-2">
+              <Folder/>
+                </div>
               </div>
               <p className="truncate">{value.title}</p>
             </div>
           </div>
           <div className="flex-1 flex justify-end pr-2 ">
             <button onClick={() => handleDeleteCollection(value, setShowOverlayMenuPage, setCurrentOverlayMenuPage, setActiveCollection)}>
-              <span className="material-symbols-outlined flex items-center">delete</span>
+            <Trash2 />
             </button>
           </div>
         </div>

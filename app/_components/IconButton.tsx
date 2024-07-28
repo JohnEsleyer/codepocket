@@ -1,7 +1,8 @@
+'use client'
 import React, { ReactNode, useState } from 'react';
 
 interface IconButtonProps {
-  icon: string;
+  icon: ReactNode;
   text: string;
   isDark?: boolean;
   noBackground?: boolean;
@@ -54,8 +55,8 @@ const IconButton: React.FC<IconButtonProps> = ({
     
     }}>
       <div className={`flex flex items-center ${isDark && !disabled ? disableHover ? 'text-white' :'hover:text-black text-white' : disabled ? 'text-gray-500': 'text-black'}`}>
-        <span className={`text-2xl material-symbols-outlined text-${iconColor}-500`}>{icon}</span>
-        <span className={`flex items-center text-${textColor}-500`}>{text}</span>
+        {icon}
+        <span className={`flex items-center text-${textColor}-500 pl-2`}>{text}</span>
       </div>
     </button>
   );

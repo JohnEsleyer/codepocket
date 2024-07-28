@@ -1,9 +1,11 @@
+'use client'
 import React, { Dispatch, SetStateAction } from 'react';
 import SidebarButton from '../_components/SidebarButton'; 
 import Collections from './Collections';
 import { DropdownMenu, DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { workspacesData } from '../testData';
+import { CirclePlus, Folder, Icon, LogOut, Search, Settings } from 'lucide-react';
 
 interface SidebarProps {
   orientation: string;
@@ -40,18 +42,39 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div className="shadow">
       <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
       <div className="pt-4 pb-2 flex flex-col">
-        <div className="pl-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger>Workspaces</DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {workspacesData.map((workspace) => (
-                <div className="bg-white">{workspace.name}</div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex">
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+          <div className="w-64 flex justify-start hover:bg-slate-300">
+          <SidebarButton 
+          icon={<Folder/>}
+          text="Workspaces"
+          disableHover={true}
+          onClick={() => {
+          }}
+   
+        />
+        </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <div className="bg-slate-100 w-64 rounded p-4 shadow-md">
+            {
+              workspacesData.map((workspace) => (
+                <div>{workspace.name}</div>
+              ))
+            }
+            <div className="flex justify-start border-black border-2 p-2 rounded">
+              <CirclePlus/>
+              <span>Create new workspace</span>
+            </div>
+           
+            </div>
+          </DropdownMenuContent>
+        
+        </DropdownMenu>
         </div>
         <SidebarButton
-          icon="search"
+          icon={<Search />}
           text="Search"
           onClick={() => {
             setShowOverlayMenuPage(true);
@@ -60,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           }}
         />
         <SidebarButton
-          icon="settings"
+          icon={<Settings />}
           text="Settings"
           onClick={() => {
             setShowOverlayMenuPage(true);
@@ -68,12 +91,12 @@ const Sidebar: React.FC<SidebarProps> = ({
           }}
         />
         <SidebarButton
-          icon="logout"
+          icon={ <LogOut />}
           text="Sign out"
           onClick={handleSignOut}
         />
         <SidebarButton
-          icon="add"
+          icon={<CirclePlus/>}
           text="Add a collection"
           onClick={handleAddCollection}
           loading={loadingAddCollection}

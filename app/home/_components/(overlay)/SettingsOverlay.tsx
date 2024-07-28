@@ -3,6 +3,7 @@ import supabase from "../../../utils/supabase";
 import Loading from "/public/loading.svg";
 import Image from "next/image";
 import IconButton from "../../../_components/IconButton";
+import { KeyRound, Trash2 } from "lucide-react";
 
 export default function SettingsOverlayPage() {
     const [email, setEmail] = useState<string | undefined>('');
@@ -51,10 +52,10 @@ export default function SettingsOverlayPage() {
             </div>
             <div className="flex flex-col w-44">
             <a href="/update-password">
-            <IconButton icon="password" text="Change Password" onClick={() => { }} />
+            <IconButton icon={<KeyRound />} text="Change Password" onClick={() => { }} />
             </a>
             <a  href="/delete-account">
-            <IconButton iconColor="red" textColor="red" icon="delete" text="Delete Account" onClick={() => { }} />
+            <IconButton iconColor="red" textColor="red" icon={<Trash2 color="red"/>}text="Delete Account" onClick={() => { }} />
             </a>
             </div>
         </div>

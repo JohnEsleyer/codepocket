@@ -7,6 +7,7 @@ import { Snippet } from '../types';
 import { languages } from '../constants';
 import { handleUpdateSelectedSnippetLanguage, handleUpdateSnippetLanguage } from '../_utility/updateData';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { ChevronDown, CirclePlus, Earth, Folder, Share2, Trash2 } from 'lucide-react';
 
 interface ToolbarProps {
   activeCollection: any;
@@ -59,19 +60,19 @@ const Toolbar: React.FC<ToolbarProps> = ({
       </span>}
     </p>
     <div className="flex space-x-4">
-      <IconButton icon="add" text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark />
+      <IconButton icon={<CirclePlus/>} text="New code snippet" onClick={handleAddSnippet} disabled={!activeCollection} isDark />
       {activeCollection?.shared
-        ? <IconButton iconColor="green" textColor="green" icon="public" text="Public" isDark onClick={handleShare} />
-        : <IconButton icon="share" text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
-      <IconButton icon="delete" text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets(selectedSnippetsId, setSnippets)} />
-      <IconButton icon="folder" text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
+        ? <IconButton iconColor="green" textColor="green" icon={<Earth />} text="Public" isDark onClick={handleShare} />
+        : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
+      <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets(selectedSnippetsId, setSnippets)} />
+      <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
       <div>
         {
           selectedSnippetsId.length != 0 ? 
           <DropdownMenu >
           <DropdownMenuTrigger>
           <div className="flex items-center pt-4 pb-4">
-          <span className="material-symbols-outlined">arrow_drop_down</span>
+          <ChevronDown />
           {selectedLangauge}
           </div>
              </DropdownMenuTrigger>
@@ -89,10 +90,9 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </DropdownMenuContent>
         </DropdownMenu> : 
         <div className="text-gray-500 flex items-center pt-4 pb-4">
-          <span className="material-symbols-outlined">arrow_drop_down</span>
+          <ChevronDown />
           {selectedLangauge}
           </div>
-
         }
      
           </div>
