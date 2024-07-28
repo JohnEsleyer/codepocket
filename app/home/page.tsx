@@ -123,10 +123,6 @@ export default function Home() {
 
 
 
-
-
-
-
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             const filtered = snippets.filter(item =>

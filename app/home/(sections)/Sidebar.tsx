@@ -1,6 +1,9 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import SidebarButton from '../_components/SidebarButton'; 
 import Collections from './Collections';
+import { DropdownMenu, DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { workspacesData } from '../testData';
 
 interface SidebarProps {
   orientation: string;
@@ -37,6 +40,16 @@ const Sidebar: React.FC<SidebarProps> = ({
     <div className="shadow">
       <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
       <div className="pt-4 pb-2 flex flex-col">
+        <div className="pl-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger>Workspaces</DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {workspacesData.map((workspace) => (
+                <div className="bg-white">{workspace.name}</div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <SidebarButton
           icon="search"
           text="Search"

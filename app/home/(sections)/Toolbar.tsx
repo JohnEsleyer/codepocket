@@ -4,9 +4,9 @@ import Image from 'next/image';
 import IconButton from '@/app/_components/IconButton';
 import WhiteLoading from "/public/loadingWhite.svg";
 import { Snippet } from '../types';
-import DropdownMenu from '@/app/_components/DropdownMenu';
 import { languages } from '../constants';
 import { handleUpdateSelectedSnippetLanguage, handleUpdateSnippetLanguage } from '../_utility/updateData';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 
 interface ToolbarProps {
   activeCollection: any;
@@ -65,19 +65,37 @@ const Toolbar: React.FC<ToolbarProps> = ({
         : <IconButton icon="share" text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
       <IconButton icon="delete" text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets(selectedSnippetsId, setSnippets)} />
       <IconButton icon="folder" text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
-      <DropdownMenu buttonText={selectedLangauge} disabled={selectedSnippetsId.length === 0}>
-        <div className="text-black h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
-          {languages.map((lang, index) => (
-            <button key={index} onClick={() => {
-              setSelectedLanguage(lang);
-              handleUpdateSelectedSnippetLanguage(lang, setSnippets, selectedSnippetsId)
-            }}>
-              <p className="hover:bg-slate-300 p-1">{lang}</p>
-            </button>
-          ))}
-        </div>
-      </DropdownMenu>
+      <div>
+        {
+          selectedSnippetsId.length != 0 ? 
+          <DropdownMenu >
+          <DropdownMenuTrigger>
+          <div className="flex items-center pt-4 pb-4">
+          <span className="material-symbols-outlined">arrow_drop_down</span>
+          {selectedLangauge}
+          </div>
+             </DropdownMenuTrigger>
+          <DropdownMenuContent>
+          <div className="text-black h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
+            {languages.map((lang, index) => (
+              <button key={index} onClick={() => {
+                setSelectedLanguage(lang);
+                handleUpdateSelectedSnippetLanguage(lang, setSnippets, selectedSnippetsId)
+              }}>
+                <p className="hover:bg-slate-300 p-1">{lang}</p>
+              </button>
+            ))}
+          </div>
+          </DropdownMenuContent>
+        </DropdownMenu> : 
+        <div className="text-gray-500 flex items-center pt-4 pb-4">
+          <span className="material-symbols-outlined">arrow_drop_down</span>
+          {selectedLangauge}
+          </div>
 
+        }
+     
+          </div>
     </div>
   </div>
   )
