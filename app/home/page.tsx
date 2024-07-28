@@ -23,6 +23,7 @@ import Sidebar from "./(sections)/Sidebar";
 import Toolbar from "./(sections)/Toolbar";
 import Snippets from "./(sections)/Snippets";
 import OverlayMenu from "./(sections)/OverlayMenu";
+import { Copy, Minimize2, Trash2 } from "lucide-react";
 
 export default function Home() {
 
@@ -359,7 +360,7 @@ export default function Home() {
             <ProtectedPage>
                 <div >
                     <div className="p-2 bg-white space-x-4 flex">
-                        <IconButton icon="close_fullscreen" text="Close full screen" onClick={() => {
+                        <IconButton icon={ <Minimize2 />} text="Close full screen" onClick={() => {
                             setIsFullscreen(false);
 
                         }} />
@@ -375,7 +376,7 @@ export default function Home() {
                             />
                         </div>
                         {/* //  Fullscreen delete button */}
-                        <IconButton icon="delete" text="Delete" onClick={() => {
+                        <IconButton icon={<Trash2/>} text="Delete" onClick={() => {
                             setSnippets((prevItems) => {
                                 return prevItems.filter((item) => item.id !== fullScreenSnippet.id);
                             });
@@ -383,7 +384,7 @@ export default function Home() {
                         <CopyToClipboard text={fullScreenSnippet.code} onCopy={() => {
                             copyTrigger();
                         }}>
-                            <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={(
+                            <IconButton icon={<Copy/>} text="Copy" onClick={() => { }} elementAfterClick={(
                                 <p className="pt-1">
                                     Copied!
                                 </p>

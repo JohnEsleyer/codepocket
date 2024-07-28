@@ -30,7 +30,7 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
     return (
         <OverlayMenuPage width="w-96" title="Share" onClose={() => setShowOverlayMenuPage(false)}>
             <div>
-                <p className="text-xl">Collection is now shared publicly.</p>
+                <p className="text-xl">Collection is shared publicly.</p>
                 <p>You can access it here:</p>
                 <input ref={inputRef} className="p-2 w-full border border-black rounded" value={`${window.location.hostname}/share/${linkId}`} readOnly />
                 <div className="flex gap-2">

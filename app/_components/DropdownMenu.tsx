@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react';
 import React, { ReactNode, useState } from 'react';
 
 interface DropdownMenuProps {
@@ -21,7 +22,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   return (
     <div className={disabled ? `dropdown text-gray-500`:`dropdown`} style={{ position: 'relative', display: 'inline-block' }}>
       <button className="dropdown-toggle flex items-center" onClick={toggleDropdown} disabled={disabled}>
-      <span className="text-2xl material-symbols-outlined">expand_more</span>
+      <ChevronDown />
         {buttonText}
       </button>
       {isOpen && (
