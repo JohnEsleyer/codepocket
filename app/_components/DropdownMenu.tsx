@@ -8,10 +8,10 @@ interface DropdownMenuProps {
 }
 
 
-const DropdownMenu: React.FC<DropdownMenuProps> = ({ 
+const MyDropdownMenu: React.FC<DropdownMenuProps> = ({ 
   buttonText, 
   children,
-  disabled,
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -42,13 +42,11 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
           }}>
           {children}
           </button>
-            
-
-
+        
         </div>
       )}
     </div>
   );
 };
 
-export default DropdownMenu;
+export default MyDropdownMenu;

@@ -8,6 +8,7 @@ import { languages } from '../constants';
 import { handleUpdateSelectedSnippetLanguage, handleUpdateSnippetLanguage } from '../_utility/updateData';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, CirclePlus, Earth, Folder, Share2, Trash2 } from 'lucide-react';
+import MyDropdownMenu from '@/app/_components/DropdownMenu';
 
 interface ToolbarProps {
   activeCollection: any;
@@ -37,7 +38,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   setSnippets
 }) => {
 
-  const [selectedLangauge, setSelectedLanguage] = useState('python');
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   
   return (
   <div className="p-2 border-b border-black bg-neutral-900 text-white">
@@ -66,36 +67,18 @@ const Toolbar: React.FC<ToolbarProps> = ({
         : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
       <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets(selectedSnippetsId, setSnippets)} />
       <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
-      <div>
-        {
-          selectedSnippetsId.length != 0 ? 
-          <DropdownMenu >
-          <DropdownMenuTrigger>
-          <div className="flex items-center pt-4 pb-4">
-          <ChevronDown />
-          {selectedLangauge}
-          </div>
-             </DropdownMenuTrigger>
-          <DropdownMenuContent>
-          <div className="text-black h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
-            {languages.map((lang, index) => (
-              <button key={index} onClick={() => {
-                setSelectedLanguage(lang);
-                handleUpdateSelectedSnippetLanguage(lang, setSnippets, selectedSnippetsId)
-              }}>
-                <p className="hover:bg-slate-300 p-1">{lang}</p>
-              </button>
-            ))}
-          </div>
-          </DropdownMenuContent>
-        </DropdownMenu> : 
-        <div className="text-gray-500 flex items-center pt-4 pb-4">
-          <ChevronDown />
-          {selectedLangauge}
-          </div>
-        }
-     
-          </div>
+      <MyDropdownMenu buttonText={selectedLanguage} disabled={selectedSnippetsId.length === 0}>
+        <div className="text-black h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
+          {languages.map((lang, index) => (
+            <button key={index} onClick={() => {
+              setSelectedLanguage(lang);
+              handleUpdateSelectedSnippetLanguage(lang, setSnippets, selectedSnippetsId)
+            }}>
+              <p className="hover:bg-slate-300 p-1">{lang}</p>
+            </button>
+          ))}
+        </div>
+      </MyDropdownMenu>
     </div>
   </div>
   )

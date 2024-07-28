@@ -106,7 +106,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     </CopyToClipboard>
                 </div>
 
-                <div className="h-60 overflow-x-hidden rounded-2xl">
+                <div className="h-60 overflow-x-hidden rounded-2xl ">
                     <CodeBlock
                         codeValue={value.code}
                         language={value.language}
