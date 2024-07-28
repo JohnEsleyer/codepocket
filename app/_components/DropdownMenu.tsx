@@ -21,8 +21,8 @@ const MyDropdownMenu: React.FC<DropdownMenuProps> = ({
 
   return (
     <div className={disabled ? `dropdown text-gray-500`:`dropdown`} style={{ position: 'relative', display: 'inline-block' }}>
-      <button className="dropdown-toggle flex items-center" onClick={toggleDropdown} disabled={disabled}>
-      <ChevronDown />
+      <button className={disabled ? 'dropdown-toggle flex items-center p-2' : `flex items-center p-2 hover:bg-slate-300 rounded hover:text-black`} onClick={toggleDropdown} disabled={disabled}>
+      <ChevronDown /> 
         {buttonText}
       </button>
       {isOpen && (

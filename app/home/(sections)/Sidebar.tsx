@@ -1,11 +1,12 @@
 'use client'
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import SidebarButton from '../_components/SidebarButton'; 
 import Collections from './Collections';
 import { DropdownMenu, DropdownMenuContent } from '@radix-ui/react-dropdown-menu';
 import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { workspacesData } from '../testData';
+
 import { CirclePlus, Folder, Icon, LogOut, Search, Settings } from 'lucide-react';
+import { Collection, Workspace } from '../types';
 
 interface SidebarProps {
   orientation: string;
@@ -21,6 +22,7 @@ interface SidebarProps {
   activeCollection: any;
   handleDeleteCollection: (value: any, setShowOverlayMenuPage: any, setCurrentOverlayMenuPage: any, setToDeleteCollection: any) => void;
   setDisableSnippets: Dispatch<SetStateAction<boolean>>;
+  workspaces: Workspace[] | undefined;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -37,7 +39,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeCollection,
   handleDeleteCollection,
   setDisableSnippets,
-}) => (
+  workspaces,
+}) => { 
+
+
+  return(
   <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
     <div className="shadow">
       <p className="text-2xl font-bold p-2 flex justify-center">CodePocket</p>
@@ -48,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="w-64 flex justify-start hover:bg-slate-300">
           <SidebarButton 
           icon={<Folder/>}
-          text="Workspaces"
+          text={workspaces?.filter((workspace) => (workspace.active == true))[0].name as string}
           disableHover={true}
           onClick={() => {
           }}
@@ -59,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <DropdownMenuContent>
             <div className="bg-slate-100 w-64 rounded p-4 shadow-md">
             {
-              workspacesData.map((workspace) => (
+              workspaces?.map((workspace) => (
                 <div>{workspace.name}</div>
               ))
             }
@@ -113,7 +119,8 @@ const Sidebar: React.FC<SidebarProps> = ({
       setCurrentOverlayMenuPage={setCurrentOverlayMenuPage}
       setDisableSnippets={setDisableSnippets}
     />
-  </div>
-);
+  </div>)
+}
+;
 
 export default Sidebar;

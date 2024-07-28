@@ -8,7 +8,7 @@ import { defaultFullscreenSnippet, languages } from "./constants";
 import IconButton from "../_components/IconButton";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
-import { Collection, Link, Snippet } from "./types";
+import { Collection, Link, Snippet, Workspace } from "./types";
 import LanguageDropdown from "./_components/LanguageDropdown";
 import DeleteCollectionConfirmationOverlayPage from "./_components/(overlay)/DeleteConfirmation";
 import MoveOverlayPage from "./_components/(overlay)/MoveOverlayContent";
@@ -23,7 +23,9 @@ import Sidebar from "./(sections)/Sidebar";
 import Toolbar from "./(sections)/Toolbar";
 import Snippets from "./(sections)/Snippets";
 import OverlayMenu from "./(sections)/OverlayMenu";
-import { Copy, Minimize2, Trash2 } from "lucide-react";
+import { Copy, Divide, Minimize2, Trash2 } from "lucide-react";
+import Loading from '/public/loading.svg';
+import Image from 'next/image';
 
 export default function Home() {
 
@@ -45,15 +47,28 @@ export default function Home() {
     const [query, setQuery] = useState('');
     const [linkId, setLinkId] = useState('');
     const [disableSnippets, setDisableSnippets] = useState(false);
-    
+    const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+    const [activeWorkspace, setActiveWorkspace] = useState<Workspace>();
+
     // Loading indicator states
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const fetchDbData = async () => {
         fetchAllCollections(setCollections);
         fetchAllSnippets(setSnippets);
     };
+
+    const fetchWorkspace = async () => {
+
+        let { data: workspace, error } = await supabase
+        .from('workspace')
+        .select('*');
+
+        setWorkspaces(workspace as Workspace[]);
+        setIsLoading(false);
+    }
 
     useEffect(() => {
         const checkOrientation = () => {
@@ -79,6 +94,8 @@ export default function Home() {
 
         fetchDbData();
         setActiveCollection(collections[0]);
+        fetchWorkspace();
+        setActiveWorkspace(workspaces.filter((workspace) => (workspace.active == true))[0]);
 
         window.addEventListener('resize', resizeListener);
 
@@ -102,6 +119,7 @@ export default function Home() {
             .from('collection')
             .insert({
                 title: "New Collection",
+                workspace_id: activeWorkspace?.id,
             }).select();
 
         if (error) {
@@ -112,6 +130,7 @@ export default function Home() {
                 id: data[0].id,
                 title: data[0].title,
                 shared: false,
+                workspace_id: data[0].workspace_id,
             }]);
 
         }
@@ -426,6 +445,19 @@ export default function Home() {
         );
     }
 
+    if (isLoading){
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Image 
+                src={Loading}
+                width={30}
+                height={30}
+                alt="Loading"
+                />
+            </div>
+        )
+    }
+
     return (
         <ProtectedPage>
             <OverlayMenu showOverlayMenuPage={showOverlayMenuPage} displayCurrentOverlayMenuPage={displayCurrentOverlayMenuPage} />
@@ -445,6 +477,7 @@ export default function Home() {
                     activeCollection={activeCollection}
                     handleDeleteCollection={handleDeleteCollection}
                     setDisableSnippets={setDisableSnippets}
+                    workspaces={workspaces}
                 />
 
                 <div className="flex-1 flex flex-col">

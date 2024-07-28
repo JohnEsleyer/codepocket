@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, SetStateAction } from 'react';
 import Image from 'next/image';
 import Loading from '/public/loading.svg';
 import { LucideProps } from 'lucide-react';
+import { Collection } from '../types';
 
 interface SidebarButtonProps {
   icon: ReactNode;

@@ -2,6 +2,7 @@ export type Collection = {
     id: number;
     title: string;
     shared: boolean;
+    workspace_id: number | undefined;
 }
 
 export type Snippet = {
@@ -21,6 +22,7 @@ export type Link = {
 }
 
 export type Workspace = {
-    id: string,
+    id: number,
     name: string,
+    active: boolean,
 };

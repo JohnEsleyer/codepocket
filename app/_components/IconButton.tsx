@@ -40,7 +40,7 @@ const IconButton: React.FC<IconButtonProps> = ({
   }
 
   return (
-    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded`} onClick={() => {
+    <button disabled={disabled} className={`${noBackground ? "": "hover:bg-slate-300"} rounded p-2`} onClick={() => {
       
       if (elementAfterClick){
         setChangeElement(true);
