@@ -12,6 +12,7 @@ import Loading from "/public/loading.svg";
 import Image from "next/image";
 import { defaultFullscreenSnippet } from "./constants";
 import { link } from "fs";
+import { Copy, Frown, Maximize2, Minimize2, Trash } from "lucide-react";
 
 export default function Page({ params }: { params: { slug: string } }) {
 
@@ -22,7 +23,8 @@ export default function Page({ params }: { params: { slug: string } }) {
     const [isFullScreen, setIsFullscreen] = useState(false);
     const [fullScreenSnippet, setFullScreenSnippet] = useState<Snippet>(defaultFullscreenSnippet);
     const [isLoading, setIsLoading] = useState(true);
-    
+    const [isPageNotFound, setIsPageNotFound] = useState(false);
+
     useEffect(() => {
 
         const checkOrientation = () => {
@@ -52,6 +54,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
             if (error) {
                 console.log(error);
+             
             } else {
                 setSnippets(snippet as Snippet[]);
                 setIsLoading(false);
@@ -84,6 +87,7 @@ export default function Page({ params }: { params: { slug: string } }) {
 
             if (error) {
                 console.log(error);
+                setIsPageNotFound(true);
             } else {
                 setLinkState((link as Link[])[0]);
                 fetchCollection((link as Link[])[0].collection_id);
@@ -100,7 +104,7 @@ export default function Page({ params }: { params: { slug: string } }) {
         };
     }, []);
 
-    if (isLoading) {
+    if (isLoading && !isPageNotFound) {
         return (
             <div className="flex items-center justify-center h-screen">
                 <Image
@@ -114,28 +118,28 @@ export default function Page({ params }: { params: { slug: string } }) {
         );
     }
 
-    if (linkState) {
+    if (linkState && !isPageNotFound) {
 
         if (isFullScreen) {
             return (
 
                 <div >
                     <div className="p-2 bg-white space-x-4 flex">
-                        <IconButton icon="close_fullscreen" text="Close full screen" onClick={() => {
+                        <IconButton icon={<Minimize2 />} text="Close full screen" onClick={() => {
                             setIsFullscreen(false);
 
                         }} />
                         <p className="p-1">{fullScreenSnippet.language}</p>
 
                         {/* //  Fullscreen delete button */}
-                        <IconButton icon="delete" text="Delete" onClick={() => {
+                        {/* <IconButton icon={<Trash/>} text="Delete" onClick={() => {
                             setSnippets((prevItems) => {
                                 return prevItems?.filter((item) => item.id !== fullScreenSnippet.id);
                             });
-                        }} />
+                        }} /> */}
                         <CopyToClipboard text={fullScreenSnippet.code}>
-                            <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={(
-                                <p className="pt-1">
+                            <IconButton icon={<Copy/>} text="Copy" onClick={() => { }} elementAfterClick={(
+                                <p className="pt-1 flex items-center">
                                     Copied!
                                 </p>
                             )} />
@@ -177,8 +181,8 @@ export default function Page({ params }: { params: { slug: string } }) {
 
 
         return <div>
-
             <div className="bg-black text-white p-4">
+            <div className="flex justify-center font-bold">CodePocket</div>
                 <p className="text-2xl">{collection?.title}</p>
                 <p>Creator: {linkState.owner_username}</p>
                 <p className="text-xs">Read Only</p>
@@ -221,13 +225,13 @@ export default function Page({ params }: { params: { slug: string } }) {
 
                                     <p>{value.language}</p>
 
-                                    <IconButton icon="open_in_full" text="Full screen" onClick={() => {
+                                    <IconButton icon={<Maximize2 />} text="Full screen" onClick={() => {
                                         setIsFullscreen(true);
                                         setFullScreenSnippet(value);
                                     }} />
 
                                     <CopyToClipboard text={value.code}>
-                                        <IconButton icon="content_copy" text="Copy" onClick={() => { }} elementAfterClick={
+                                        <IconButton icon={<Copy />} text="Copy" onClick={() => { }} elementAfterClick={
                                             (<p>
                                                 Copied!
                                             </p>)
@@ -255,12 +259,11 @@ export default function Page({ params }: { params: { slug: string } }) {
 
         </div>
     }
-    return <div className="flex justify-center items-center h-screen w-screen bg-slate-100">
-        <div>
-            <span className="flex justify-center text-5xl material-symbols-outlined">
-                sentiment_dissatisfied
-            </span>
-            <p>Page Not Found</p>
+
+return <div className="flex justify-center items-center h-screen w-screen bg-slate-100">
+        <div className="flex flex-row"> 
+        <Frown />
+            <p className="pl-2">Page Not Found</p>
 
         </div>
     </div>

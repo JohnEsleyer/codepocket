@@ -29,6 +29,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
     return (
         <div key={index} className="bg-slate-100 border border-black rounded h-96">
             <div className="m-2">
+               
                 <form className="flex flex-col">
                     <div className="flex">
                         <textarea
