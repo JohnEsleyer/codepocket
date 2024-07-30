@@ -8,6 +8,7 @@ I build this web app to aid my learning journey across different programming lan
 - [x] Store and organize code snippets
 - [x] Create collections of snippets
 - [x] Share collections online
+- [x] Multiple workspaces
 
 ### How to run this project?
 Create a env.local file and provide the following:
@@ -24,13 +25,6 @@ npm run build
 npm run start
 ```
 
-### Supabase Database Schema
-![image](https://github.com/JohnEsleyer/codepocket/assets/66754038/814e83e5-9c60-44e4-908b-6086bb7fe67c)
-
 
 ### Screenshots 
-![Screenshot from 2024-05-22 06-22-20](https://github.com/JohnEsleyer/codepocket/assets/66754038/1eeb4fa9-b26b-472d-a907-fdea46714686)
-
-![Screenshot from 2024-05-22 06-22-39](https://github.com/JohnEsleyer/codepocket/assets/66754038/95fd8f85-b380-48b8-a5c3-13ee496aed36)
-
-
+![Screenshot from 2024-07-30 23-20-53](https://github.com/user-attachments/assets/48e09123-7605-49bf-b289-d8d63e03daf2)
