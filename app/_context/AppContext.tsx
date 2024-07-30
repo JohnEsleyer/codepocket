@@ -39,8 +39,12 @@ interface AppContextProps {
     setLoadingAddCollection: Dispatch<SetStateAction<boolean>>;
     loadingAddSnippet: boolean;
     setLoadingAddSnippet: Dispatch<SetStateAction<boolean>>;
-    activeWorkspace: Workspace[];
-    setActiveWorkspace: Dispatch<SetStateAction<Workspace[]>>;
+    activeWorkspace: Workspace | undefined;
+    setActiveWorkspace: Dispatch<SetStateAction<Workspace | undefined>>;
+    currentSnippetsLength: number;
+    setCurrentSnippetsLength: React.Dispatch<React.SetStateAction<number>>;
+    currentCollectionsLength: number;
+    setCurrentCollectionsLength: Dispatch<SetStateAction<number>>;
   }
 
 

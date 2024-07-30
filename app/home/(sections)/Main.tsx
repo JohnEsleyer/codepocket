@@ -62,6 +62,8 @@ export default function Main() {
         fullScreenSnippet,
         setFullScreenSnippet,
         setActiveWorkspace,
+        activeWorkspace,
+        workspaces,
     } = useAppContext();
 
 
@@ -81,11 +83,17 @@ export default function Main() {
         .from('workspace')
         .select('*');
         setWorkspaces(workspace as Workspace[]);
-        if (workspace){
-            setActiveWorkspace((workspace as Workspace[]).filter((value) => value.active == true));
-        }
+       
     }
 
+    useEffect(() => {
+        // Update active workspaces
+        const active = (workspaces as Workspace[]).filter((value) => value.active === true)[0];
+        setActiveWorkspace(active);
+
+        setIsLoading(false);
+      }, [workspaces]);
+  
 
     useEffect(() => {
         const checkOrientation = () => {
@@ -113,22 +121,12 @@ export default function Main() {
         setActiveCollection(collections[0]);
         fetchWorkspace();
 
-        
-        setIsLoading(false);
-
         window.addEventListener('resize', resizeListener);
 
         return () => {
             window.removeEventListener('resize', resizeListener);
         };
     }, []);
-
-
-
-  
-
-
-
 
     useEffect(() => {
         const timeoutId = setTimeout(() => {

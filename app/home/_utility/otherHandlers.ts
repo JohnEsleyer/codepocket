@@ -13,7 +13,7 @@ export const handleSignOut = async (
 
 
 export const handleShare = async (
-    activeCollection: Collection,
+    activeCollection: Collection | undefined,
     setLinkId:  (linkId: string) => void,
     setActiveCollection: (collection?: Collection) => void,
     setCollections: Dispatch<SetStateAction<Collection[]>>,

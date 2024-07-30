@@ -1,5 +1,5 @@
 import supabase from "@/app/utils/supabase";
-import { Collection, Snippet } from "../types";
+import { Collection, Snippet, Workspace } from "../types";
 import { Dispatch, SetStateAction } from "react";
 import { useAppContext } from "@/app/_context/AppContext";
 
@@ -132,8 +132,8 @@ export const handleUpdateSnippetTitle = async (
 export const handleUpdateCollectionTitle = async (
     event: React.ChangeEvent<HTMLInputElement>,
     setCollections: Dispatch<SetStateAction<Collection[]>>,
-    activeCollection: Collection, 
-    setActiveCollection: Dispatch<SetStateAction<Collection>>,
+    activeCollection: Collection | undefined, 
+    setActiveCollection: Dispatch<SetStateAction<Collection | undefined>>,
 ) => {
 
     setCollections((collections) => (
@@ -155,4 +155,40 @@ export const handleUpdateCollectionTitle = async (
     }
 };
 
+export const handleChangeWorkspace = async (
+    workspace: Workspace,
+    setWorkspaces: Dispatch<SetStateAction<Workspace[]>>,
+    setActiveWorkspace: Dispatch<SetStateAction<Workspace | undefined>>,
+) => {
 
+    // Update the data (backend)
+    const { data, error } = await supabase
+    .from('workspace')
+    .update({ active: true })
+    .eq('id', workspace.id)
+    .select();
+
+    // Update activeWorkspace
+    setActiveWorkspace(workspace);
+
+    // Update the data (frontend)
+    setWorkspaces((values) => (
+        values.map((value) => {
+            if (value.id == workspace.id){
+                return {
+                    ...workspace,
+                    active: true,
+                }
+            }else{
+                return {
+                    ...value,
+                    active: false,
+                }
+            }
+        })
+    ));
+
+
+
+
+};

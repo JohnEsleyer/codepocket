@@ -1,7 +1,7 @@
 'use client'
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Collection } from '../types';
-import { Folder, Trash2 } from 'lucide-react';
+import { Folder, FolderCode, Trash2 } from 'lucide-react';
 import { useAppContext } from '@/app/_context/AppContext';
 import { handleDeleteCollection } from '../_utility/deleteData';
 
@@ -14,12 +14,21 @@ const Collections: React.FC = () => {
     activeCollection,
     setCurrentOverlayMenuPage,
     setShowOverlayMenuPage,
+    activeWorkspace,
+    currentCollectionsLength,
+    setCurrentCollectionsLength,
   } = useAppContext();
+
   
+  useEffect(() => {
+    setCurrentCollectionsLength(collections.filter((value) => ( value.workspace_id == activeWorkspace?.id)).length);
+  }, [activeWorkspace, collections]);
+
   return (
 
   <div className="flex flex-col overflow-y-auto pl-2">
-    {collections.map((value, index) => (
+    <div>{currentCollectionsLength} / 10</div>
+    {collections.map((value, index) => ( value.workspace_id == activeWorkspace?.id && 
       <button
         key={index}
         className="flex justify-start"
@@ -34,7 +43,7 @@ const Collections: React.FC = () => {
             <div className="truncate flex">
               <div className="flex items-center">
               <div className="pr-2">
-              <Folder/>
+              <FolderCode />
                 </div>
               </div>
               <p className="truncate">{value.title}</p>

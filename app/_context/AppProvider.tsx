@@ -23,8 +23,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
     const [loadingAddCollection, setLoadingAddCollection] = useState(false);
     const [loadingAddSnippet, setLoadingAddSnippet] = useState(false);
-    const [activeWorkspace, setActiveWorkspace] = useState<Workspace[]>([]);
-
+    const [activeWorkspace, setActiveWorkspace] = useState<Workspace>();
+    const [currentSnippetsLength, setCurrentSnippetsLength] = useState(0);
+    const [currentCollectionsLength, setCurrentCollectionsLength] = useState(0);
+    
     return (
         <AppContext.Provider
           value={{
@@ -64,6 +66,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             setLoadingAddSnippet,
             activeWorkspace,
             setActiveWorkspace,
+            currentSnippetsLength,
+            setCurrentSnippetsLength,
+            currentCollectionsLength,
+            setCurrentCollectionsLength,
           }}
         >
           {children}

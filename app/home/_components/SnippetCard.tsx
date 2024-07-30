@@ -19,7 +19,13 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
     value,
 }) => {
 
-    const { setSelectedSnippetsId, selectedSnippetsId, setIsFullscreen, setFullScreenSnippet} = useAppContext();
+    const { 
+        setSelectedSnippetsId, 
+        selectedSnippetsId, 
+        setIsFullscreen, 
+        setFullScreenSnippet,
+        setSnippets,
+    } = useAppContext();
     return (
         <div key={index} className="bg-slate-100 border border-black rounded h-96">
             <div className="m-2">
@@ -30,7 +36,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                             name="title"
                             maxLength={50}
                             value={value.title}
-                            onChange={(event) => handleUpdateSnippetTitle(event, value)}
+                            onChange={(event) => handleUpdateSnippetTitle(event, value, setSnippets)}
                         />
                         <input
                             className="w-6 accent-black"
@@ -54,7 +60,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         name="description"
                         maxLength={110}
                         value={value.description}
-                        onChange={(event) => handleUpdateSnippetDescription(event, value)}
+                        onChange={(event) => handleUpdateSnippetDescription(event, value, setSnippets)}
                     />
                 </form>
 
@@ -78,7 +84,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     <CodeBlock
                         codeValue={value.code}
                         language={value.language}
-                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue)}
+                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue, setSnippets)}
                     />
                 </div>
             </div>

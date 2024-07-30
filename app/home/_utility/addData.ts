@@ -6,7 +6,7 @@ import { Collection , Snippet, Workspace} from "../types";
 export const handleAddCollection = async (
     setLoadingAddCollection:(loadingAddCollection: boolean) => void,
     setCollections: Dispatch<SetStateAction<Collection[]>>,
-    activeWorkspace: Workspace[],
+    activeWorkspace: Workspace | undefined,
 ) => {
     
     setLoadingAddCollection(true);
@@ -15,7 +15,7 @@ export const handleAddCollection = async (
         .from('collection')
         .insert({
             title: "New Collection",
-            workspace_id: activeWorkspace[0].id,
+            workspace_id: activeWorkspace?.id,
         }).select();
 
     if (error) {
@@ -43,7 +43,7 @@ export const handleAddSnippet = async (
     scrollToBottom: () => void,
     setLoadingAddSnippet: Dispatch<SetStateAction<boolean>>,
     setSnippets: Dispatch<SetStateAction<Snippet[]>>,
-    activeCollection: Collection,
+    activeCollection: Collection | undefined,
 ) => {
 
     setLoadingAddSnippet(true);
@@ -82,3 +82,26 @@ export const handleAddSnippet = async (
     }, 1000);
 
 };
+
+export const handleAddNewWorkspace = async (
+    setWorkspaces: Dispatch<SetStateAction<Workspace[]>>
+) => {
+    
+    const { data, error } = await supabase
+    .from('workspace')
+    .insert([
+    { name: 'New Workspace'},
+    ])
+    .select()
+    
+    setWorkspaces((workspaces) => (
+        [
+            ...workspaces,
+            {
+                id: (data as Workspace[])[0].id,
+                name: (data as Workspace[])[0].name,
+                active: (data as Workspace[])[0].active,
+            }
+        ]
+    ));
+}

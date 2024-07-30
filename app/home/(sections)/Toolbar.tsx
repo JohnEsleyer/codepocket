@@ -3,7 +3,7 @@ import React, { Dispatch, SetStateAction, useState } from 'react';
 import Image from 'next/image';
 import IconButton from '@/app/_components/IconButton';
 import WhiteLoading from "/public/loadingWhite.svg";
-import { Snippet } from '../types';
+import { Collection, Snippet } from '../types';
 import { languages } from '../constants';
 import { handleUpdateCollectionTitle, handleUpdateSelectedSnippetLanguage, handleUpdateSnippetLanguage } from '../_utility/updateData';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
@@ -20,7 +20,19 @@ interface ToolbarProps {
 
 const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
 
-  const {activeCollection, loadingAddSnippet, selectedSnippetsId, setSnippets} = useAppContext();
+  const {
+    activeCollection, 
+    loadingAddSnippet, 
+    selectedSnippetsId, 
+    setCollections,
+    setActiveCollection,
+    setSnippets,
+    setLoadingAddSnippet,
+    setLinkId,
+    setShowOverlayMenuPage,
+    setCurrentOverlayMenuPage,
+    currentSnippetsLength,
+  } = useAppContext();
 
   const [selectedLanguage, setSelectedLanguage] = useState('python');
 
@@ -33,7 +45,7 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
         type="text"
         disabled={!activeCollection}
         value={activeCollection?.title}
-        onChange={(event) => handleUpdateCollectionTitle(event)}
+        onChange={(event) => handleUpdateCollectionTitle(event,setCollections,activeCollection,setActiveCollection)}
       />
       {loadingAddSnippet && <span className="pl-2">
         <Image
@@ -46,11 +58,17 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
     </p>
     <div className="flex space-x-4">
       <IconButton icon={<CirclePlus/>} text="New code snippet" onClick={() => {
-        handleAddSnippet(scrollToBottom);
+        if (currentSnippetsLength < 20){
+          handleAddSnippet(scrollToBottom,setLoadingAddSnippet,setSnippets,activeCollection);
+        }
       }} disabled={!activeCollection} isDark />
       {activeCollection?.shared
-        ? <IconButton iconColor="green" textColor="green" icon={<Earth />} text="Public" isDark onClick={handleShare} />
-        : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={handleShare} />}
+        ? <IconButton iconColor="green" textColor="green" icon={<Earth />} text="Public" isDark onClick={() => {
+          handleShare(activeCollection, setLinkId, setActiveCollection, setCollections, setShowOverlayMenuPage, setCurrentOverlayMenuPage)
+        }} />
+        : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={() => {
+          handleShare(activeCollection, setLinkId, setActiveCollection, setCollections, setShowOverlayMenuPage, setCurrentOverlayMenuPage)
+        }} />}
       <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets()} />
       <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
       <MyDropdownMenu buttonText={selectedLanguage} disabled={selectedSnippetsId.length === 0}>
@@ -58,13 +76,14 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
           {languages.map((lang, index) => (
             <button key={index} onClick={() => {
               setSelectedLanguage(lang);
-              handleUpdateSelectedSnippetLanguage(lang)
+              handleUpdateSelectedSnippetLanguage(lang, setSnippets, selectedSnippetsId);
             }}>
               <p className="hover:bg-slate-300 p-1">{lang}</p>
             </button>
           ))}
         </div>
       </MyDropdownMenu>
+  
     </div>
   </div>
   )
