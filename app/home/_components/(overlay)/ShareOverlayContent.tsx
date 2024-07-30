@@ -48,14 +48,10 @@ const ShareOverlayPage: React.FC = ({
                             <IconButton icon={ <ExternalLink />}text="Visit" onClick={() => { }} />
                         </a>
                     </div>
-                    <div className="bg-black rounded p-1 m-2">
-                        <IconButton
-                            noBackground={true}
-                            isDark={true}
-                            icon={<GlobeLock />}
-                            textColor='slate'
-                            text="Set to private"
-                            disableHover={true}
+                    <div className="bg-black rounded p-1 m-2 flex text-white items-center">
+                        <GlobeLock/>
+                        <button
+                            className="p-2"
                             onClick={async () => {
                                 handleDeleteLink(linkId)
 
@@ -86,8 +82,8 @@ const ShareOverlayPage: React.FC = ({
                                   
                                 setShowOverlayMenuPage(false);
                             }}
-                            elementAfterClick={<p className="pt-1">Copied!</p>}
-                        />
+                            
+                        > Set to private </button>
                     </div>
                 </div>
             </div>

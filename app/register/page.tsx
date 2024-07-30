@@ -34,7 +34,7 @@ export default function Register() {
       const { data, error } = await supabase
       .from('workspace')
       .insert([
-        { name: "My workspace", user_id: user?.id},
+        { name: user?.user_metadata.username + "'s workspace", active: true},
       ])
       .select()
         

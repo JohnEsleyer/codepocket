@@ -62,16 +62,16 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
         if (currentSnippetsLength < 20){
           handleAddSnippet(scrollToBottom,setLoadingAddSnippet,setSnippets,activeCollection);
         }
-      }} disabled={!activeCollection} isDark />
+      }} disabled={!activeCollection}  />
       {activeCollection?.shared
-        ? <IconButton iconColor="green" textColor="green" icon={<Earth />} text="Public" isDark onClick={() => {
+        ? <IconButton icon={<Earth color='green' />} text="Public"  onClick={() => {
           handleShare(activeCollection, setLinkId, setActiveCollection, setCollections, setShowOverlayMenuPage, setCurrentOverlayMenuPage)
         }} />
-        : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={() => {
+        : <IconButton icon={<Share2 />} text="Share"  disabled={!activeCollection} onClick={() => {
           handleShare(activeCollection, setLinkId, setActiveCollection, setCollections, setShowOverlayMenuPage, setCurrentOverlayMenuPage)
         }} />}
-      <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => {handleDeleteSnippets(selectedSnippetsId, setSnippets, snippets)}} />
-      <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={() => {
+      <IconButton icon={<Trash2 />} text="Delete"  disabled={selectedSnippetsId.length === 0} onClick={() => {handleDeleteSnippets(selectedSnippetsId, setSnippets, snippets)}} />
+      <IconButton icon={<Folder/>} text="Move"  disabled={selectedSnippetsId.length === 0} onClick={() => {
         handleMoveSnippets(setCurrentOverlayMenuPage, setShowOverlayMenuPage);
       }} />
       <MyDropdownMenu buttonText={selectedLanguage} disabled={selectedSnippetsId.length === 0}>

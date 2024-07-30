@@ -93,7 +93,7 @@ export default function SettingsOverlayPage() {
                     <IconButton icon={<KeyRound />} text="Change Password" onClick={() => { }} />
                 </a>
                 <a href="/delete-account">
-                    <IconButton iconColor="red" textColor="red" icon={<Trash2 color="red" />} text="Delete Account" onClick={() => { }} />
+                    <IconButton  icon={<Trash2 color="red" />} text="Delete Account" onClick={() => { }} />
                 </a>
             </div>
         </div>
