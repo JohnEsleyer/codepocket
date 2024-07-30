@@ -1,27 +1,26 @@
 import React from 'react';
 import OverlayMenuPage from '../OverlayMenuContent';
 import supabase from '@/app/utils/supabase';
+import { FolderCode } from 'lucide-react';
+import { useAppContext } from '@/app/_context/AppContext';
 
 interface MoveOverlayPageProps {
-    collections: any[];
-    setShowOverlayMenuPage: (value: boolean) => void;
-    setSnippets: (value: any[]) => void;
-    selectedSnippetsId: number[];
     onClick: (value: any, index: number) => void;
 }
 
 const MoveOverlayPage: React.FC<MoveOverlayPageProps> = ({
-    collections,
-    setShowOverlayMenuPage,
-    setSnippets,
-    selectedSnippetsId,
+
     onClick,
 }) => {
+
+    const {collections, setShowOverlayMenuPage, activeWorkspace} = useAppContext();
+    
     return (
         <OverlayMenuPage width="w-4/5" title="Move to collection" onClose={() => setShowOverlayMenuPage(false)}>
             <p>Select a collection</p>
-            <div>
+            <div className='overflow-y-auto'>
                 {collections.map((value, index) => (
+                    value.workspace_id == activeWorkspace?.id && 
                     <button
                         key={index}
                         className="flex justify-start w-full"
@@ -32,7 +31,7 @@ const MoveOverlayPage: React.FC<MoveOverlayPageProps> = ({
                         <div className="w-full space-x-10 flex text-xl pl-2 hover:bg-neutral-900 hover:text-white hover:rounded">
                             <div className="flex overflow-x-auto">
                                 <p className="flex items-center">
-                                    <span className="material-symbols-outlined">folder</span>
+                                <FolderCode />
                                     {value.title}
                                 </p>
                             </div>

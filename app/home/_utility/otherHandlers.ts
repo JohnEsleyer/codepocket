@@ -90,8 +90,10 @@ export const handleShare = async (
 }
 
 
-export const handleMoveSnippets = () => {
-    const {setCurrentOverlayMenuPage, setShowOverlayMenuPage} = useAppContext();
+export const handleMoveSnippets = (
+    setCurrentOverlayMenuPage: Dispatch<SetStateAction<string>>,
+    setShowOverlayMenuPage: Dispatch<SetStateAction<boolean>>,
+) => {
     setCurrentOverlayMenuPage('move');
     setShowOverlayMenuPage(true);
 };

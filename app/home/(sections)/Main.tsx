@@ -199,10 +199,6 @@ export default function Main() {
             case "move":
                 return (
                     <MoveOverlayPage
-                        collections={collections}
-                        setShowOverlayMenuPage={setShowOverlayMenuPage}
-                        setSnippets={setSnippets}
-                        selectedSnippetsId={selectedSnippetsId}
                         onClick={(value, index) => {
                             setSnippets(snippets.map((item) => {
                                     const updateDb = async () => {

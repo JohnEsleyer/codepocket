@@ -159,14 +159,19 @@ export const handleChangeWorkspace = async (
     workspace: Workspace,
     setWorkspaces: Dispatch<SetStateAction<Workspace[]>>,
     setActiveWorkspace: Dispatch<SetStateAction<Workspace | undefined>>,
+    activeWorkspace: Workspace | undefined,
 ) => {
 
     // Update the data (backend)
-    const { data, error } = await supabase
+     await supabase
     .from('workspace')
     .update({ active: true })
-    .eq('id', workspace.id)
-    .select();
+    .eq('id', workspace.id);
+
+    await supabase
+    .from('workspace')
+    .update({ active: false })
+    .eq('id', activeWorkspace?.id );
 
     // Update activeWorkspace
     setActiveWorkspace(workspace);
@@ -188,7 +193,23 @@ export const handleChangeWorkspace = async (
         })
     ));
 
-
-
-
 };
+
+
+export const updateWorkspaceName = async (
+    newName: string,
+    activeWorkspace: Workspace | undefined,
+) => {
+        
+    const { data, error } = await supabase
+    .from('workspace')
+    .update({ name: newName})
+    .eq('id', activeWorkspace?.id)
+    .select();
+
+    if (error){
+        console.log(error);
+    }
+
+        
+}

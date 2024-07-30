@@ -60,9 +60,9 @@ const Sidebar: React.FC = () => {
             
             {
               workspaces?.map((workspace) => (
-                
+                workspace.active == false && 
                 <button key={workspace.id} onClick={() => {
-                  handleChangeWorkspace(workspace, setWorkspaces, setActiveWorkspace);
+                  handleChangeWorkspace(workspace, setWorkspaces, setActiveWorkspace, activeWorkspace);
                 }} className="w-full">
                   <DropdownMenuItem>
                 <div className="p-1 flex items-center rounded hover:bg-slate-200 hover:text-black">

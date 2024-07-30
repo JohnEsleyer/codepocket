@@ -32,6 +32,7 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
     setShowOverlayMenuPage,
     setCurrentOverlayMenuPage,
     currentSnippetsLength,
+    snippets,
   } = useAppContext();
 
   const [selectedLanguage, setSelectedLanguage] = useState('python');
@@ -69,8 +70,10 @@ const Toolbar: React.FC<ToolbarProps> = ({scrollToBottom}) => {
         : <IconButton icon={<Share2 />} text="Share" isDark disabled={!activeCollection} onClick={() => {
           handleShare(activeCollection, setLinkId, setActiveCollection, setCollections, setShowOverlayMenuPage, setCurrentOverlayMenuPage)
         }} />}
-      <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => handleDeleteSnippets()} />
-      <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={handleMoveSnippets} />
+      <IconButton icon={<Trash2 />} text="Delete" isDark disabled={selectedSnippetsId.length === 0} onClick={() => {handleDeleteSnippets(selectedSnippetsId, setSnippets, snippets)}} />
+      <IconButton icon={<Folder/>} text="Move" isDark disabled={selectedSnippetsId.length === 0} onClick={() => {
+        handleMoveSnippets(setCurrentOverlayMenuPage, setShowOverlayMenuPage);
+      }} />
       <MyDropdownMenu buttonText={selectedLanguage} disabled={selectedSnippetsId.length === 0}>
         <div className="text-black h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
           {languages.map((lang, index) => (

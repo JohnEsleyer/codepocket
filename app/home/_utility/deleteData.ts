@@ -13,8 +13,11 @@ export const handleDeleteCollection = async (
     // setToDeleteCollection(value);
 };
 
-export const handleDeleteSnippets = async () => {
-    const {selectedSnippetsId, setSnippets, snippets} = useAppContext();
+export const handleDeleteSnippets = async (
+    selectedSnippetsId: number[],
+    setSnippets: Dispatch<SetStateAction<Snippet[]>>,
+    snippets: Snippet[],
+) => {
     selectedSnippetsId.map(async (itemId) => {
         const { error } = await supabase
             .from('snippet')
