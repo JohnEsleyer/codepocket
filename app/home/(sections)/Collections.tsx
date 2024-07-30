@@ -2,29 +2,22 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Collection } from '../types';
 import { Folder, Trash2 } from 'lucide-react';
+import { useAppContext } from '@/app/_context/AppContext';
+import { handleDeleteCollection } from '../_utility/deleteData';
 
+const Collections: React.FC = () => {
+  const {
+    collections, 
+    setSelectedSnippetsId,
+    setActiveCollection,
+    setDisableSnippets,
+    activeCollection,
+    setCurrentOverlayMenuPage,
+    setShowOverlayMenuPage,
+  } = useAppContext();
+  
+  return (
 
-interface CollectionsProps {
-  collections: any[];
-  setSelectedSnippetsId: (ids: any[]) => void;
-  setActiveCollection: (collection: any) => void;
-  activeCollection: any;
-  handleDeleteCollection: (value: any, setShowOverlayMenuPage: any, setCurrentOverlayMenuPage: any, setToDeleteCollection: any) => void;
-  setShowOverlayMenuPage: (show: boolean) => void;
-  setCurrentOverlayMenuPage: (page: string) => void;
-  setDisableSnippets: Dispatch<SetStateAction<boolean>>;
-}
-
-const Collections: React.FC<CollectionsProps> = ({
-  collections,
-  setSelectedSnippetsId,
-  setActiveCollection,
-  activeCollection,
-  handleDeleteCollection,
-  setShowOverlayMenuPage,
-  setCurrentOverlayMenuPage,
-  setDisableSnippets,
-}) => (
   <div className="flex flex-col overflow-y-auto pl-2">
     {collections.map((value, index) => (
       <button
@@ -48,7 +41,7 @@ const Collections: React.FC<CollectionsProps> = ({
             </div>
           </div>
           <div className="flex-1 flex justify-end pr-2 ">
-            <button onClick={() => handleDeleteCollection(value, setShowOverlayMenuPage, setCurrentOverlayMenuPage, setActiveCollection)}>
+            <button onClick={() => handleDeleteCollection(value, setCurrentOverlayMenuPage, setShowOverlayMenuPage)}>
             <Trash2 />
             </button>
           </div>
@@ -57,5 +50,6 @@ const Collections: React.FC<CollectionsProps> = ({
     ))}
   </div>
 );
+}
 
 export default Collections;

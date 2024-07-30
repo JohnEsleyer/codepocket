@@ -1,43 +1,18 @@
-import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import React, { ChangeEvent, Dispatch, RefObject, SetStateAction } from 'react';
 import SnippetCard from '../_components/SnippetCard';
 import { Snippet } from '../types';
+import { useAppContext } from '@/app/_context/AppContext';
 
-interface SnippetsProps {
-  activeCollection: any;
-  snippets: any[];
-  singleColumn: boolean;
-  scrollableDiv: React.RefObject<HTMLDivElement>;
-  handleUpdateSnippetTitle: (event: ChangeEvent<HTMLTextAreaElement>, value: Snippet, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
-  handleUpdateSnippetDescription: (event: React.ChangeEvent<HTMLTextAreaElement>, value: Snippet, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
-  handleUpdateSnippetLanguage: (value: Snippet, code: string, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
-  handleUpdateSnippetCode: (value: Snippet, code: string, setSnippets: Dispatch<SetStateAction<Snippet[]>>) => void;
-  setSelectedSnippetsId: Dispatch<SetStateAction<number[]>>;
-  setIsFullscreen: Dispatch<SetStateAction<boolean>>;
-  setFullScreenSnippet: (snippet: any) => void;
-  copyTrigger: () => void;
-  setSnippets: Dispatch<SetStateAction<Snippet[]>>;
-  languages: string[];
-  disable: boolean;
+interface SnippetsProps{
+  scrollableDiv: RefObject<HTMLDivElement>;
 }
 
 const Snippets: React.FC<SnippetsProps> = ({
-  activeCollection,
-  snippets,
-  singleColumn,
   scrollableDiv,
-  handleUpdateSnippetTitle,
-  handleUpdateSnippetDescription,
-  handleUpdateSnippetLanguage,
-  handleUpdateSnippetCode,
-  setSelectedSnippetsId,
-  setIsFullscreen,
-  setFullScreenSnippet,
-  copyTrigger,
-  setSnippets,
-  languages,
-  disable,
-}) => (
-  !activeCollection || disable ? 
+}) => {
+  const {activeCollection, disableSnippets, snippets, singleColumn} = useAppContext();
+  return (
+  !activeCollection || disableSnippets ? 
     <div className="bg-slate-300 flex-1 flex justify-center items-center text-gray-800">
       <span>Select or create a collection to start adding new code snippets</span>
     </div>
@@ -50,20 +25,11 @@ const Snippets: React.FC<SnippetsProps> = ({
             key={index}
             index={index}
             value={value}
-            handleUpdateSnippetTitle={handleUpdateSnippetTitle}
-            handleUpdateSnippetDescription={handleUpdateSnippetDescription}
-            handleUpdateSnippetLanguage={handleUpdateSnippetLanguage}
-            handleUpdateSnippetCode={handleUpdateSnippetCode}
-            setSelectedSnippetsId={setSelectedSnippetsId}
-            setIsFullscreen={setIsFullscreen}
-            setFullScreenSnippet={setFullScreenSnippet}
-            copyTrigger={copyTrigger}
-            setSnippets={setSnippets}
-            languages={languages}
+        
           />
         );
       })}
     </div>
 );
-
+}
 export default Snippets;

@@ -7,42 +7,26 @@ import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 import { CirclePlus, Folder, Icon, LogOut, Search, Settings } from 'lucide-react';
 import { Collection, Workspace } from '../types';
-
-interface SidebarProps {
-  orientation: string;
-  setShowOverlayMenuPage: (show: boolean) => void;
-  setFilteredSnippets: (snippets: any[]) => void;
-  setCurrentOverlayMenuPage: (page: string) => void;
-  handleSignOut: () => void;
-  handleAddCollection: () => void;
-  loadingAddCollection: boolean;
-  collections: any[];
-  setSelectedSnippetsId: (ids: any[]) => void;
-  setActiveCollection: (collection: any) => void;
-  activeCollection: any;
-  handleDeleteCollection: (value: any, setShowOverlayMenuPage: any, setCurrentOverlayMenuPage: any, setToDeleteCollection: any) => void;
-  setDisableSnippets: Dispatch<SetStateAction<boolean>>;
-  workspaces: Workspace[] | undefined;
-}
-
-const Sidebar: React.FC<SidebarProps> = ({
-  orientation,
-  setShowOverlayMenuPage,
-  setFilteredSnippets,
-  setCurrentOverlayMenuPage,
-  handleSignOut,
-  handleAddCollection,
-  loadingAddCollection,
-  collections,
-  setSelectedSnippetsId,
-  setActiveCollection,
-  activeCollection,
-  handleDeleteCollection,
-  setDisableSnippets,
-  workspaces,
-}) => { 
+import { useAppContext } from '@/app/_context/AppContext';
+import { handleSignOut } from '../_utility/otherHandlers';
+import { handleAddCollection } from '../_utility/addData';
 
 
+const Sidebar: React.FC = () => { 
+
+  const {
+    orientation,
+    setShowOverlayMenuPage,
+    setFilteredSnippets,
+    setCurrentOverlayMenuPage,
+    loadingAddCollection,
+    workspaces,
+    setLoadingAddCollection,
+    setCollections,
+    activeWorkspace,
+  } = useAppContext();
+
+  
   return(
   <div className={`${orientation == "Portrait" ? 'hidden' : ''} w-64 h-full flex flex-col border-r border-black`}>
     <div className="shadow">
@@ -54,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="w-64 flex justify-start hover:bg-slate-300">
           <SidebarButton 
           icon={<Folder/>}
-          text={workspaces?.filter((workspace) => (workspace.active == true))[0].name as string}
+          text='Niwejfiewjf'
           disableHover={true}
           onClick={() => {
           }}
@@ -99,26 +83,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         <SidebarButton
           icon={ <LogOut />}
           text="Sign out"
-          onClick={handleSignOut}
+          onClick={() => {
+            handleSignOut(setShowOverlayMenuPage, setCurrentOverlayMenuPage)
+          }}
         />
         <SidebarButton
           icon={<CirclePlus/>}
           text="Add a collection"
-          onClick={handleAddCollection}
+          onClick={()=> {
+            handleAddCollection(setLoadingAddCollection, setCollections, activeWorkspace);
+          }}
           loading={loadingAddCollection}
         />
       </div>
     </div>
-    <Collections
-      collections={collections}
-      setSelectedSnippetsId={setSelectedSnippetsId}
-      setActiveCollection={setActiveCollection}
-      activeCollection={activeCollection}
-      handleDeleteCollection={handleDeleteCollection}
-      setShowOverlayMenuPage={setShowOverlayMenuPage}
-      setCurrentOverlayMenuPage={setCurrentOverlayMenuPage}
-      setDisableSnippets={setDisableSnippets}
-    />
+    <Collections />
   </div>)
 }
 ;

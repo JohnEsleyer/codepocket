@@ -5,53 +5,21 @@ import React, { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { Snippet } from '../types';
 import { Copy, Maximize2 } from 'lucide-react';
+import { handleUpdateSnippetCode, handleUpdateSnippetDescription, handleUpdateSnippetTitle } from '../_utility/updateData';
+import { useAppContext } from '@/app/_context/AppContext';
+import { copyTrigger } from '../_utility/otherHandlers';
 
 interface SnippetCardProps {
     index: number;
     value: Snippet;
-    languages: string[];
-    handleUpdateSnippetTitle: (
-        event: ChangeEvent<HTMLTextAreaElement>,
-        value: Snippet,
-        setSnippets: Dispatch<SetStateAction<Snippet[]>>
-    ) => void;
-    handleUpdateSnippetDescription: (
-        event: React.ChangeEvent<HTMLTextAreaElement>,
-        value: Snippet,
-        setSnippets: Dispatch<SetStateAction<Snippet[]>>
-    ) => void;
-    handleUpdateSnippetLanguage: (
-        value: Snippet,
-        language: string,
-        setSnippets: Dispatch<SetStateAction<Snippet[]>>
-    ) => void;
-    handleUpdateSnippetCode: (
-        value: Snippet,
-        code: string,
-        setSnippets: Dispatch<SetStateAction<Snippet[]>>
-    ) => void;
-    setSelectedSnippetsId: Dispatch<SetStateAction<number[]>>;
-    setIsFullscreen: Dispatch<SetStateAction<boolean>>;
-    setFullScreenSnippet: Dispatch<SetStateAction<Snippet>>;
-    copyTrigger: () => void;
-    setSnippets:  Dispatch<SetStateAction<Snippet[]>>,
-
 }
 
 const SnippetCard: React.FC<SnippetCardProps> = ({
     index,
     value,
-    languages,
-    handleUpdateSnippetTitle,
-    handleUpdateSnippetDescription,
-    handleUpdateSnippetLanguage,
-    handleUpdateSnippetCode,
-    setSelectedSnippetsId,
-    setIsFullscreen,
-    setFullScreenSnippet,
-    copyTrigger,
-    setSnippets,
 }) => {
+
+    const { setSelectedSnippetsId, selectedSnippetsId, setIsFullscreen, setFullScreenSnippet} = useAppContext();
     return (
         <div key={index} className="bg-slate-100 border border-black rounded h-96">
             <div className="m-2">
@@ -62,7 +30,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                             name="title"
                             maxLength={50}
                             value={value.title}
-                            onChange={(event) => handleUpdateSnippetTitle(event, value, setSnippets)}
+                            onChange={(event) => handleUpdateSnippetTitle(event, value)}
                         />
                         <input
                             className="w-6 accent-black"
@@ -71,13 +39,13 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                             name="myCheckbox"
                             key={value.id}
                             onChange={(event) => {
-                                setSelectedSnippetsId((prevItemsId) => {
-                                    if (prevItemsId.includes(value.id)) {
-                                        return prevItemsId.filter((snippetId) => snippetId !== value.id);
-                                    } else {
-                                        return [...prevItemsId, value.id];
-                                    }
-                                });
+                                setSelectedSnippetsId(
+                                    selectedSnippetsId.includes(value.id) ?
+                                        selectedSnippetsId.filter((snippetId) => snippetId !== value.id) :
+
+                                        [...selectedSnippetsId, value.id]
+
+                                );
                             }}
                         />
                     </div>
@@ -86,7 +54,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                         name="description"
                         maxLength={110}
                         value={value.description}
-                        onChange={(event) => handleUpdateSnippetDescription(event, value, setSnippets)}
+                        onChange={(event) => handleUpdateSnippetDescription(event, value)}
                     />
                 </form>
 
@@ -94,7 +62,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     {value.code.length >= 3000 && <p className="text-red-500">Max characters reached!</p>}
                     <p>{value.language}</p>
                     <IconButton
-                        icon={ <Maximize2 />}
+                        icon={<Maximize2 />}
                         text="Full screen"
                         onClick={() => {
                             setIsFullscreen(true);
@@ -110,7 +78,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({
                     <CodeBlock
                         codeValue={value.code}
                         language={value.language}
-                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue, setSnippets)}
+                        onCodeChange={(codeValue) => handleUpdateSnippetCode(value, codeValue)}
                     />
                 </div>
             </div>

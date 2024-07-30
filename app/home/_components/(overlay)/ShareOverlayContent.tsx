@@ -7,25 +7,22 @@ import { Collection } from '../../types';
 import supabase from '@/app/utils/supabase';
 import { Copy, ExternalLink, GlobeLock } from 'lucide-react';
 import { LockKeyhole } from 'lucide-react';
+import { useAppContext } from '@/app/_context/AppContext';
 
-interface ShareOverlayPageProps {
-    linkId: string;
-    setShowOverlayMenuPage: (value: boolean) => void;
-    setCollections: Dispatch<SetStateAction<Collection[]>>;
-    collections: Collection[];
-    activeCollection: Collection | undefined;
-    setActiveCollection: Dispatch<SetStateAction<Collection | undefined>>;
-}
 
-const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
-    linkId,
-    setShowOverlayMenuPage,
-    setCollections,
-    collections,
-    activeCollection,
-    setActiveCollection,
+
+const ShareOverlayPage: React.FC = ({
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const {
+        linkId,
+        setShowOverlayMenuPage,
+        setCollections,
+        collections,
+        activeCollection,
+        setActiveCollection,
+    } = useAppContext();
 
     return (
         <OverlayMenuPage width="w-96" title="Share" onClose={() => setShowOverlayMenuPage(false)}>
@@ -68,8 +65,8 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                                     .eq('id', activeCollection?.id)
                                     .select()
 
-                                setCollections((prevValues: Collection[]) => {
-                                    return prevValues.map((value: Collection) => {
+                                setCollections(
+                                    collections.map((value: Collection) => {
                                         if (value.id === activeCollection?.id) {
                                             return {
                                                 ...value,
@@ -77,18 +74,15 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                                             };
                                         }
                                         return value;
-                                    });
-                                });
+                                    })
+                                );
 
-                                setActiveCollection((prevValue) => {
-                                    if (prevValue) {
-                                      return {
-                                        ...prevValue,
+                                setActiveCollection(
+                                    activeCollection ? {
+                                        ...activeCollection,
                                         shared: false,
-                                      };
-                                    }
-                                    return prevValue; // Ensure it returns the previous value if it's undefined
-                                  });
+                                      } : activeCollection,
+                                  );
                                   
                                 setShowOverlayMenuPage(false);
                             }}

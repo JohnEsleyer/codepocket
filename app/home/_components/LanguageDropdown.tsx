@@ -1,34 +1,27 @@
 import DropdownMenu from '@/app/_components/DropdownMenu';
 import React from 'react';
 import { Snippet } from '../types';
+import { useAppContext } from '@/app/_context/AppContext';
+import { languages } from '../constants';
+import supabase from '@/app/utils/supabase';
 
 
-interface LanguageDropdownProps {
-    buttonText: string;
-    languages: string[];
-    fullScreenSnippet: Snippet;
-    setSnippets: React.Dispatch<React.SetStateAction<Snippet[]>>;
-    setFullScreenSnippet: React.Dispatch<React.SetStateAction<Snippet>>;
-    supabase: any;
-}
 
-const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
-    buttonText,
-    languages,
-    fullScreenSnippet,
-    setSnippets,
-    setFullScreenSnippet,
-    supabase
-}) => {
+const LanguageDropdown: React.FC  = () => {
+
+    const {
+        fullScreenSnippet,
+        setSnippets,
+        snippets,
+        setFullScreenSnippet,
+    } = useAppContext();
+
     const handleLanguageChange = async (lang: string) => {
-        setSnippets((prevItems) =>
-            prevItems.map((item) =>
+        setSnippets(snippets.map((item) =>
                 item.id === fullScreenSnippet.id ? { ...item, language: lang } : item
             )
         );
-        setFullScreenSnippet((prevValue) => {
-            return { ...fullScreenSnippet, language: lang };
-        });
+        setFullScreenSnippet({ ...fullScreenSnippet, language: lang });
         const { error } = await supabase
             .from('snippet')
             .update({ language: lang })
@@ -40,7 +33,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
     };
 
     return (
-        <DropdownMenu buttonText={buttonText}>
+        <DropdownMenu buttonText={fullScreenSnippet.language}>
             <div className="h-44 grid grid-cols-1 w-24 bg-slate-100 overflow-y-auto">
                 {languages.map((lang, index) => (
                     <button key={index} onClick={() => handleLanguageChange(lang)}>
