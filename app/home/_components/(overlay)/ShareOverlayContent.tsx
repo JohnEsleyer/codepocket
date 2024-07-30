@@ -5,36 +5,35 @@ import IconButton from '@/app/_components/IconButton';
 import { handleDeleteLink } from '../../_utility/deleteData';
 import { Collection } from '../../types';
 import supabase from '@/app/utils/supabase';
+import { Copy, ExternalLink, GlobeLock } from 'lucide-react';
+import { LockKeyhole } from 'lucide-react';
+import { useAppContext } from '@/app/_context/AppContext';
 
-interface ShareOverlayPageProps {
-    linkId: string;
-    setShowOverlayMenuPage: (value: boolean) => void;
-    setCollections: Dispatch<SetStateAction<Collection[]>>;
-    collections: Collection[];
-    activeCollection: Collection | undefined;
-    setActiveCollection: Dispatch<SetStateAction<Collection | undefined>>;
-}
 
-const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
-    linkId,
-    setShowOverlayMenuPage,
-    setCollections,
-    collections,
-    activeCollection,
-    setActiveCollection,
+
+const ShareOverlayPage: React.FC = ({
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const {
+        linkId,
+        setShowOverlayMenuPage,
+        setCollections,
+        collections,
+        activeCollection,
+        setActiveCollection,
+    } = useAppContext();
 
     return (
         <OverlayMenuPage width="w-96" title="Share" onClose={() => setShowOverlayMenuPage(false)}>
             <div>
-                <p className="text-xl">Collection is now shared publicly.</p>
+                <p className="text-xl">Collection is shared publicly.</p>
                 <p>You can access it here:</p>
                 <input ref={inputRef} className="p-2 w-full border border-black rounded" value={`${window.location.hostname}/share/${linkId}`} readOnly />
                 <div className="flex gap-2">
                     <CopyToClipboard text={`${window.location.hostname}/share/${linkId}`}>
                         <IconButton
-                            icon="content_copy"
+                            icon={<Copy/>}
                             text="Copy"
                             onClick={() => {
                                 if (inputRef.current) {
@@ -46,17 +45,13 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                     </CopyToClipboard>
                     <div className="flex items-center">
                         <a href={`/share/${linkId}`} target="_blank" rel="noopener noreferrer">
-                            <IconButton icon="open_in_new" text="Visit" onClick={() => { }} />
+                            <IconButton icon={ <ExternalLink />}text="Visit" onClick={() => { }} />
                         </a>
                     </div>
-                    <div className="bg-black rounded p-1 m-2">
-                        <IconButton
-                            noBackground={true}
-                            isDark={true}
-                            icon="lock"
-                            textColor='slate'
-                            text="Set to private"
-                            disableHover={true}
+                    <div className="bg-black rounded p-1 m-2 flex text-white items-center">
+                        <GlobeLock/>
+                        <button
+                            className="p-2"
                             onClick={async () => {
                                 handleDeleteLink(linkId)
 
@@ -66,8 +61,8 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                                     .eq('id', activeCollection?.id)
                                     .select()
 
-                                setCollections((prevValues: Collection[]) => {
-                                    return prevValues.map((value: Collection) => {
+                                setCollections(
+                                    collections.map((value: Collection) => {
                                         if (value.id === activeCollection?.id) {
                                             return {
                                                 ...value,
@@ -75,23 +70,20 @@ const ShareOverlayPage: React.FC<ShareOverlayPageProps> = ({
                                             };
                                         }
                                         return value;
-                                    });
-                                });
+                                    })
+                                );
 
-                                setActiveCollection((prevValue) => {
-                                    if (prevValue) {
-                                      return {
-                                        ...prevValue,
+                                setActiveCollection(
+                                    activeCollection ? {
+                                        ...activeCollection,
                                         shared: false,
-                                      };
-                                    }
-                                    return prevValue; // Ensure it returns the previous value if it's undefined
-                                  });
+                                      } : activeCollection,
+                                  );
                                   
                                 setShowOverlayMenuPage(false);
                             }}
-                            elementAfterClick={<p className="pt-1">Copied!</p>}
-                        />
+                            
+                        > Set to private </button>
                     </div>
                 </div>
             </div>

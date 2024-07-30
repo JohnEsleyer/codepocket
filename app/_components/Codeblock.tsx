@@ -79,6 +79,7 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange, r
   }
     
     return (
+    
         <AceEditor
             //   className="bg-slate-50"
             height={full ? maxScreenHeight!-50 + "px" : "240px"}
@@ -106,6 +107,7 @@ const CodeBlock: React.FC<Props> = ({ codeValue, language, full, onCodeChange, r
                 scrollPastEnd: false,
             }}
         />
+
     );
 };
 

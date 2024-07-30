@@ -1,29 +1,34 @@
-import React, { Dispatch, SetStateAction } from 'react';
+'use client'
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Collection } from '../types';
+import { Folder, FolderCode, Trash2 } from 'lucide-react';
+import { useAppContext } from '@/app/_context/AppContext';
+import { handleDeleteCollection } from '../_utility/deleteData';
 
-interface CollectionsProps {
-  collections: any[];
-  setSelectedSnippetsId: (ids: any[]) => void;
-  setActiveCollection: (collection: any) => void;
-  activeCollection: any;
-  handleDeleteCollection: (value: any, setShowOverlayMenuPage: any, setCurrentOverlayMenuPage: any, setToDeleteCollection: any) => void;
-  setShowOverlayMenuPage: (show: boolean) => void;
-  setCurrentOverlayMenuPage: (page: string) => void;
-  setDisableSnippets: Dispatch<SetStateAction<boolean>>;
-}
+const Collections: React.FC = () => {
+  const {
+    collections, 
+    setSelectedSnippetsId,
+    setActiveCollection,
+    setDisableSnippets,
+    activeCollection,
+    setCurrentOverlayMenuPage,
+    setShowOverlayMenuPage,
+    activeWorkspace,
+    currentCollectionsLength,
+    setCurrentCollectionsLength,
+  } = useAppContext();
 
-const Collections: React.FC<CollectionsProps> = ({
-  collections,
-  setSelectedSnippetsId,
-  setActiveCollection,
-  activeCollection,
-  handleDeleteCollection,
-  setShowOverlayMenuPage,
-  setCurrentOverlayMenuPage,
-  setDisableSnippets,
-}) => (
+  
+  useEffect(() => {
+    setCurrentCollectionsLength(collections.filter((value) => ( value.workspace_id == activeWorkspace?.id)).length);
+  }, [activeWorkspace, collections]);
+
+  return (
+
   <div className="flex flex-col overflow-y-auto pl-2">
-    {collections.map((value, index) => (
+    <div>{currentCollectionsLength} / 10</div>
+    {collections.map((value, index) => ( value.workspace_id == activeWorkspace?.id && 
       <button
         key={index}
         className="flex justify-start"
@@ -37,14 +42,16 @@ const Collections: React.FC<CollectionsProps> = ({
           <div className="flex overflow-x-auto w-80">
             <div className="truncate flex">
               <div className="flex items-center">
-                <span className="material-symbols-outlined">folder</span>
+              <div className="pr-2">
+              <FolderCode />
+                </div>
               </div>
               <p className="truncate">{value.title}</p>
             </div>
           </div>
           <div className="flex-1 flex justify-end pr-2 ">
-            <button onClick={() => handleDeleteCollection(value, setShowOverlayMenuPage, setCurrentOverlayMenuPage, setActiveCollection)}>
-              <span className="material-symbols-outlined flex items-center">delete</span>
+            <button onClick={() => handleDeleteCollection(value, setCurrentOverlayMenuPage, setShowOverlayMenuPage)}>
+            <Trash2 />
             </button>
           </div>
         </div>
@@ -52,5 +59,6 @@ const Collections: React.FC<CollectionsProps> = ({
     ))}
   </div>
 );
+}
 
 export default Collections;

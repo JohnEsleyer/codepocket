@@ -1,6 +1,7 @@
 import supabase from "@/app/utils/supabase";
-import { Collection, Snippet } from "../types";
+import { Collection, Snippet, Workspace } from "../types";
 import { Dispatch, SetStateAction } from "react";
+import { useAppContext } from "@/app/_context/AppContext";
 
 // This handler does not execute from fullscreen mode, only preview.
 // Update snippet language
@@ -27,10 +28,10 @@ export const handleUpdateSnippetLanguage = async (
 export const handleUpdateSelectedSnippetLanguage = async (
     language: string,
     setSnippets: Dispatch<SetStateAction<Snippet[]>>,
-    selectedSnippetsId: number[],
+    selectedSnippetsId: number[]
 ) => {
-    setSnippets((prevItems) =>
-        prevItems.map((item) => {
+    setSnippets((snippets) => (
+        snippets.map((item) => {
             
             if (selectedSnippetsId.includes(item.id))
                  {  
@@ -39,6 +40,7 @@ export const handleUpdateSelectedSnippetLanguage = async (
             return item;
         }
         )
+    )
     );
 
     async function updateDbSnippets(snippetId: number){
@@ -61,12 +63,13 @@ export const handleUpdateSelectedSnippetLanguage = async (
 export const handleUpdateSnippetCode = async (
     value: Snippet,
     code: string,
-    setSnippets: Dispatch<SetStateAction<Snippet[]>>
+    setSnippets: Dispatch<SetStateAction<Snippet[]>>,
 ) => {
-    setSnippets((prevItems) =>
-        prevItems.map((item) =>
+    setSnippets((snippets) => (
+        snippets.map((item) =>
             item.id === value.id ? { ...item, code: code } : item
         )
+    )
     );
 
     const { error } = await supabase
@@ -85,10 +88,11 @@ export const handleUpdateSnippetDescription = async (
     value: Snippet,
     setSnippets: Dispatch<SetStateAction<Snippet[]>>
 ) => {
-    setSnippets((prevItems) =>
-        prevItems.map((item) =>
+    setSnippets((snippets) => (
+        snippets.map((item) =>
             item.id === value.id ? { ...item, description: event.target.value } : item
         )
+    )
     );
 
     const { error } = await supabase
@@ -107,10 +111,11 @@ export const handleUpdateSnippetTitle = async (
     value: Snippet,
     setSnippets: Dispatch<SetStateAction<Snippet[]>>
 ) => {
-    setSnippets((prevItems) =>
-        prevItems.map((item) =>
+    setSnippets((snippets) => (
+        snippets.map((item) =>
             item.id === value.id ? { ...item, title: event.target.value } : item
         )
+    )
     );
 
     const { error } = await supabase
@@ -126,17 +131,18 @@ export const handleUpdateSnippetTitle = async (
 // Update collection title
 export const handleUpdateCollectionTitle = async (
     event: React.ChangeEvent<HTMLInputElement>,
-    activeCollection: Collection | undefined,
     setCollections: Dispatch<SetStateAction<Collection[]>>,
-    setActiveCollection: Dispatch<SetStateAction<Collection | undefined>>
+    activeCollection: Collection | undefined, 
+    setActiveCollection: Dispatch<SetStateAction<Collection | undefined>>,
 ) => {
-    setCollections((prevItems) =>
-        prevItems.map((item) =>
+
+    setCollections((collections) => (
+        collections.map((item) =>
             item.id === activeCollection?.id ? { ...item, title: event.target.value } : item
         )
+    )
     );
-    setActiveCollection((prevValue) =>
-        prevValue ? { ...prevValue, title: event.target.value } : prevValue
+    setActiveCollection(activeCollection ? { ...activeCollection, title: event.target.value } : activeCollection
     );
 
     const { error } = await supabase
@@ -149,4 +155,61 @@ export const handleUpdateCollectionTitle = async (
     }
 };
 
+export const handleChangeWorkspace = async (
+    workspace: Workspace,
+    setWorkspaces: Dispatch<SetStateAction<Workspace[]>>,
+    setActiveWorkspace: Dispatch<SetStateAction<Workspace | undefined>>,
+    activeWorkspace: Workspace | undefined,
+) => {
 
+    // Update the data (backend)
+     await supabase
+    .from('workspace')
+    .update({ active: true })
+    .eq('id', workspace.id);
+
+    await supabase
+    .from('workspace')
+    .update({ active: false })
+    .eq('id', activeWorkspace?.id );
+
+    // Update activeWorkspace
+    setActiveWorkspace(workspace);
+
+    // Update the data (frontend)
+    setWorkspaces((values) => (
+        values.map((value) => {
+            if (value.id == workspace.id){
+                return {
+                    ...workspace,
+                    active: true,
+                }
+            }else{
+                return {
+                    ...value,
+                    active: false,
+                }
+            }
+        })
+    ));
+
+};
+
+
+export const updateWorkspaceName = async (
+    newName: string,
+    activeWorkspace: Workspace | undefined,
+) => {
+        
+    const { data, error } = await supabase
+    .from('workspace')
+    .update({ name: newName})
+    .eq('id', activeWorkspace?.id)
+    .select();
+
+    if (error){
+        console.log(error);
+    }
+
+        
+}

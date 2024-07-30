@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { ReactNode, SetStateAction } from 'react';
 import Image from 'next/image';
 import Loading from '/public/loading.svg';
+import { LucideProps } from 'lucide-react';
+import { Collection } from '../types';
 
 interface SidebarButtonProps {
-  icon: string;
+  icon: ReactNode;
   text: string;
   onClick?: () => void;
   loading?: boolean;
+  disableHover?: boolean;
 }
 
-const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, text, onClick, loading }) => {
+const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, text, onClick, loading, disableHover }) => {
   return (
-    <button className="p-1 hover:bg-slate-300" onClick={onClick}>
+    <button className={`p-1 ${disableHover ? '' : 'hover:bg-slate-300'}`} onClick={onClick}>
       <p className="flex items-center pl-2">
-        <span className="material-symbols-outlined">{icon}</span>
+        {icon}
+        <div className="pl-2">
         {text}
+        </div>
         {loading && (
           <span className="pl-2">
             <Image src={Loading} alt={''} width={30} height={30} />

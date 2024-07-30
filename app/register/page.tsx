@@ -5,6 +5,7 @@ import { useState } from "react";
 import supabase from "../utils/supabase";
 import { useRouter } from "next/navigation";
 import Loading from "/public/loading.svg";
+import { User } from "@supabase/supabase-js";
 
 type FormState = {
     email: string;
@@ -27,6 +28,17 @@ export default function Register() {
         [name]: value,
       }));
     };
+
+    const createDefaultWorkspace = async (user: User | null ) => {
+
+      const { data, error } = await supabase
+      .from('workspace')
+      .insert([
+        { name: user?.user_metadata.username + "'s workspace", active: true},
+      ])
+      .select()
+        
+    }
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -47,6 +59,8 @@ export default function Register() {
           }
         }
       });
+
+      createDefaultWorkspace(data.user);
 
 
       if (!error) {
